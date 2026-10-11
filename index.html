@@ -536,7 +536,9 @@ function applyTheme(){ document.documentElement.dataset.theme = state.theme;
 const map = L.map("map", { zoomControl:false, attributionControl:true }).setView([15.0, 76.6], 7);
 L.control.zoom({ position:"bottomright" }).addTo(map);
 map.attributionControl.setPrefix(false);
-const cartoURL = kind => "https://{s}.basemaps.cartocdn.com/rastertiles/" + kind + "/{z}/{x}/{y}@2x.png" + (state.cartoKey ? "?key=" + encodeURIComponent(state.cartoKey) : "");
+const CARTO_BUILTIN_KEY = "cb1_4hc8_1_48c9852a02ec4b6d8ea710ad"; /* temporary test key */
+const cartoKeyEff = () => (state.cartoKey || "").trim() || CARTO_BUILTIN_KEY;
+const cartoURL = kind => "https://{s}.basemaps.cartocdn.com/rastertiles/" + kind + "/{z}/{x}/{y}@2x.png?key=" + encodeURIComponent(cartoKeyEff());
 const layers = {
   streets: L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom:19, attribution:"© OpenStreetMap contributors" }),
   satellite: L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom:19, attribution:"Imagery © Esri" }),
@@ -547,9 +549,9 @@ const layers = {
 layers.streets.addTo(map);
 let curLayer = "streets";
 /* temporary map-style test: A = current layers, B = CARTO (Voyager light / Dark Matter dark) */
-function applyBaseLayer(){
-  layers.cartoLight.setUrl(cartoURL("voyager"));
-  layers.cartoDark.setUrl(cartoURL("dark_all"));
+function applyBaseLayer(force){
+  layers.cartoLight.setUrl(cartoURL("voyager"), force ? false : undefined);
+  layers.cartoDark.setUrl(cartoURL("dark_all"), force ? false : undefined);
   const b = state.mapStyle === "b" ? (state.theme === "dark" ? "cartoDark" : "cartoLight") : curLayer;
   Object.keys(layers).forEach(k => { if (map.hasLayer(layers[k])) map.removeLayer(layers[k]); });
   layers[b].addTo(map);
@@ -922,7 +924,7 @@ function syncMapStyleSeg(){ document.querySelectorAll("#mapStyleSeg .seg").forEa
 document.querySelectorAll("#mapStyleSeg .seg").forEach(b => b.onclick = () => { state.mapStyle = b.dataset.ms; save(); applyBaseLayer(); syncMapStyleSeg(); });
 syncMapStyleSeg();
 $("cartoKey").value = state.cartoKey || "";
-$("cartoKeySave").onclick = () => { state.cartoKey = $("cartoKey").value.trim(); save(); applyBaseLayer(); toast(state.cartoKey ? "CARTO key saved on this device." : "CARTO key cleared."); };
+$("cartoKeySave").onclick = () => { state.cartoKey = $("cartoKey").value.trim(); save(); applyBaseLayer(true); toast(state.cartoKey ? "CARTO key saved on this device." : "CARTO key cleared."); };
 $("btnReset").onclick = () => {
   if (!confirm("Reset all progress? This clears your visited and planned lists on this device.")) return;
   state.visited = {}; state.planned = {}; state.milestones = []; save();
