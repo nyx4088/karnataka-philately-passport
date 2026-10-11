@@ -324,6 +324,11 @@ h3.sec{font-size:17px;margin:22px 0 10px;letter-spacing:.5px}
 .tile .pcam.has{background:var(--collected);border-color:var(--collected);color:#fff}
 .meter{height:8px;border-radius:4px;background:var(--border);overflow:hidden;margin:8px 0 4px}
 .meter i{display:block;height:100%;background:var(--brand);border-radius:4px;transition:width .3s}
+.segrow{display:flex;gap:8px;margin:4px 0 8px}
+.segrow .seg{flex:1;min-height:48px;border-radius:12px;border:1.5px solid var(--border-strong);background:transparent;color:var(--ink);font-size:14px;font-weight:700;cursor:pointer}
+.segrow .seg.on{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.checkrow{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;margin:6px 0;cursor:pointer}
+.checkrow input{width:20px;height:20px;accent-color:var(--brand)}
 
 /* toggle */
 .togglerow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 2px;font-size:14px;font-weight:600}
@@ -437,7 +442,12 @@ html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,
     <div class="card" id="districtProg" style="padding:8px 14px"></div>
     <h3 class="sec">Share &amp; backup</h3>
     <div class="card">
-      <div class="actionrow" style="margin-top:0">
+      <div class="segrow" id="shareFmt" role="group" aria-label="Share card format">
+        <button class="seg on" data-fmt="post">Post · 4:5</button>
+        <button class="seg" data-fmt="story">Story · 9:16</button>
+      </div>
+      <label class="checkrow"><input type="checkbox" id="sharePhotos" checked> <span>Include my stamp photos</span></label>
+      <div class="actionrow" style="margin-top:10px">
         <button class="btn accent" id="btnShare">Share my journey</button>
       </div>
       <div class="actionrow">
@@ -1137,6 +1147,105 @@ function renderDistricts(){
 
 /* share card */
 function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function shareColors(){
+  const dark = state.theme==="dark";
+  return {
+    paper:cssVar("--paper")||(dark?"#16120F":"#F3EBD8"),
+    ink:cssVar("--ink")||(dark?"#F3EDE0":"#1F1B16"),
+    ink2:cssVar("--ink-2")||(dark?"#B9AF9F":"#54493C"),
+    brand:cssVar("--brand")||(dark?"#F0707A":"#A91F26"),
+    subtle:cssVar("--border-subtle")||(dark?"#3A322A":"#D9CFB4"),
+    collected:cssVar("--collected")||(dark?"#6FCB9A":"#2B6A46")
+  };
+}
+function topDistricts(){
+  const byD = {};
+  LOCATIONS.forEach(l => {
+    if (!byD[l.district]) byD[l.district] = { total:0, done:0 };
+    byD[l.district].total++;
+    if (state.visited[l.n]) byD[l.district].done++;
+  });
+  return Object.entries(byD).map(([d,v]) => ({ d, ...v }))
+    .filter(x => x.done > 0).sort((a,b) => b.done - a.done || b.done/b.total - a.done/a.total).slice(0,3);
+}
+async function recentPhotos(limit){
+  try {
+    const db = await photoDB();
+    return new Promise((res) => {
+      const out = [];
+      const tx = db.transaction("photos", "readonly");
+      const cur = tx.objectStore("photos").openCursor();
+      cur.onsuccess = () => {
+        const c = cur.result;
+        if (c){ out.push(c.value); c.continue(); }
+        else res(out.sort((a,b) => b.addedAt - a.addedAt).slice(0, limit));
+      };
+      cur.onerror = () => res([]);
+    });
+  } catch(e){ return []; }
+}
+function drawPostmark(x, cx, cy, r, brand){
+  x.strokeStyle = brand; x.lineWidth = r*0.055;
+  x.beginPath(); x.arc(cx, cy, r, 0, 7); x.stroke();
+  x.lineWidth = r*0.02; x.beginPath(); x.arc(cx, cy, r*0.74, 0, 7); x.stroke();
+}
+async function drawStoryCard(withPhotos){
+  const W=1080, H=1920, cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+  const x=cv.getContext("2d"), C=shareColors();
+  const FD='Fraunces,Georgia,serif', FS='DM Sans,system-ui,sans-serif', FM='DM Mono,ui-monospace,monospace';
+  x.fillStyle=C.paper; x.fillRect(0,0,W,H);
+  x.strokeStyle=C.subtle; x.lineWidth=3; x.strokeRect(40,40,W-80,H-80);
+  // content lives between y=250 and y=1670 (top/bottom 250px clear)
+  const cx=W/2, c=visitedCount();
+  drawPostmark(x, cx, 420, 95, C.brand);
+  x.save(); x.translate(cx,420); x.rotate(-0.12);
+  x.fillStyle=C.brand; x.font="600 56px "+FD; x.textAlign="center"; x.fillText("100",0,20); x.restore();
+  x.fillStyle=C.ink; x.textAlign="center"; x.font="600 50px "+FD;
+  x.fillText("MY PHILATELY JOURNEY", cx, 600);
+  x.font="600 170px "+FD; x.fillStyle=C.brand; x.fillText(c+"", cx, 800);
+  x.font="400 40px "+FS; x.fillStyle=C.ink2; x.fillText("of 100 post offices", cx, 860);
+  // progress bar
+  const bw=W-360; x.fillStyle=C.subtle; x.fillRect((W-bw)/2, 910, bw, 24);
+  x.fillStyle=C.collected; x.fillRect((W-bw)/2, 910, bw*c/100, 24);
+  // 100-dot grid (10x10)
+  const dotR=16, gap=56, gw=9*gap, gx0=cx-gw/2, gy0=1000;
+  LOCATIONS.forEach((l,i) => {
+    const dx=gx0+(i%10)*gap, dy=gy0+Math.floor(i/10)*gap;
+    x.beginPath(); x.arc(dx,dy,dotR,0,7);
+    if (state.visited[l.n]){ x.fillStyle=C.collected; x.fill(); }
+    else { x.strokeStyle=C.subtle; x.lineWidth=2.5; x.stroke(); }
+  });
+  // top districts
+  const tops=topDistricts();
+  x.font="600 34px "+FS; x.fillStyle=C.ink2; x.fillText("TOP DISTRICTS", cx, 1640-180);
+  x.font="500 36px "+FS; x.fillStyle=C.ink;
+  tops.forEach((t,i) => x.fillText(t.d+" · "+t.done+"/"+t.total, cx, 1640-130+i*52));
+  // stamp photos strip
+  if (withPhotos){
+    const photos=await recentPhotos(5);
+    if (photos.length){
+      const pw=170, ph=170, pgap=20, tw=photos.length*pw+(photos.length-1)*pgap, tx0=cx-tw/2, ty=1330;
+      x.font="600 30px "+FS; x.fillStyle=C.ink2; x.fillText("LATEST STAMPS", cx, ty-24);
+      for (let i=0;i<photos.length;i++){
+        try {
+          const bmp=await createImageBitmap(photos[i].thumb);
+          x.save();
+          x.beginPath(); x.rect(tx0+i*(pw+pgap), ty, pw, ph); x.clip();
+          const s=Math.max(pw/bmp.width, ph/bmp.height);
+          x.drawImage(bmp, tx0+i*(pw+pgap)-(bmp.width*s-pw)/2, ty-(bmp.height*s-ph)/2, bmp.width*s, bmp.height*s);
+          x.restore();
+          x.strokeStyle=C.subtle; x.lineWidth=2; x.strokeRect(tx0+i*(pw+pgap), ty, pw, ph);
+        } catch(e){}
+      }
+    }
+  }
+  // footer (above bottom clear zone)
+  x.font="600 38px "+FD; x.fillStyle=C.ink; x.fillText("STAMPQUEST", cx, 1560);
+  x.font="400 28px "+FS; x.fillStyle=C.ink2;
+  const url=(location.origin+location.pathname).replace(/^https?:\/\//,"");
+  x.fillText(url, cx, 1605);
+  return cv;
+}
 function drawShareCard(){
   const W=1080,H=1350,cv=document.createElement("canvas");cv.width=W;cv.height=H;
   const x=cv.getContext("2d"), dark = state.theme==="dark";
@@ -1172,17 +1281,25 @@ function drawShareCard(){
   x.font="italic 400 30px "+FD; x.fillText("Every stamp tells a story.", W/2, 1180);
   return cv;
 }
+let shareFmt = "post";
+document.querySelectorAll("#shareFmt .seg").forEach(b => b.onclick = () => {
+  shareFmt = b.dataset.fmt;
+  document.querySelectorAll("#shareFmt .seg").forEach(x => x.classList.toggle("on", x === b));
+});
 $("btnShare").onclick = async () => {
   try { await document.fonts.ready; } catch(e){}
-  const cv = drawShareCard();
+  const withPhotos = $("sharePhotos").checked;
+  const cv = shareFmt === "story" ? await drawStoryCard(withPhotos) : drawShareCard();
   const blob = await new Promise(r => cv.toBlob(r,"image/png"));
-  const file = new File([blob],"stampquest-journey.png",{type:"image/png"});
+  const fname = shareFmt === "story" ? "stampquest-story.png" : "stampquest-journey.png";
+  const file = new File([blob], fname, {type:"image/png"});
   if (navigator.canShare && navigator.canShare({ files:[file] })){
     try{ await navigator.share({ files:[file], title:"My StampQuest journey", text:"I've collected "+visitedCount()+" of 100 Karnataka Philately Passport stamps!" }); return; }
     catch(e){ if (e && e.name === "AbortError") return; }
   }
-  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="stampquest-journey.png"; a.click();
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=fname; a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+  toast("Card downloaded.");
   toast("Progress card downloaded — share it anywhere.");
 };
 
