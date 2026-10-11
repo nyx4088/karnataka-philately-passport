@@ -311,6 +311,19 @@ h3.sec{font-size:17px;margin:22px 0 10px;letter-spacing:.5px}
 .faq details[open] summary:after{content:"–"}
 .faq .a{font-size:13px;color:var(--ink-2);line-height:1.55;margin-top:8px}
 .faq .a b{color:var(--ink)}
+/* ---------- Stamp photos (Part 6/7) ---------- */
+.photosec{margin:12px 0;padding:12px;border:1.5px dashed var(--border-strong);border-radius:12px;text-align:center}
+.photosec .thumb{width:100%;max-height:180px;object-fit:cover;border-radius:8px;display:block}
+.photosec .prow{display:flex;gap:8px;margin-top:10px}
+.photosec .prow .btn{flex:1}
+#toast button{margin-left:10px;background:transparent;border:1px solid currentColor;border-radius:8px;
+  color:inherit;font:inherit;font-size:13px;font-weight:700;padding:4px 10px;cursor:pointer}
+.tile .pcam{position:absolute;left:4px;bottom:6px;width:24px;height:24px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;
+  font-size:12px;cursor:pointer;padding:0}
+.tile .pcam.has{background:var(--collected);border-color:var(--collected);color:#fff}
+.meter{height:8px;border-radius:4px;background:var(--border);overflow:hidden;margin:8px 0 4px}
+.meter i{display:block;height:100%;background:var(--brand);border-radius:4px;transition:width .3s}
 
 /* toggle */
 .togglerow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 2px;font-size:14px;font-weight:600}
@@ -431,7 +444,11 @@ html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,
         <button class="btn ghost" id="btnExport" style="flex:1">Export backup</button>
         <label class="btn ghost filebtn" style="flex:1;text-align:center">Import backup<input type="file" id="fileImport" accept="application/json"></label>
       </div>
-      <div class="note" style="margin-top:10px">Your progress lives only in this browser. Export a backup file before clearing browser data or switching devices.</div>
+      <div class="note" style="margin-top:10px">Your progress lives only in this browser. Export a backup file before clearing browser data or switching devices. Stamp photos are stored on this device only and are <b>not</b> included in the JSON backup.</div>
+    </div>
+    <h3 class="sec">Stamp photos</h3>
+    <div class="card">
+      <div id="photoMeter"></div>
     </div>
   </div>
 </section>
@@ -536,6 +553,8 @@ html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,
 
 <div id="toast" role="status"></div>
 
+<input type="file" id="photoCam" accept="image/*" capture="environment" style="display:none" aria-hidden="true">
+<input type="file" id="photoGal" accept="image/*" style="display:none" aria-hidden="true">
 <div id="firstrun">
   <div class="card tcard">
     <div class="ttrack" id="tTrack">
@@ -745,6 +764,7 @@ function renderSheetBody(l){
       ppc +
       '<div class="kv"><span class="k">GETTING THERE</span><span class="v">Via '+esc(l.transit_town)+'<span class="sub">Nearest transit town — indicative only</span></span></div>'+
       vline +
+      '<div class="photosec" id="photoSec"></div>'+
       '<div class="actionrow">'+
         '<a class="btn ghost" style="flex:1;text-decoration:none;text-align:center" target="_blank" rel="noopener" href="'+gmapsPhotos(l)+'">Photos</a>'+
         '<button class="btn ghost" id="btnPlanned" style="flex:1">'+(st==="planned"?"★ Planned":"Plan to visit")+'</button>'+
@@ -756,9 +776,12 @@ function renderSheetBody(l){
     '</div>';
   $("sheetFoot").innerHTML =
     '<a class="btn primary" style="text-decoration:none;text-align:center" target="_blank" rel="noopener" href="'+gmapsSearch(l)+'">Directions</a>'+
-    '<button class="btn accent" id="btnVisited">'+(st==="visited"?"✓ Visited":"Mark visited")+'</button>';
+    (st === "visited"
+      ? '<button class="btn ghost" id="btnVisited">Unmark visited</button>'
+      : '<button class="btn ghost" id="btnVisited">Mark visited without photo</button>');
   $("btnVisited").onclick = () => toggleVisited(l.n);
   $("btnPlanned").onclick = () => togglePlanned(l.n);
+  renderPhotoSection(l);
 }
 function stampPop(){
   const c = $("stampCard"); if (!c) return;
@@ -767,7 +790,8 @@ function stampPop(){
 }
 function toggleVisited(n){
   const was = !!state.visited[n];
-  if (was) delete state.visited[n]; else { state.visited[n] = true; delete state.planned[n]; }
+  if (was) delete state.visited[n];
+  else { state.visited[n] = new Date().toISOString().slice(0, 10); delete state.planned[n]; }
   save(); refreshMarker(n); renderSheetBody(byN[n]); renderProgress(); renderGrid(); renderDistricts(); renderSaved();
   if (!was){ stampPop(); checkMilestones(); toast("Stamped! " + visitedCount() + " of 100 collected."); }
   else toast("Removed from visited.");
@@ -785,6 +809,184 @@ function checkMilestones(){
       toast(m === 100 ? "INCREDIBLE — all 100 stamps collected!" : m + " stamps! Milestone reached."); }
   });
 }
+
+/* ================= Stamp photos (Part 6/7) ================= */
+const PHOTO_CAP = 25 * 1024 * 1024; // 25MB
+let photoTargetN = null;
+
+function toastAction(msg, label, fn){
+  const t = $("toast");
+  t.innerHTML = "";
+  t.appendChild(document.createTextNode(msg));
+  const b = document.createElement("button");
+  b.textContent = label;
+  b.onclick = () => { t.classList.remove("show"); fn(); };
+  t.appendChild(b);
+  t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove("show"), 5000);
+}
+
+/* IndexedDB: photos live on-device only, never in JSON backup */
+function photoDB(){
+  return new Promise((res, rej) => {
+    const r = indexedDB.open("stampquest_photos", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("photos", { keyPath:"n" });
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  });
+}
+async function photoGet(n){
+  const db = await photoDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction("photos", "readonly");
+    const q = tx.objectStore("photos").get(n);
+    q.onsuccess = () => res(q.result || null);
+    q.onerror = () => rej(q.error);
+  });
+}
+async function photoPut(rec){
+  const db = await photoDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction("photos", "readwrite");
+    tx.objectStore("photos").put(rec);
+    tx.oncomplete = () => res();
+    tx.onerror = () => rej(tx.error);
+  });
+}
+async function photoDel(n){
+  const db = await photoDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction("photos", "readwrite");
+    tx.objectStore("photos").delete(n);
+    tx.oncomplete = () => res();
+    tx.onerror = () => rej(tx.error);
+  });
+}
+async function photoTotalBytes(){
+  const db = await photoDB();
+  return new Promise((res, rej) => {
+    let total = 0;
+    const tx = db.transaction("photos", "readonly");
+    const cur = tx.objectStore("photos").openCursor();
+    cur.onsuccess = () => {
+      const c = cur.result;
+      if (c){ total += (c.value.full?.size || 0) + (c.value.thumb?.size || 0); c.continue(); }
+      else res(total);
+    };
+    cur.onerror = () => rej(cur.error);
+  });
+}
+async function photoHas(n){ return !!(await photoGet(n)); }
+
+/* Resize + JPEG + EXIF strip (canvas redraw drops EXIF) */
+function resizeBlob(file, maxPx, quality){
+  return new Promise((res, rej) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const s = Math.min(1, maxPx / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      c.toBlob(b => b ? res(b) : rej(new Error("encode")), "image/jpeg", quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error("decode")); };
+    img.src = url;
+  });
+}
+
+function openPhotoPicker(n){
+  photoTargetN = n;
+  const existing = document.getElementById("photoChoice");
+  if (existing) existing.remove();
+  const d = document.createElement("div");
+  d.id = "photoChoice"; d.className = "layersheet";
+  d.style.cssText = "position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);right:auto;z-index:960;min-width:220px;display:block";
+  d.innerHTML = '<button id="pcCam">Take photo</button><button id="pcGal">Choose from gallery</button><button id="pcCancel">Cancel</button>';
+  document.body.appendChild(d);
+  $("pcCam").onclick = () => { d.remove(); $("photoCam").click(); };
+  $("pcGal").onclick = () => { d.remove(); $("photoGal").click(); };
+  $("pcCancel").onclick = () => d.remove();
+}
+$("photoCam").addEventListener("change", e => { if (e.target.files[0]) handlePhotoFile(photoTargetN, e.target.files[0]); e.target.value = ""; });
+$("photoGal").addEventListener("change", e => { if (e.target.files[0]) handlePhotoFile(photoTargetN, e.target.files[0]); e.target.value = ""; });
+
+async function handlePhotoFile(n, file){
+  if (!n || !file || !file.type.startsWith("image/")) return;
+  toast("Processing photo…");
+  try {
+    const full = await resizeBlob(file, 1000, 0.8);
+    const thumb = await resizeBlob(file, 300, 0.75);
+    const used = await photoTotalBytes();
+    const old = await photoGet(n);
+    const oldSize = old ? (old.full.size + old.thumb.size) : 0;
+    if (used - oldSize + full.size + thumb.size > PHOTO_CAP){
+      toast("Photo storage is full (25MB). Remove a photo to add more.");
+      return;
+    }
+    const wasVisited = !!state.visited[n];
+    const wasPlanned = !!state.planned[n];
+    await photoPut({ n, full, thumb, addedAt: Date.now() });
+    // auto-mark visited with date; planned -> visited
+    const today = new Date().toISOString().slice(0, 10);
+    state.visited[n] = today;
+    delete state.planned[n];
+    save();
+    refreshMarker(n); renderSheetBody(byN[n]); renderProgress(); renderGrid(); renderDistricts(); renderSaved();
+    if (!wasVisited){ stampPop(); checkMilestones(); }
+    toastAction("Marked visited. Undo", "Undo", async () => {
+      await photoDel(n);
+      if (!wasVisited) delete state.visited[n];
+      if (wasPlanned) state.planned[n] = true;
+      save();
+      refreshMarker(n); renderSheetBody(byN[n]); renderProgress(); renderGrid(); renderDistricts(); renderSaved();
+      toast("Photo removed, visit undone.");
+    });
+  } catch(err){
+    toast("Couldn't read that photo. Try another.");
+  }
+}
+
+async function removePhoto(n){
+  if (!confirm("Remove this stamp photo? Your visited mark stays.")) return;
+  await photoDel(n);
+  save(); renderSheetBody(byN[n]); renderGrid(); renderPhotoMeter();
+  toast("Photo removed.");
+}
+
+async function renderPhotoSection(l){
+  const el = document.getElementById("photoSec");
+  if (!el) return;
+  const rec = await photoGet(l.n);
+  if (rec){
+    const url = URL.createObjectURL(rec.thumb);
+    el.innerHTML = '<img class="thumb" alt="Your stamp photo">'+
+      '<div class="prow"><button class="btn ghost" id="btnPhotoRm">Remove photo</button></div>';
+    el.querySelector(".thumb").src = url;
+    $("btnPhotoRm").onclick = () => removePhoto(l.n);
+  } else {
+    el.innerHTML = '<button class="btn primary" id="btnPhotoAdd" style="width:100%">Add stamp photo</button>'+
+      '<div class="note" style="margin-top:6px">Take or pick a photo — the office is marked visited automatically.</div>';
+    $("btnPhotoAdd").onclick = () => openPhotoPicker(l.n);
+  }
+}
+
+async function renderPhotoMeter(){
+  const el = document.getElementById("photoMeter");
+  if (!el) return;
+  try {
+    const used = await photoTotalBytes();
+    const pct = Math.min(100, used / PHOTO_CAP * 100);
+    el.innerHTML = '<div class="meter"><i style="width:'+pct.toFixed(1)+'%"></i></div>'+
+      '<div class="note">'+(used/1048576).toFixed(1)+' MB of 25 MB used · stored on this device only, not included in JSON backups</div>';
+  } catch(e){
+    el.innerHTML = '<div class="note">Photo storage unavailable on this browser.</div>';
+  }
+}
+
+/* ask the browser to persist storage */
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(()=>{});
 
 /* ================= search ================= */
 const sInput = $("searchInput"), sBox = $("searchResults"), sClear = $("searchClear");
@@ -865,6 +1067,7 @@ function switchTab(name){
   if (name === "passport"){ renderProgress(); renderGrid(); renderDistricts(); }
   if (name === "saved") renderSaved();
   if (name === "circuits") renderCircuits();
+  if (name === "settings") renderPhotoMeter();
 }
 document.querySelectorAll("#nav button").forEach(b => b.onclick = () => switchTab(b.dataset.tab));
 $("progChip").onclick = () => switchTab("passport");
@@ -918,9 +1121,10 @@ function renderGrid(){
     const st = statusOf(l.n);
     const pm = st === "visited" ? '<span class="postmark">'+esc(l.district)+'</span>' : "";
     const ck = st === "visited" ? '<span class="check" aria-hidden="true">✓</span>' : "";
-    return '<button class="tile '+st+'" data-n="'+l.n+'" aria-label="'+l.n+". "+esc(l.name)+", "+st+'"><span class="tno">'+l.n+'</span><span class="nm">'+esc(l.name)+'</span>'+ck+pm+'</button>';
+    return '<button class="tile '+st+'" data-n="'+l.n+'" aria-label="'+l.n+". "+esc(l.name)+", "+st+'"><span class="tno">'+l.n+'</span><span class="nm">'+esc(l.name)+'</span>'+ck+pm+'<span class="pcam" data-n="'+l.n+'" role="button" aria-label="Add stamp photo" title="Add stamp photo">📷</span></button>';
   }).join("");
   g.querySelectorAll(".tile").forEach(t => t.onclick = () => { switchTab("explore"); openLocation(+t.dataset.n); });
+  g.querySelectorAll(".pcam").forEach(b => b.onclick = e => { e.stopPropagation(); openPhotoPicker(+b.dataset.n); });
 }
 function renderDistricts(){
   const seen = []; LOCATIONS.forEach(l => { if (!seen.includes(l.district)) seen.push(l.district); });
