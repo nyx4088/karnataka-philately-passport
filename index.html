@@ -54,7 +54,7 @@ html[data-theme="dark"]{
   --border-strong:#8C8272; --border-subtle:#3A322A;
   --brand:#F0707A; --brand-hover:#F58D95; --on-brand:#16120F; --focus:#F3EDE0;
   --collected:#6FCB9A; --planned:#E8B84A; --error:#F0707A;
-  --locked-fill:#2C251F;
+  --locked-fill:#3E3226;
   --mapbg:#14100D;
   --shadow:0 2px 12px rgba(0,0,0,.5);
 }
@@ -132,7 +132,7 @@ body.sheet-open .mapctl{display:none}
   font-family:var(--font-mono);font-weight:500;border:2px solid var(--paper);box-shadow:0 1px 6px rgba(0,0,0,.35)}
 
 /* ---------- bottom sheet ---------- */
-#sheet{position:fixed;z-index:700;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--border-subtle);
+#sheet{position:fixed;z-index:700;left:0;right:0;bottom:calc(70px + env(safe-area-inset-bottom));background:var(--surface);border-top:1px solid var(--border-subtle);
   border-radius:20px 20px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.18);transform:translateY(105%);
   transition:transform .32s ease,background-color .6s ease;max-height:82vh;display:flex;flex-direction:column}
 #sheet.open{transform:translateY(0)}
@@ -164,6 +164,7 @@ body.sheet-open .mapctl{display:none}
 .kv .v{text-align:right;font-weight:600}
 .kv .v .sub{display:block;font-weight:400;color:var(--ink-2);font-size:12px;margin-top:2px}
 .hintline{font-size:12px;color:var(--ink-2);font-style:italic;margin-top:8px}
+.hintline.ok{color:var(--collected);font-style:normal;font-weight:700}
 .linkrow{display:flex;justify-content:space-between;gap:12px;margin-top:10px;flex-wrap:wrap}
 .linkrow a{font-size:12px;color:var(--brand-2);text-decoration:underline;text-underline-offset:2px}
 .actionrow{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
@@ -244,10 +245,10 @@ h3.sec{font-size:17px;margin:22px 0 10px;letter-spacing:.5px}
   --hole:radial-gradient(circle 4px,#000 4px,transparent 4.6px);
   -webkit-mask:var(--hole) left top/20px 12px repeat-x,var(--hole) left bottom/20px 12px repeat-x,
     var(--hole) left top/12px 20px repeat-y,var(--hole) right top/12px 20px repeat-y,linear-gradient(#000,#000);
-  -webkit-mask-composite:destination-out;
+  -webkit-mask-composite:xor;
   mask:var(--hole) left top/20px 12px repeat-x,var(--hole) left bottom/20px 12px repeat-x,
     var(--hole) left top/12px 20px repeat-y,var(--hole) right top/12px 20px repeat-y,linear-gradient(#000,#000);
-  mask-composite:subtract}
+  mask-composite:exclude}
 .tile .tno{font-family:var(--font-mono);font-weight:500;font-size:12px;color:var(--ink-2)}
 .tile .nm{overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
   overflow-wrap:anywhere;min-width:0;font-size:12px}
@@ -447,7 +448,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,
   <div class="handle" id="sheetHandle"></div>
   <div class="sheet-head">
     <div class="info">
-      <div class="no" id="shNo">Nº —</div>
+      <div class="no" id="shNo">No. —</div>
       <h2 id="shName">—</h2>
       <div class="meta" id="shMeta">—</div>
       <span class="badge unvisited" id="shBadge">UNVISITED</span>
@@ -574,7 +575,7 @@ function openLocation(n, opts){
   if (selectedN && markers[selectedN]) refreshMarker(selectedN);
   selectedN = n;
   refreshMarker(n);
-  $("shNo").textContent = "Nº " + l.n;
+  $("shNo").textContent = "No. " + l.n;
   $("shName").textContent = fullName(l);
   $("shMeta").textContent = (l.pin + " · " + l.district).toUpperCase();
   renderSheetBody(l);
@@ -593,7 +594,9 @@ function renderSheetBody(l){
   let ppc = "";
   if (l.ppc) ppc = '<div class="kv"><span class="k">CANCELLATION</span><span class="v">'+esc(l.ppc.motif)+'<span class="sub">Introduced '+esc(l.ppc.introduced)+'</span></span></div>';
   const office = l.office_type_full ? esc(l.office_type_full) : "Office type unknown";
-  const approx = l.approx ? '<div class="hintline">Approximate location — pinned to the town centre.</div>' : "";
+  const vline = l.verified === "approx"
+    ? '<div class="hintline">Approximate location — pinned to the town centre.</div>'
+    : '<div class="hintline ok">Location confirmed.</div>';
   $("sheetBody").innerHTML =
     '<div class="stampcard" id="stampCard">'+
       '<div class="kv"><span class="k">OFFICE</span><span class="v">'+office+'</span></div>'+
@@ -602,7 +605,7 @@ function renderSheetBody(l){
       '<div class="kv"><span class="k">SETTING</span><span class="v">'+esc(LANDSCAPE_LABEL[l.landscape] || l.landscape)+'</span></div>'+
       ppc +
       '<div class="kv"><span class="k">GETTING THERE</span><span class="v">Via '+esc(l.transit_town)+'<span class="sub">Nearest transit town — indicative only</span></span></div>'+
-      approx +
+      vline +
       '<div class="actionrow">'+
         '<a class="btn ghost" style="flex:1;text-decoration:none;text-align:center" target="_blank" rel="noopener" href="'+gmapsPhotos(l)+'">Photos</a>'+
         '<button class="btn ghost" id="btnPlanned" style="flex:1">'+(st==="planned"?"★ Planned":"Plan to visit")+'</button>'+
@@ -714,6 +717,9 @@ function showNearby(){
 function switchTab(name){
   document.querySelectorAll("#nav button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
   document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === "view-"+name));
+  if (name !== "explore" && sheet.classList.contains("open")){
+    const n = selectedN; closeSheet(); if (n && markers[n]) refreshMarker(n);
+  }
   if (name === "explore"){ setTimeout(()=>map.invalidateSize(), 60); }
   if (name === "passport"){ renderProgress(); renderGrid(); renderDistricts(); }
   if (name === "saved") renderSaved();
