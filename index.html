@@ -75,6 +75,20 @@ h1,.wm,.explored,.pagehead h1,.sheet-head h2{font-family:var(--font-display);fon
 /* ---------- explore / map ---------- */
 #map{position:absolute;inset:0;background:var(--mapbg);z-index:0}
 html[data-theme="dark"] #map .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.94)}
+/* ---------- Karnataka fog (Part 4 v2) ---------- */
+:root{--fog:#E4DBC4}
+html[data-theme="dark"]{--fog:#2C251F}
+.fog-poly{fill:var(--fog)!important;stroke:none!important}
+.ka-border{fill:none!important;stroke:var(--brand)!important;stroke-width:1.5}
+.fog-texture{position:absolute;inset:0;pointer-events:none;z-index:450;opacity:.07;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.014' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.42 0 0 0 0 0.38 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='280' height='280' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:fogdrift 110s linear infinite}
+@keyframes fogdrift{to{background-position:420px 210px}}
+@media (prefers-reduced-motion:reduce){.fog-texture{animation:none}}
+.fog-label{background:transparent!important;border:0!important;box-shadow:none!important;
+  color:var(--ink-2)!important;font-family:var(--font-sans)!important;font-size:11px!important;
+  letter-spacing:2.5px!important;text-transform:uppercase;white-space:nowrap}
+.fog-label:before{display:none!important}
 .topbar{position:relative;z-index:500;padding:calc(10px + env(safe-area-inset-top)) 12px 0;pointer-events:none}
 .topbar>*{pointer-events:auto}
 .brand{display:inline-flex;align-items:center;gap:10px;background:var(--surface);
@@ -346,6 +360,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,
   <div class="mapctl">
     <button id="btnLayers" aria-label="Change map view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg><span class="cap">Layers</span></button>
     <button id="btnLocate" aria-label="Find nearest to me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="2" x2="5" y1="12" y2="12"/><line x1="19" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="5"/><line x1="12" x2="12" y1="19" y2="22"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/></svg><span class="cap">Near me</span></button>
+    <button id="btnReset" aria-label="Reset map view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span class="cap">Reset</span></button>
   </div>
   <div class="layersheet" id="layerSheet">
     <button data-layer="streets" class="on">Streets</button>
@@ -515,10 +530,12 @@ function applyTheme(){ document.documentElement.dataset.theme = state.theme;
 const map = L.map("map", { zoomControl:false, attributionControl:true }).setView([15.0, 76.6], 7);
 L.control.zoom({ position:"bottomright" }).addTo(map);
 map.attributionControl.setPrefix(false);
+/* Karnataka bbox (buffered, from karnataka.geojson) — tiles never load outside this */
+const KA_BOUNDS = L.latLngBounds([11.608, 74.073], [18.479, 78.587]);
 const layers = {
-  streets: L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom:19, attribution:"© OpenStreetMap contributors" }),
-  satellite: L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom:19, attribution:"Imagery © Esri" }),
-  terrain: L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", { maxZoom:17, attribution:"© OpenStreetMap contributors, SRTM | style: © OpenTopoMap" })
+  streets: L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom:19, bounds:KA_BOUNDS, attribution:"© OpenStreetMap contributors" }),
+  satellite: L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom:19, bounds:KA_BOUNDS, attribution:"Imagery © Esri" }),
+  terrain: L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", { maxZoom:17, bounds:KA_BOUNDS, attribution:"© OpenStreetMap contributors, SRTM | style: © OpenTopoMap" })
 };
 layers.streets.addTo(map);
 let curLayer = "streets";
@@ -544,6 +561,51 @@ LOCATIONS.forEach(l => {
   m._locN = l.n; markers[l.n] = m; cluster.addLayer(m);
 });
 map.addLayer(cluster);
+
+/* ================= Karnataka-only fog map (Part 4 v2) ================= */
+let kaRings = null; // buffered Karnataka outer rings, [lat,lng]
+function kaContains(lat, lng){
+  if (!kaRings) return true;
+  let inside = false;
+  for (const ring of kaRings){
+    let j = ring.length - 1;
+    for (let i = 0; i < ring.length; i++){
+      const xi = ring[i][1], yi = ring[i][0], xj = ring[j][1], yj = ring[j][0];
+      if ((yi > lat) !== (yj > lat) && lng < (xj - xi) * (lat - yi) / (yj - yi) + xi) inside = !inside;
+      j = i;
+    }
+  }
+  return inside;
+}
+fetch("karnataka.geojson").then(r => { if (!r.ok) throw 0; return r.json(); }).then(gj => {
+  const feat = gj.type === "FeatureCollection" ? gj.features[0] : gj;
+  const polys = feat.geometry.type === "MultiPolygon" ? feat.geometry.coordinates : [feat.geometry.coordinates];
+  kaRings = polys.map(poly => poly[0].map(([x, y]) => [y, x]));
+  const bounds = L.latLngBounds(kaRings.flat());
+  /* opaque inverted mask: world bbox with Karnataka cut out */
+  const pad = 1.5, outer = [
+    [bounds.getSouth() - pad, bounds.getWest() - pad],
+    [bounds.getNorth() + pad, bounds.getWest() - pad],
+    [bounds.getNorth() + pad, bounds.getEast() + pad],
+    [bounds.getSouth() - pad, bounds.getEast() + pad]
+  ];
+  const fog = L.polygon([outer, ...kaRings], { className:"fog-poly", stroke:false, fillOpacity:1 }).addTo(map);
+  fog.on("click", () => toast("Beyond Karnataka. Nothing to stamp here."));
+  /* brand border along the edge */
+  L.polygon(kaRings, { className:"ka-border", stroke:true, fill:false, interactive:false }).addTo(map);
+  /* subtle "Karnataka only." label over the sea fog */
+  L.tooltip({ permanent:true, direction:"center", className:"fog-label", interactive:false })
+    .setLatLng([13.6, 72.4]).setContent("Karnataka only.").addTo(map);
+  /* map limits */
+  map.options.maxBoundsViscosity = 1.0;
+  map.setMaxBounds(bounds.pad(0.06));
+  const minZ = map.getBoundsZoom(bounds);
+  map.setMinZoom(minZ);
+  if (map.getZoom() < minZ) map.setZoom(minZ);
+  /* drifting cloud texture above fog, below markers */
+  L.DomUtil.create("div", "fog-texture", map.getContainer());
+}).catch(() => {});
+$("btnReset").onclick = () => { if (kaRings) map.fitBounds(L.latLngBounds(kaRings.flat())); else map.setView([15.0, 76.6], 7); };
 function refreshMarker(n){ const l = byN[n]; if (l && markers[n]) markers[n].setIcon(pinIcon(l, n === selectedN)); }
 
 /* layer switcher */
@@ -680,7 +742,9 @@ $("btnLocate").onclick = () => {
   if (!navigator.geolocation){ nearbyManual("Geolocation isn't available on this device."); return; }
   $("btnLocate").classList.add("on"); toast("Locating…");
   navigator.geolocation.getCurrentPosition(
-    p => { $("btnLocate").classList.remove("on"); myPos = { lat:p.coords.latitude, lng:p.coords.longitude }; showNearby(); },
+    p => { $("btnLocate").classList.remove("on"); myPos = { lat:p.coords.latitude, lng:p.coords.longitude };
+      if (!kaContains(myPos.lat, myPos.lng)) toast("You're outside Karnataka. Showing the nearest post offices.");
+      showNearby(); },
     err => { $("btnLocate").classList.remove("on"); nearbyManual("Location permission was denied."); },
     { timeout:12000 });
 };
