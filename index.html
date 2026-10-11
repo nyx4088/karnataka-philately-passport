@@ -74,7 +74,7 @@ h1,.wm,.explored,.pagehead h1,.sheet-head h2{font-family:var(--font-display);fon
 
 /* ---------- explore / map ---------- */
 #map{position:absolute;inset:0;background:var(--mapbg);z-index:0}
-html[data-theme="dark"] #map .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.94)}
+html[data-theme="dark"]:not(.cartoB) #map .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.94)}
 .topbar{position:relative;z-index:500;padding:calc(10px + env(safe-area-inset-top)) 12px 0;pointer-events:none}
 .topbar>*{pointer-events:auto}
 .brand{display:inline-flex;align-items:center;gap:10px;background:var(--surface);
@@ -166,7 +166,15 @@ body.sheet-open .mapctl{display:none}
 .hintline{font-size:12px;color:var(--ink-2);font-style:italic;margin-top:8px}
 .hintline.ok{color:var(--collected);font-style:normal;font-weight:700}
 .linkrow{display:flex;justify-content:space-between;gap:12px;margin-top:10px;flex-wrap:wrap}
-.linkrow a{font-size:12px;color:var(--brand-2);text-decoration:underline;text-underline-offset:2px}
+.linkrow a{font-size:12px;color:var(--brand);text-decoration:underline;text-underline-offset:2px}
+.tmpbadge{font-size:10px;letter-spacing:1.5px;color:var(--ink-2);border:1px solid var(--border-strong);border-radius:10px;padding:2px 8px;vertical-align:2px;font-family:var(--font-sans);font-weight:700}
+.segrow{display:flex;gap:8px;margin:4px 0 8px}
+.segrow .seg{flex:1;min-height:48px;border-radius:12px;border:1.5px solid var(--border-strong);background:transparent;color:var(--ink);font-size:14px;font-weight:700;cursor:pointer}
+.segrow .seg.on{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.keyrow{display:flex;gap:8px;margin:4px 0 8px}
+.keyrow input{flex:1;min-height:48px;border-radius:12px;border:1.5px solid var(--border-strong);background:var(--paper);color:var(--ink);padding:0 12px;font-size:14px;font-family:var(--font-sans)}
+.keyrow input::placeholder{color:var(--ink-2)}
+.keyrow .btn{flex:none}
 .actionrow{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 .btn{border:0;border-radius:12px;padding:12px 18px;font-size:14px;font-weight:700;min-height:48px;font-family:var(--font-sans)}
 .btn.primary{background:var(--brand);color:var(--on-brand);flex:1}
@@ -422,6 +430,18 @@ html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,
       </div>
       <div class="note">Theme preference is saved on this device only.</div>
     </div>
+    <h3 class="sec">Map style test <span class="tmpbadge">temporary</span></h3>
+    <div class="card">
+      <div class="segrow" id="mapStyleSeg" role="group" aria-label="Map style test">
+        <button class="seg on" data-ms="a">A · Current</button>
+        <button class="seg" data-ms="b">B · CARTO</button>
+      </div>
+      <div class="keyrow">
+        <input type="password" id="cartoKey" autocomplete="off" spellcheck="false" placeholder="Paste CARTO API key" aria-label="CARTO API key">
+        <button class="btn ghost" id="cartoKeySave">Save</button>
+      </div>
+      <div class="note">B needs a free CARTO API key — paste it above, it stays on this device only, next to your progress. CARTO now requires a key for basemap tiles; without one, B shows a watermark. Restrict the key by HTTP referrer in the CARTO dashboard. This whole panel is temporary and will be removed once you choose a style.</div>
+    </div>
     <h3 class="sec">About this data</h3>
     <div class="card note">
       Locations are the 100 post offices from the Karnataka Philately Passport booklet (₹600, issued October 2026 by the Department of Posts, Karnataka Circle). Coordinates were geocoded per post office — 34 hand-verified to the actual office, 3 near-verified, the rest town-level approximations labelled "Approximate location" on their cards; the Directions button searches the post office on Google Maps, and "Directions to map pin" navigates to the exact pinned point.<br><br>
@@ -482,7 +502,7 @@ const LOCATIONS = [{"n": 1, "name": "Aihole", "office_type": "BO", "office_type_
 
 /* ================= state ================= */
 const LS_KEY = "stampquest_v1";
-let state = { visited:{}, planned:{}, theme:"light", firstRun:false, milestones:[] };
+let state = { visited:{}, planned:{}, theme:"light", firstRun:false, milestones:[], mapStyle:"a", cartoKey:"" };
 try { const s = JSON.parse(localStorage.getItem(LS_KEY)); if (s && typeof s === "object") state = Object.assign(state, s); } catch(e){}
 function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
 const byN = {}; LOCATIONS.forEach(l => byN[l.n] = l);
@@ -509,19 +529,33 @@ function havKm(a,b,c,d){ const R=6371, r=x=>x*Math.PI/180, dLa=r(c-a), dLo=r(d-b
 /* ================= theme ================= */
 function applyTheme(){ document.documentElement.dataset.theme = state.theme;
   $("themeToggle").checked = state.theme === "dark";
-  document.querySelector('meta[name="theme-color"]').content = state.theme === "dark" ? "#16120F" : "#F3EBD8"; }
+  document.querySelector('meta[name="theme-color"]').content = state.theme === "dark" ? "#16120F" : "#F3EBD8";
+  if (typeof applyBaseLayer === "function") applyBaseLayer(); }
 
 /* ================= map ================= */
 const map = L.map("map", { zoomControl:false, attributionControl:true }).setView([15.0, 76.6], 7);
 L.control.zoom({ position:"bottomright" }).addTo(map);
 map.attributionControl.setPrefix(false);
+const cartoURL = kind => "https://{s}.basemaps.cartocdn.com/rastertiles/" + kind + "/{z}/{x}/{y}@2x.png" + (state.cartoKey ? "?api_key=" + encodeURIComponent(state.cartoKey) : "");
 const layers = {
   streets: L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom:19, attribution:"© OpenStreetMap contributors" }),
   satellite: L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom:19, attribution:"Imagery © Esri" }),
-  terrain: L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", { maxZoom:17, attribution:"© OpenStreetMap contributors, SRTM | style: © OpenTopoMap" })
+  terrain: L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", { maxZoom:17, attribution:"© OpenStreetMap contributors, SRTM | style: © OpenTopoMap" }),
+  cartoLight: L.tileLayer(cartoURL("voyager"), { maxZoom:20, subdomains:"abcd", attribution:"© OpenStreetMap contributors © CARTO" }),
+  cartoDark: L.tileLayer(cartoURL("dark_all"), { maxZoom:20, subdomains:"abcd", attribution:"© OpenStreetMap contributors © CARTO" })
 };
 layers.streets.addTo(map);
 let curLayer = "streets";
+/* temporary map-style test: A = current layers, B = CARTO (Voyager light / Dark Matter dark) */
+function applyBaseLayer(){
+  layers.cartoLight.setUrl(cartoURL("voyager"));
+  layers.cartoDark.setUrl(cartoURL("dark_all"));
+  const b = state.mapStyle === "b" ? (state.theme === "dark" ? "cartoDark" : "cartoLight") : curLayer;
+  Object.keys(layers).forEach(k => { if (map.hasLayer(layers[k])) map.removeLayer(layers[k]); });
+  layers[b].addTo(map);
+  $("btnLayers").style.display = state.mapStyle === "b" ? "none" : "";
+  document.documentElement.classList.toggle("cartoB", state.mapStyle === "b");
+}
 
 const markers = {};
 const cluster = L.markerClusterGroup({
@@ -884,6 +918,11 @@ function renderSaved(){
 
 /* ================= settings ================= */
 $("themeToggle").addEventListener("change", e => { state.theme = e.target.checked ? "dark" : "light"; save(); applyTheme(); });
+function syncMapStyleSeg(){ document.querySelectorAll("#mapStyleSeg .seg").forEach(x => x.classList.toggle("on", x.dataset.ms === state.mapStyle)); }
+document.querySelectorAll("#mapStyleSeg .seg").forEach(b => b.onclick = () => { state.mapStyle = b.dataset.ms; save(); applyBaseLayer(); syncMapStyleSeg(); });
+syncMapStyleSeg();
+$("cartoKey").value = state.cartoKey || "";
+$("cartoKeySave").onclick = () => { state.cartoKey = $("cartoKey").value.trim(); save(); applyBaseLayer(); toast(state.cartoKey ? "CARTO key saved on this device." : "CARTO key cleared."); };
 $("btnReset").onclick = () => {
   if (!confirm("Reset all progress? This clears your visited and planned lists on this device.")) return;
   state.visited = {}; state.planned = {}; state.milestones = []; save();
