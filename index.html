@@ -502,7 +502,7 @@ const LOCATIONS = [{"n": 1, "name": "Aihole", "office_type": "BO", "office_type_
 
 /* ================= state ================= */
 const LS_KEY = "stampquest_v1";
-let state = { visited:{}, planned:{}, theme:"light", firstRun:false, milestones:[], mapStyle:"a", cartoKey:"" };
+let state = { visited:{}, planned:{}, theme:"light", firstRun:false, milestones:[], mapStyle:"a", cartoKey:"cb1_4hc8_1_48c9852a02ec4b6d8ea710ad" };
 try { const s = JSON.parse(localStorage.getItem(LS_KEY)); if (s && typeof s === "object") state = Object.assign(state, s); } catch(e){}
 function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
 const byN = {}; LOCATIONS.forEach(l => byN[l.n] = l);
