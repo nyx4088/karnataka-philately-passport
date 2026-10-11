@@ -296,6 +296,21 @@ h3.sec{font-size:17px;margin:22px 0 10px;letter-spacing:.5px}
 #firstrun{position:fixed;z-index:950;inset:0;background:rgba(20,16,12,.55);display:none;align-items:flex-end;justify-content:center;padding:20px}
 #firstrun.show{display:flex}
 #firstrun .card{max-width:420px;width:100%;margin:0}
+#firstrun .tcard{overflow:hidden}
+.ttrack{display:flex;transition:transform .28s ease}
+.tslide{flex:0 0 100%;padding:2px}
+.tdots{display:flex;gap:8px;justify-content:center;margin:14px 0 4px}
+.tdots span{width:8px;height:8px;border-radius:50%;background:var(--border-strong);transition:background .2s}
+.tdots span.on{background:var(--brand)}
+/* FAQ accordion */
+.faq{border-top:1px solid var(--border)}
+.faq details{border-bottom:1px solid var(--border);padding:12px 2px}
+.faq summary{font-size:14px;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary:after{content:"+";font-size:18px;color:var(--brand);font-weight:400;flex:none}
+.faq details[open] summary:after{content:"–"}
+.faq .a{font-size:13px;color:var(--ink-2);line-height:1.55;margin-top:8px}
+.faq .a b{color:var(--ink)}
 
 /* toggle */
 .togglerow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 2px;font-size:14px;font-weight:600}
@@ -360,7 +375,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,
   <div class="mapctl">
     <button id="btnLayers" aria-label="Change map view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg><span class="cap">Layers</span></button>
     <button id="btnLocate" aria-label="Find nearest to me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="2" x2="5" y1="12" y2="12"/><line x1="19" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="5"/><line x1="12" x2="12" y1="19" y2="22"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/></svg><span class="cap">Near me</span></button>
-    <button id="btnReset" aria-label="Reset map view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span class="cap">Reset</span></button>
+    <button id="btnMapReset" aria-label="Reset map view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span class="cap">Reset</span></button>
   </div>
   <div class="layersheet" id="layerSheet">
     <button data-layer="streets" class="on">Streets</button>
@@ -437,6 +452,46 @@ html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,
       </div>
       <div class="note">Theme preference is saved on this device only.</div>
     </div>
+    <h3 class="sec">FAQ</h3>
+    <div class="card faq">
+      <details>
+        <summary>How do I mark a place visited?</summary>
+        <div class="a">Visit a post office, tap its tile in Passport, add a photo of your stamp — <b>it's marked visited automatically</b>, with the visit date saved. You'll see "Marked visited. Undo" if you want to revert. Prefer no photo? Use <b>Mark visited without photo</b> on the office card.</div>
+      </details>
+      <details>
+        <summary>Where are my photos stored?</summary>
+        <div class="a"><b>On this device only.</b> Photos are kept in on-device storage, never uploaded to any server. They are also <b>not included</b> if you export your progress as a JSON backup — the backup carries your visited/planned lists only.</div>
+      </details>
+      <details>
+        <summary>What do the passport tile colors mean?</summary>
+        <div class="a"><b>Green with a ✓</b> = visited (stamped). <b>Dashed amber</b> = planned (in your Postbox). <b>Plain</b> = not visited yet. The number is the booklet serial; the district postmark shows at a glance where it belongs.</div>
+      </details>
+      <details>
+        <summary>What does "Approximate location" mean?</summary>
+        <div class="a">The pin is placed at the town centre, not the exact office building. Use the <b>Directions</b> button (which searches the post office by name and PIN) rather than the pin alone when you're close.</div>
+      </details>
+      <details>
+        <summary>How do I get directions?</summary>
+        <div class="a">Tap any pin or tile, then <b>Directions</b> — it opens Google Maps searching the post office by name and PIN. <b>Directions to map pin</b> navigates to the exact pinned point instead. "Getting there" names the nearest major transit town as a hint only; there is no live transport data and no fares.</div>
+      </details>
+      <details>
+        <summary>Is my progress backed up anywhere?</summary>
+        <div class="a">Only if you back it up: use <b>Export progress</b> under Share &amp; backup to save a JSON file, and <b>Import</b> to restore it. Photos are not part of the backup. Clearing browser data erases everything unless you exported.</div>
+      </details>
+      <details>
+        <summary>What are Circuits?</summary>
+        <div class="a">Suggested region-wise routes (North, Coastal, South, etc.) to plan multi-stop stamp runs. They're neutral suggestions — start wherever you are.</div>
+      </details>
+      <details>
+        <summary>Why is only Karnataka on the map?</summary>
+        <div class="a">That's the whole quest — the passport covers Karnataka's 100 post offices only. Everything outside the state is hidden by design.</div>
+      </details>
+    </div>
+    <h3 class="sec">Tutorial</h3>
+    <div class="card">
+      <button class="btn ghost" id="replayTutorial" style="width:100%">Replay tutorial</button>
+      <div class="note">The 3-card intro from your first visit.</div>
+    </div>
     <h3 class="sec">About this data</h3>
     <div class="card note">
       Locations are the 100 post offices from the Karnataka Philately Passport booklet (₹600, issued October 2026 by the Department of Posts, Karnataka Circle). Coordinates were geocoded per post office — 34 hand-verified to the actual office, 3 near-verified, the rest town-level approximations labelled "Approximate location" on their cards; the Directions button searches the post office on Google Maps, and "Directions to map pin" navigates to the exact pinned point.<br><br>
@@ -482,10 +537,26 @@ html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,
 <div id="toast" role="status"></div>
 
 <div id="firstrun">
-  <div class="card">
-    <div class="serif" style="font-size:19px;margin-bottom:8px">Welcome to StampQuest</div>
-    <div class="note" style="font-size:13px;color:var(--ink)">All 100 Karnataka Philately Passport post offices, on one map. Tap a pin for details and directions, mark each stamp as you collect it, and watch your passport fill up.<br><br>Your progress never leaves this device.</div>
-    <div class="actionrow"><button class="btn primary" id="btnFirstOk" style="flex:1">Start exploring</button></div>
+  <div class="card tcard">
+    <div class="ttrack" id="tTrack">
+      <div class="tslide">
+        <div class="serif" style="font-size:20px;margin-bottom:8px">Welcome to StampQuest</div>
+        <div class="note" style="font-size:13px;color:var(--ink)">All 100 Karnataka Philately Passport post offices, on one map. Tap a pin for details and directions, mark each stamp as you collect it, and watch your passport fill up.<br><br>Your progress never leaves this device.</div>
+      </div>
+      <div class="tslide">
+        <div class="serif" style="font-size:20px;margin-bottom:8px">Collect with a photo</div>
+        <div class="note" style="font-size:13px;color:var(--ink)">Visit a post office, tap its tile in Passport, add a photo of your stamp. It's marked visited automatically.<br><br>Photos stay on this device only — never uploaded.</div>
+      </div>
+      <div class="tslide">
+        <div class="serif" style="font-size:20px;margin-bottom:8px">Explore Karnataka</div>
+        <div class="note" style="font-size:13px;color:var(--ink)">Use Circuits for region-wise routes, Postbox for your planned stops, and share your progress as a postcard when the passport fills up.<br><br>Only Karnataka is on the map — that's the whole quest.</div>
+      </div>
+    </div>
+    <div class="tdots" id="tDots"><span class="on"></span><span></span><span></span></div>
+    <div class="actionrow">
+      <button class="btn ghost" id="btnTSkip">Skip</button>
+      <button class="btn primary" id="btnTNext" style="flex:1">Next</button>
+    </div>
   </div>
 </div>
 
@@ -605,7 +676,7 @@ fetch("karnataka.geojson").then(r => { if (!r.ok) throw 0; return r.json(); }).t
   /* drifting cloud texture above fog, below markers */
   L.DomUtil.create("div", "fog-texture", map.getContainer());
 }).catch(() => {});
-$("btnReset").onclick = () => { if (kaRings) map.fitBounds(L.latLngBounds(kaRings.flat())); else map.setView([15.0, 76.6], 7); };
+$("btnMapReset").onclick = () => { if (kaRings) map.fitBounds(L.latLngBounds(kaRings.flat())); else map.setView([15.0, 76.6], 7); };
 function refreshMarker(n){ const l = byN[n]; if (l && markers[n]) markers[n].setIcon(pinIcon(l, n === selectedN)); }
 
 /* layer switcher */
@@ -961,7 +1032,28 @@ function handleHash(){
   if (m && byN[+m[1]]) openLocation(+m[1]);
 }
 window.addEventListener("hashchange", handleHash);
-$("btnFirstOk").onclick = () => { state.firstRun = true; save(); $("firstrun").classList.remove("show"); };
+/* ---- 3-card swipeable tutorial ---- */
+let tIdx = 0;
+function tShow(i){
+  tIdx = Math.max(0, Math.min(2, i));
+  $("tTrack").style.transform = "translateX(-" + (tIdx * 100) + "%)";
+  document.querySelectorAll("#tDots span").forEach((d, k) => d.classList.toggle("on", k === tIdx));
+  $("btnTNext").textContent = tIdx === 2 ? "Start exploring" : "Next";
+}
+function tClose(){ state.firstRun = true; save(); $("firstrun").classList.remove("show"); }
+$("btnTNext").onclick = () => { if (tIdx === 2) tClose(); else tShow(tIdx + 1); };
+$("btnTSkip").onclick = tClose;
+$("replayTutorial").onclick = () => { tShow(0); $("firstrun").classList.add("show"); };
+(function(){
+  let sx = 0, dx = 0;
+  const tr = $("tTrack");
+  tr.addEventListener("touchstart", e => { sx = e.touches[0].clientX; dx = 0; }, { passive:true });
+  tr.addEventListener("touchmove", e => { dx = e.touches[0].clientX - sx; }, { passive:true });
+  tr.addEventListener("touchend", () => {
+    if (dx < -50 && tIdx < 2) tShow(tIdx + 1);
+    else if (dx > 50 && tIdx > 0) tShow(tIdx - 1);
+  }, { passive:true });
+})();
 
 applyTheme();
 renderProgress(); renderCircuits(); renderGrid(); renderDistricts(); renderSaved();
