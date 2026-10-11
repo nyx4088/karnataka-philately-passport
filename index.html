@@ -3,91 +3,136 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#FAF6EE">
+<meta name="theme-color" content="#F3EBD8">
 <title>StampQuest — Karnataka Philately Passport Explorer</title>
 <meta name="description" content="Interactive map of all 100 Karnataka Philately Passport post offices. Discover, navigate, and track your stamp collection.">
+<link rel="manifest" href="manifest.json">
+<link rel="preload" href="fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/dmsans-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
 <style>
-@property --accent { syntax:'<color>'; inherits:true; initial-value:#C1272D; }
-@property --soft { syntax:'<color>'; inherits:true; initial-value:#F7E9DB; }
+/* ============ StampQuest — Postmark Modern design system (self-hosted fonts) ============ */
+@font-face{font-family:"Fraunces";font-style:normal;font-weight:100 900;font-display:swap;
+  src:url("fonts/fraunces-latin.woff2") format("woff2");
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
+@font-face{font-family:"Fraunces";font-style:normal;font-weight:100 900;font-display:swap;
+  src:url("fonts/fraunces-latinext.woff2") format("woff2");
+  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CE,U+02CF-02D7,U+02D8-02DE,U+02DF-02FF,U+0300-0303,U+0305-0307,U+0309-0328,U+032A-032F,U+2001-2003,U+2074,U+20AB,U+20AD,U+20B9,U+20CF,U+2113,U+2C60-2C7F,U+A720-A7FF;}
+@font-face{font-family:"DM Sans";font-style:normal;font-weight:100 1000;font-display:swap;
+  src:url("fonts/dmsans-latin.woff2") format("woff2");
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
+@font-face{font-family:"DM Sans";font-style:normal;font-weight:100 1000;font-display:swap;
+  src:url("fonts/dmsans-latinext.woff2") format("woff2");
+  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CE,U+02CF-02D7,U+02D8-02DE,U+02DF-02FF,U+0300-0303,U+0305-0307,U+0309-0328,U+032A-032F,U+2001-2003,U+2074,U+20AB,U+20AD,U+20CF,U+2113,U+2C60-2C7F,U+A720-A7FF;}
+@font-face{font-family:"DM Sans";font-style:normal;font-weight:400 700;font-display:swap;
+  src:url("fonts/dmsans-rupee.woff2") format("woff2");
+  unicode-range:U+20B9;}
+@font-face{font-family:"DM Mono";font-style:normal;font-weight:500;font-display:swap;
+  src:url("fonts/dmmono-latin-500.woff2") format("woff2");
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
+@font-face{font-family:"DM Mono";font-style:normal;font-weight:500;font-display:swap;
+  src:url("fonts/dmmono-latinext-500.woff2") format("woff2");
+  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CE,U+02CF-02D7,U+02D8-02DE,U+02DF-02FF,U+0300-0303,U+0305-0307,U+0309-0328,U+032A-032F,U+2001-2003,U+2074,U+20AB,U+20AD,U+20CF,U+2113,U+2C60-2C7F,U+A720-A7FF;}
+
 :root{
-  --paper:#FAF6EE; --ink:#2E2A26; --muted:#8A8178; --red:#C1272D;
-  --accent:#C1272D; --soft:#F7E9DB;
-  --card:#FFFFFF; --border:#EAE3D2; --mapbg:#EDE8DB;
-  --shadow:0 2px 12px rgba(46,42,38,.12);
+  --paper:#F3EBD8; --surface:#FBF6E9; --ink:#1F1B16; --ink-2:#54493C;
+  --border-strong:#6E6254; --border-subtle:#D9CFB4;
+  --brand:#A91F26; --brand-hover:#8F1822; --on-brand:#FFFFFF; --focus:#1D3557;
+  --collected:#2B6A46; --planned:#7A5600; --error:#8E1B1B;
+  --locked-fill:#E4DBC4; --milestone:#E3A512;
+  --mapbg:#E7DFC9;
+  --shadow:0 2px 12px rgba(31,27,22,.14);
   --r:14px;
-  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;
-  --serif:Georgia,"Times New Roman",serif;
+  --font-display:"Fraunces",Georgia,"Times New Roman",serif;
+  --font-sans:"DM Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-mono:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
 }
 html[data-theme="dark"]{
-  --paper:#12211C; --ink:#F1EEE3; --muted:#9AA79B;
-  --card:#1B2F27; --border:#2C4237; --mapbg:#0F1B16;
-  --shadow:0 2px 12px rgba(0,0,0,.4);
+  --paper:#16120F; --surface:#221C17; --ink:#F3EDE0; --ink-2:#B9AF9F;
+  --border-strong:#8C8272; --border-subtle:#3A322A;
+  --brand:#F0707A; --brand-hover:#F58D95; --on-brand:#16120F; --focus:#F3EDE0;
+  --collected:#6FCB9A; --planned:#E8B84A; --error:#F0707A;
+  --locked-fill:#2C251F;
+  --mapbg:#14100D;
+  --shadow:0 2px 12px rgba(0,0,0,.5);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;margin:0}
-body{font-family:var(--sans);background:var(--paper);color:var(--ink);
-  transition:background-color .6s ease,color .6s ease;overflow:hidden;
-  --accent:var(--accent);--soft:var(--soft)}
+body{font-family:var(--font-sans);background:var(--paper);color:var(--ink);
+  transition:background-color .6s ease,color .6s ease;overflow:hidden;font-size:14px;line-height:1.45}
 button{font-family:inherit;cursor:pointer}
-.serif{font-family:var(--serif)}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2.5px solid var(--focus);outline-offset:2px;border-radius:6px}
+.serif{font-family:var(--font-display);font-variation-settings:"SOFT" 50,"WONK" 0}
+h1,.wm,.explored,.pagehead h1,.sheet-head h2{font-family:var(--font-display);font-variation-settings:"SOFT" 50,"WONK" 0;font-weight:600}
 
 /* ---------- views ---------- */
 .view{position:fixed;inset:0;display:none;flex-direction:column;background:var(--paper);transition:background-color .6s ease}
 .view.active{display:flex}
-.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 96px}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 96px;min-width:0}
 
 /* ---------- explore / map ---------- */
 #map{position:absolute;inset:0;background:var(--mapbg);z-index:0}
+html[data-theme="dark"] #map .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.94)}
 .topbar{position:relative;z-index:500;padding:calc(10px + env(safe-area-inset-top)) 12px 0;pointer-events:none}
 .topbar>*{pointer-events:auto}
-.brand{display:flex;align-items:center;gap:10px;padding:2px 4px 8px}
-.brand .wm{font-family:var(--serif);font-weight:700;font-size:19px;letter-spacing:3px}
-.brand .wm b{color:var(--red);font-weight:700}
-.brand .sub{font-size:9px;letter-spacing:2.2px;color:var(--muted);margin-top:1px}
+.brand{display:inline-flex;align-items:center;gap:10px;background:var(--surface);
+  border:1px solid var(--border-subtle);border-radius:16px;padding:8px 16px 8px 10px;
+  box-shadow:var(--shadow);margin-bottom:8px;transition:background-color .6s ease,border-color .6s ease}
+.brand .wm{font-weight:600;font-size:20px;letter-spacing:3px}
+.brand .wm b{color:var(--brand);font-weight:600}
+.brand .sub{font-size:12px;letter-spacing:2.2px;color:var(--ink-2);margin-top:1px}
 .searchrow{display:flex;gap:8px;align-items:center}
-.searchbox{flex:1;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);
+.searchbox{flex:1;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border-subtle);
   border-radius:22px;padding:0 6px 0 14px;box-shadow:var(--shadow);transition:background-color .6s ease,border-color .6s ease}
 .searchbox input{flex:1;border:0;outline:0;background:transparent;color:var(--ink);font-size:14px;padding:11px 0;min-width:0}
-.searchbox input::placeholder{color:var(--muted)}
-.sclear{border:0;background:transparent;color:var(--muted);font-size:16px;padding:8px;display:none}
-.progchip{flex:none;display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);
+.searchbox input::placeholder{color:var(--ink-2)}
+.sclear{border:0;background:transparent;color:var(--ink-2);font-size:16px;padding:8px;display:none}
+.progchip{flex:none;display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border-subtle);
   border-radius:20px;padding:9px 13px;font-size:12px;font-weight:700;box-shadow:var(--shadow);color:var(--ink);
-  transition:background-color .6s ease}
-.progchip .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);transition:background-color .6s ease}
-#searchResults{margin-top:8px;max-height:38vh;overflow-y:auto;background:var(--card);border:1px solid var(--border);
+  transition:background-color .6s ease;font-family:var(--font-mono)}
+.progchip .dot{width:8px;height:8px;border-radius:50%;background:var(--brand);transition:background-color .6s ease}
+#searchResults{margin-top:8px;max-height:38vh;overflow-y:auto;background:var(--surface);border:1px solid var(--border-subtle);
   border-radius:12px;box-shadow:var(--shadow);display:none;transition:background-color .6s ease}
 #searchResults button{display:flex;width:100%;text-align:left;gap:10px;align-items:center;background:none;border:0;
-  border-bottom:1px solid var(--border);padding:10px 12px;color:var(--ink);font-size:13px}
+  border-bottom:1px solid var(--border-subtle);padding:10px 12px;color:var(--ink);font-size:13px}
 #searchResults button:last-child{border-bottom:0}
-#searchResults .n{font-family:var(--serif);color:var(--muted);min-width:30px;font-size:12px}
+#searchResults .n{font-family:var(--font-mono);color:var(--ink-2);min-width:30px;font-size:12px}
 .mapctl{position:absolute;z-index:500;right:12px;top:34%;display:flex;flex-direction:column;gap:8px}
-.mapctl button{width:44px;height:44px;border-radius:50%;border:1px solid var(--border);background:var(--card);
-  color:var(--ink);box-shadow:var(--shadow);font-size:11px;font-weight:700;line-height:1.1;
-  transition:background-color .6s ease}
-.mapctl button.on{background:var(--red);border-color:var(--red);color:#fff}
-.layersheet{position:absolute;z-index:600;right:12px;top:calc(34% + 104px);background:var(--card);border:1px solid var(--border);
+.mapctl button{min-width:52px;min-height:52px;border-radius:14px;border:1px solid var(--border-subtle);background:var(--surface);
+  color:var(--ink);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  padding:6px 8px;transition:background-color .6s ease}
+.mapctl button svg{width:24px;height:24px}
+.mapctl button .cap{font-size:12px;font-weight:500;line-height:1;color:var(--ink-2)}
+.mapctl button.on{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.mapctl button.on .cap{color:var(--on-brand)}
+.mapctl button.locating svg{animation:mappulse 1.1s ease-in-out infinite}
+@keyframes mappulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.25);opacity:.55}}
+body.sheet-open .mapctl{display:none}
+.layersheet{position:absolute;z-index:600;right:12px;top:calc(34% + 128px);background:var(--surface);border:1px solid var(--border-subtle);
   border-radius:12px;box-shadow:var(--shadow);display:none;overflow:hidden;min-width:130px}
 .layersheet button{display:block;width:100%;text-align:left;background:none;border:0;padding:11px 14px;font-size:13px;color:var(--ink)}
-.layersheet button.on{color:var(--red);font-weight:700}
+.layersheet button.on{color:var(--brand);font-weight:700}
 
-/* pins */
-.pin{width:30px;height:30px;position:relative}
-.pin .bd{position:absolute;inset:0;background:var(--c);border-radius:50% 50% 50% 4px;transform:rotate(-45deg);
-  border:2px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center}
-.pin .bd span{transform:rotate(45deg);color:#fff;font-size:10px;font-weight:800;font-family:var(--sans)}
-.pin.planned .bd{outline:2px dashed #fff;outline-offset:-5px}
-.pin.done .bd{background:#2E7D4F!important}
-.pin.done .bd span{font-size:13px}
-.pin.sel{width:38px;height:38px;z-index:999}
-.pin.sel .bd{border:3px solid var(--red)}
-.mk-cluster{background:var(--red);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-weight:800;border:3px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.35)}
+/* postmark markers — states differ by shape, not only colour */
+.mk{width:32px;height:32px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);font-weight:500;font-size:13px;line-height:1;
+  box-shadow:0 0 0 2px var(--paper),0 2px 6px rgba(0,0,0,.35)}
+.mk.unvisited{background:transparent;border:2px solid var(--ink);color:var(--ink)}
+.mk.planned{background:var(--surface);border:2px dashed var(--planned);color:var(--ink)}
+.mk.planned .mk-star{position:absolute;top:-8px;right:-5px;font-size:13px;color:var(--planned);line-height:1;
+  text-shadow:0 0 2px var(--surface),0 0 2px var(--surface)}
+.mk.done{background:var(--collected);border:2px solid var(--collected);color:var(--paper);
+  box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--collected),0 2px 6px rgba(0,0,0,.3)}
+.mk.done .mk-check{font-size:15px;font-weight:700}
+.mk.sel{width:40px;height:40px;border:3px solid var(--brand);font-size:15px;
+  box-shadow:0 0 0 2px var(--paper),0 0 0 5px var(--brand),0 2px 8px rgba(0,0,0,.4)}
+.mk-cluster{background:var(--ink);color:var(--paper);border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);font-weight:500;border:2px solid var(--paper);box-shadow:0 1px 6px rgba(0,0,0,.35)}
 
 /* ---------- bottom sheet ---------- */
-#sheet{position:fixed;z-index:700;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--border);
+#sheet{position:fixed;z-index:700;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--border-subtle);
   border-radius:20px 20px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.18);transform:translateY(105%);
   transition:transform .32s ease,background-color .6s ease;max-height:82vh;display:flex;flex-direction:column}
 #sheet.open{transform:translateY(0)}
@@ -95,100 +140,128 @@ button{font-family:inherit;cursor:pointer}
 #sheet[data-snap="half"]{max-height:52vh}
 #sheet[data-snap="full"]{max-height:88vh}
 .handle{padding:10px 0 4px;cursor:grab;touch-action:none;flex:none}
-.handle::before{content:"";display:block;width:44px;height:5px;border-radius:3px;background:var(--border);margin:0 auto}
+.handle::before{content:"";display:block;width:44px;height:5px;border-radius:3px;background:var(--border-subtle);margin:0 auto}
 .sheet-head{display:flex;gap:12px;align-items:flex-start;padding:6px 18px 10px;flex:none}
-.sheet-head .info{flex:1;min-width:0}
-.sheet-head .no{font-family:var(--serif);font-size:11px;letter-spacing:2px;color:var(--muted)}
-.sheet-head h2{font-family:var(--serif);font-size:19px;margin:2px 0 3px;line-height:1.25}
-.sheet-head .meta{font-size:11px;letter-spacing:1.4px;color:var(--muted)}
-.badge{flex:none;font-size:10px;font-weight:800;letter-spacing:1px;padding:6px 10px;border-radius:14px;margin-top:2px}
-.badge.unvisited{background:var(--soft);color:var(--accent);transition:background-color .6s ease}
-.badge.planned{background:#FFF3D6;color:#8A6D1B}
-.badge.visited{background:#DFF0E4;color:#20603C}
-.sheet-body{overflow-y:auto;padding:2px 18px calc(88px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}
-.stampcard{position:relative;background:var(--paper);border:1px solid var(--border);outline:1px solid var(--border);
-  outline-offset:3px;border-radius:3px;padding:14px;margin:12px 2px;transition:background-color .6s ease}
-.stampcard::before{content:"";position:absolute;top:-9px;left:0;right:0;height:9px;
-  background-image:radial-gradient(circle at 7px 5px,var(--card) 3.6px,transparent 4px);background-size:15px 9px;background-repeat:repeat-x}
-.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--border);font-size:13px}
+.sheet-head .info{flex:1;min-width:0;padding-right:36px}
+.sheet-head .no{font-family:var(--font-mono);font-weight:500;font-size:12px;letter-spacing:2px;color:var(--ink-2)}
+.sheet-head h2{font-size:20px;margin:2px 0 3px;line-height:1.25}
+.sheet-head .meta{font-size:12px;letter-spacing:1.4px;color:var(--ink-2)}
+.sheet-head .badge{margin-top:8px;display:inline-block}
+.badge{font-family:var(--font-mono);font-weight:500;font-size:12px;letter-spacing:1px;padding:6px 10px;border-radius:14px;border:1.5px solid}
+.badge.unvisited{background:var(--locked-fill);color:var(--ink);border-color:var(--border-strong)}
+.badge.planned{background:transparent;color:var(--planned);border-color:var(--planned);border-style:dashed}
+.badge.visited{background:transparent;color:var(--collected);border-color:var(--collected)}
+.sheet-body{overflow-y:auto;padding:2px 18px 12px;-webkit-overflow-scrolling:touch;min-width:0}
+.sheet-foot{flex:none;display:flex;gap:8px;padding:10px 18px calc(12px + env(safe-area-inset-bottom));
+  background:var(--surface);border-top:1px solid var(--border-subtle)}
+.sheet-foot:empty{display:none}
+.sheet-foot .btn{flex:1}
+.stampcard{position:relative;background:var(--paper);border:1px solid var(--border-subtle);
+  border-radius:3px;padding:14px;margin:12px 2px;transition:background-color .6s ease}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--border-subtle);font-size:13px}
 .kv:last-child{border-bottom:0}
-.kv .k{color:var(--muted);font-size:11px;letter-spacing:1px;flex:none;padding-top:1px}
+.kv .k{color:var(--ink-2);font-size:12px;letter-spacing:1px;flex:none;padding-top:1px}
 .kv .v{text-align:right;font-weight:600}
-.kv .v .sub{display:block;font-weight:400;color:var(--muted);font-size:11px;margin-top:2px}
-.hintline{font-size:11px;color:var(--muted);font-style:italic;margin-top:8px}
+.kv .v .sub{display:block;font-weight:400;color:var(--ink-2);font-size:12px;margin-top:2px}
+.hintline{font-size:12px;color:var(--ink-2);font-style:italic;margin-top:8px}
 .actionrow{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-.btn{border:0;border-radius:22px;padding:12px 18px;font-size:13px;font-weight:700;min-height:46px}
-.btn.primary{background:var(--red);color:#fff;flex:1}
-.btn.ghost{background:transparent;border:1.5px solid var(--border);color:var(--ink)}
-.btn.accent{background:var(--accent);color:#fff;transition:background-color .6s ease}
-.btn.planned-on{border-color:#8A6D1B;color:#8A6D1B}
-.btn.done-on{background:#2E7D4F;color:#fff;border-color:#2E7D4F}
-.sheetclose{position:absolute;top:8px;right:10px;border:0;background:var(--soft);color:var(--ink);width:32px;height:32px;
-  border-radius:50%;font-size:14px;transition:background-color .6s ease}
+.btn{border:0;border-radius:12px;padding:12px 18px;font-size:14px;font-weight:700;min-height:48px;font-family:var(--font-sans)}
+.btn.primary{background:var(--brand);color:var(--on-brand);flex:1}
+.btn.primary:hover{background:var(--brand-hover)}
+.btn.ghost{background:transparent;border:1.5px solid var(--border-strong);color:var(--ink)}
+.btn.accent{background:var(--brand);color:var(--on-brand);transition:background-color .6s ease}
+.btn.accent:hover{background:var(--brand-hover)}
+.btn.planned-on{border-color:var(--planned);color:var(--planned)}
+.btn.done-on{background:var(--collected);color:#fff;border-color:var(--collected)}
+.sheetclose{position:absolute;top:10px;right:12px;border:1px solid var(--border-subtle);background:var(--surface);color:var(--ink);
+  width:36px;height:36px;border-radius:50%;font-size:14px;box-shadow:var(--shadow);z-index:2;
+  display:flex;align-items:center;justify-content:center;transition:background-color .6s ease}
 
 /* stamp pop animation */
 @keyframes stampIn{0%{transform:scale(2.4) rotate(-18deg);opacity:0}60%{transform:scale(.94) rotate(-8deg);opacity:1}100%{transform:scale(1) rotate(-8deg)}}
-.stamp-pop{position:absolute;top:6px;right:10px;width:74px;height:74px;border:3px solid #2E7D4F;border-radius:50%;
-  color:#2E7D4F;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;
-  font-size:13px;transform:rotate(-8deg);opacity:.92;pointer-events:none;background:rgba(250,246,238,.35);
+.stamp-pop{position:absolute;top:6px;right:10px;width:74px;height:74px;border:3px solid var(--collected);border-radius:50%;
+  color:var(--collected);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:600;
+  font-size:13px;transform:rotate(-8deg);opacity:.92;pointer-events:none;background:rgba(251,246,233,.35);
   animation:stampIn .45s ease}
 
 /* nearby list */
-.nearby-row{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;border-bottom:1px solid var(--border);
-  padding:11px 2px;color:var(--ink);text-align:left;font-size:13px}
-.nearby-row .d{margin-left:auto;color:var(--muted);font-size:12px;flex:none}
+.nearby-row{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;border-bottom:1px solid var(--border-subtle);
+  padding:11px 2px;color:var(--ink);text-align:left;font-size:13px;min-height:48px}
+.nearby-row .d{margin-left:auto;color:var(--ink-2);font-size:12px;flex:none;font-family:var(--font-mono)}
 .manrow{display:flex;gap:8px;margin-top:10px}
-.manrow input{flex:1;min-width:0;border:1px solid var(--border);border-radius:10px;padding:10px;background:var(--paper);color:var(--ink);font-size:13px}
+.manrow input{flex:1;min-width:0;border:1px solid var(--border-strong);border-radius:10px;padding:10px;background:var(--paper);color:var(--ink);font-size:13px}
 
 /* ---------- bottom nav ---------- */
-#nav{position:fixed;z-index:800;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--border);
+#nav{position:fixed;z-index:800;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--border-subtle);
   display:flex;padding:6px 4px calc(8px + env(safe-area-inset-bottom));transition:background-color .6s ease}
-#nav button{flex:1;background:none;border:0;color:var(--muted);font-size:10px;font-weight:700;display:flex;
-  flex-direction:column;align-items:center;gap:3px;padding:6px 0;min-height:52px}
-#nav button svg{width:23px;height:23px;opacity:.7}
-#nav button.on{color:var(--red)}
-#nav button.on svg{opacity:1}
+#nav button{flex:1;background:none;border:0;color:var(--ink-2);font-size:12px;font-weight:700;display:flex;
+  flex-direction:column;align-items:center;gap:3px;padding:8px 0 6px;min-height:56px;box-shadow:inset 0 3px 0 transparent}
+#nav button svg{width:23px;height:23px;opacity:.75}
+#nav button.on{color:var(--brand);box-shadow:inset 0 3px 0 var(--brand)}
+#nav button.on svg{opacity:1;fill:currentColor}
 
 /* ---------- generic ---------- */
-h3.sec{font-family:var(--serif);font-size:16px;margin:22px 0 10px;letter-spacing:.5px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);
-  margin-bottom:12px;transition:background-color .6s ease,border-color .6s ease}
-.rowbtn{display:flex;align-items:center;gap:12px;width:100%;background:var(--card);border:1px solid var(--border);
-  border-radius:12px;padding:12px;margin-bottom:8px;color:var(--ink);text-align:left;font-size:13px;
+h3.sec{font-size:17px;margin:22px 0 10px;letter-spacing:.5px}
+.card{background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);
+  margin-bottom:12px;transition:background-color .6s ease,border-color .6s ease;min-width:0}
+.rowbtn{display:flex;align-items:center;gap:12px;width:100%;background:var(--surface);border:1px solid var(--border-subtle);
+  border-radius:12px;padding:12px;margin-bottom:8px;color:var(--ink);text-align:left;font-size:13px;min-height:48px;
   transition:background-color .6s ease}
 .rowbtn .grow{flex:1;min-width:0}
 .rowbtn .t{font-weight:700}
-.rowbtn .s{color:var(--muted);font-size:11px;margin-top:2px}
-.sdot{width:10px;height:10px;border-radius:50%;flex:none}
+.rowbtn .s{color:var(--ink-2);font-size:12px;margin-top:2px}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-.chip{border:1.5px solid var(--border);background:var(--card);color:var(--muted);border-radius:18px;
-  padding:8px 14px;font-size:12px;font-weight:700;transition:background-color .6s ease}
-.chip.on{border-color:var(--red);color:var(--red)}
+.chip{border:1.5px solid var(--border-strong);background:var(--surface);color:var(--ink-2);border-radius:18px;
+  padding:8px 14px;font-size:12px;font-weight:700;min-height:40px;transition:background-color .6s ease}
+.chip.on{border-color:var(--brand);color:var(--brand)}
 .pagehead{padding:calc(14px + env(safe-area-inset-top)) 16px 4px}
-.pagehead h1{font-family:var(--serif);font-size:22px;margin:0;letter-spacing:1px}
-.pagehead p{color:var(--muted);font-size:12px;margin:4px 0 0}
+.pagehead h1{font-size:24px;margin:0;letter-spacing:1px}
+.pagehead p{color:var(--ink-2);font-size:12px;margin:4px 0 0}
 
 /* passport */
 .ringwrap{display:flex;gap:16px;align-items:center}
 .ring{position:relative;width:120px;height:120px;flex:none}
 .ring svg{transform:rotate(-90deg)}
 .ring .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.ring .ctr b{font-family:var(--serif);font-size:26px}
-.ring .ctr span{font-size:10px;color:var(--muted);letter-spacing:1px}
-.tilegrid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:6px}
-.tile{position:relative;aspect-ratio:.86;background:var(--paper);border:1px dashed var(--border);border-radius:4px;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 2px;
-  font-size:9px;color:var(--muted);text-align:center;line-height:1.2;border:0;width:100%;transition:background-color .6s ease}
-.tile b{font-family:var(--serif);font-size:11px;color:var(--ink)}
-.tile.visited{background:#DFF0E4;border:1px solid #2E7D4F;color:#20603C}
-.tile.visited b{color:#20603C}
-.tile.visited::after{content:"✓";position:absolute;top:1px;right:3px;font-size:10px;font-weight:800;color:#2E7D4F}
-.tile.planned{border:1.5px solid #C6A66B;background:#FFF8E6}
-.tile .nm{overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.drow{display:flex;justify-content:space-between;font-size:12px;padding:7px 2px;border-bottom:1px dashed var(--border)}
+.ring .ctr b{font-family:var(--font-display);font-weight:600;font-size:26px}
+.ring .ctr span{font-size:12px;color:var(--ink-2);letter-spacing:1px}
+.explored{font-size:24px;margin:14px 0 4px}
+.explored b{font-weight:600}
+.notchbar{display:flex;gap:2px;margin:8px 0 4px}
+.notchbar i{flex:1;height:12px;min-width:0;background:var(--border-subtle);border-radius:3px}
+.notchbar i.hit{background:var(--brand)}
+.milestones{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 2px}
+.mstone{font-family:var(--font-mono);font-weight:500;font-size:12px;padding:8px 12px;border-radius:14px;
+  background:var(--locked-fill);color:var(--ink-2);border:1.5px dashed var(--border-strong)}
+.mstone.hit{background:var(--milestone);color:#1F1B16;border:1.5px solid var(--milestone);font-weight:700}
+.tilegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px;margin-top:6px}
+.tile{position:relative;aspect-ratio:3/4;background:var(--locked-fill);border:1.5px dashed var(--border-strong);border-radius:4px;
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:4px;padding:10px 8px;
+  font-size:12px;color:var(--ink-2);text-align:left;line-height:1.3;min-width:0;width:100%;
+  transition:background-color .6s ease;
+  --hole:radial-gradient(circle 4px,#000 4px,transparent 4.6px);
+  -webkit-mask:var(--hole) left top/20px 12px repeat-x,var(--hole) left bottom/20px 12px repeat-x,
+    var(--hole) left top/12px 20px repeat-y,var(--hole) right top/12px 20px repeat-y,linear-gradient(#000,#000);
+  -webkit-mask-composite:destination-out;
+  mask:var(--hole) left top/20px 12px repeat-x,var(--hole) left bottom/20px 12px repeat-x,
+    var(--hole) left top/12px 20px repeat-y,var(--hole) right top/12px 20px repeat-y,linear-gradient(#000,#000);
+  mask-composite:subtract}
+.tile .tno{font-family:var(--font-mono);font-weight:500;font-size:12px;color:var(--ink-2)}
+.tile .nm{overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow-wrap:anywhere;min-width:0;font-size:12px}
+.tile.visited{background:var(--surface);border:1.5px solid var(--collected);color:var(--ink)}
+.tile.visited .tno{color:var(--collected)}
+.tile.visited .postmark{position:absolute;right:0;bottom:6px;transform:rotate(-8deg);
+  border:2px solid var(--collected);border-radius:50%;width:62px;height:62px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);font-size:12px;font-weight:500;color:var(--collected);text-transform:uppercase;
+  box-shadow:inset 0 0 0 2px var(--surface),inset 0 0 0 4px var(--collected);opacity:.9;pointer-events:none;
+  text-align:center;line-height:1.15;padding:6px;overflow:hidden}
+.tile.planned{border:1.5px dashed var(--planned);background:var(--surface)}
+.tile.planned .tno{color:var(--planned)}
+.drow{display:flex;justify-content:space-between;font-size:12px;padding:7px 2px;border-bottom:1px dashed var(--border-subtle)}
 .drow:last-child{border-bottom:0}
-.dbar{height:5px;background:var(--border);border-radius:3px;margin-top:4px;overflow:hidden}
-.dbar i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:background-color .6s ease,width .4s ease}
+.dbar{height:6px;background:var(--border-subtle);border-radius:3px;margin-top:4px;overflow:hidden}
+.dbar i{display:block;height:100%;background:var(--brand);border-radius:3px;transition:background-color .6s ease,width .4s ease}
 
 /* toast */
 #toast{position:fixed;z-index:900;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);background:var(--ink);
@@ -205,12 +278,12 @@ h3.sec{font-family:var(--serif);font-size:16px;margin:22px 0 10px;letter-spacing
 .togglerow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 2px;font-size:14px;font-weight:600}
 .switch{position:relative;width:52px;height:30px;flex:none}
 .switch input{opacity:0;width:100%;height:100%;position:absolute;margin:0;cursor:pointer;z-index:2}
-.switch .tr{position:absolute;inset:0;background:var(--border);border-radius:16px;transition:background .3s}
+.switch .tr{position:absolute;inset:0;background:var(--border-strong);border-radius:16px;transition:background .3s}
 .switch .th{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .3s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
-.switch input:checked~.tr{background:var(--red)}
+.switch input:checked~.tr{background:var(--brand)}
 .switch input:checked~.th{left:25px}
 
-.note{font-size:11px;color:var(--muted);line-height:1.6}
+.note{font-size:12px;color:var(--ink-2);line-height:1.6}
 .filebtn{position:relative;overflow:hidden}
 .filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
 
@@ -219,17 +292,19 @@ h3.sec{font-family:var(--serif);font-size:16px;margin:22px 0 10px;letter-spacing
   #sheet.open{transform:translateX(0)}
   #sheet[data-snap="peek"] .sheet-body{display:block}
   .handle{display:none}
-  .tilegrid{grid-template-columns:repeat(10,1fr)}
+  .tilegrid{grid-template-columns:repeat(10,minmax(0,1fr))}
   .scroll{max-width:760px;margin:0 auto;width:100%}
-  #nav{left:auto;right:auto;width:760px;margin:0 auto;border:1px solid var(--border);border-bottom:0;border-radius:18px 18px 0 0}
+  #nav{left:auto;right:auto;width:760px;margin:0 auto;border:1px solid var(--border-subtle);border-bottom:0;border-radius:18px 18px 0 0}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
-  .pin .bd{box-shadow:none}
+  .mk{box-shadow:0 0 0 2px var(--paper)}
 }
-.leaflet-container{font-family:var(--sans)}
+.leaflet-container{font-family:var(--font-sans)}
 #map .leaflet-bottom{bottom:84px}
-#map .leaflet-control-attribution{font-size:9px;background:rgba(250,246,238,.75)}
+#map .leaflet-control-attribution{font-size:12px;background:rgba(251,246,233,.8)}
+html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,15,.8)}
+
 </style>
 </head>
 <body>
@@ -240,9 +315,9 @@ h3.sec{font-family:var(--serif);font-size:16px;margin:22px 0 10px;letter-spacing
   <div class="topbar">
     <div class="brand">
       <svg width="40" height="40" viewBox="0 0 54 54" style="transform:rotate(-8deg);flex:none" aria-hidden="true">
-        <circle cx="27" cy="27" r="24" fill="none" stroke="#C1272D" stroke-width="3.4"/>
-        <circle cx="27" cy="27" r="17" fill="none" stroke="#C1272D" stroke-width="1.5"/>
-        <text x="27" y="32.5" text-anchor="middle" font-family="Georgia,serif" font-size="15" font-weight="700" fill="#C1272D">100</text>
+        <circle cx="27" cy="27" r="24" fill="none" style="stroke:var(--brand)" stroke-width="3.4"/>
+        <circle cx="27" cy="27" r="17" fill="none" style="stroke:var(--brand)" stroke-width="1.5"/>
+        <text x="27" y="32.5" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="15" font-weight="600" style="fill:var(--brand)">100</text>
       </svg>
       <div>
         <div class="wm">STAMP<b>QUEST</b></div>
@@ -252,7 +327,7 @@ h3.sec{font-family:var(--serif);font-size:16px;margin:22px 0 10px;letter-spacing
     <div class="searchrow">
       <div class="searchbox">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-        <input id="searchInput" type="search" placeholder="Search places, post offices, PIN codes..." autocomplete="off" aria-label="Search post offices">
+        <input id="searchInput" type="search" placeholder="Search 100 post offices" autocomplete="off" aria-label="Search post offices">
         <button class="sclear" id="searchClear" aria-label="Clear search">✕</button>
       </div>
       <button class="progchip" id="progChip" aria-label="Open passport progress"><span class="dot"></span><span id="progChipTxt">0/100</span></button>
@@ -260,8 +335,8 @@ h3.sec{font-family:var(--serif);font-size:16px;margin:22px 0 10px;letter-spacing
     <div id="searchResults" role="listbox"></div>
   </div>
   <div class="mapctl">
-    <button id="btnLayers" aria-label="Change map view">Layers</button>
-    <button id="btnLocate" aria-label="Find nearest to me">Near<br>me</button>
+    <button id="btnLayers" aria-label="Change map view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg><span class="cap">Layers</span></button>
+    <button id="btnLocate" aria-label="Find nearest to me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="2" x2="5" y1="12" y2="12"/><line x1="19" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="5"/><line x1="12" x2="12" y1="19" y2="22"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/></svg><span class="cap">Near me</span></button>
   </div>
   <div class="layersheet" id="layerSheet">
     <button data-layer="streets" class="on">Streets</button>
@@ -285,7 +360,7 @@ h3.sec{font-family:var(--serif);font-size:16px;margin:22px 0 10px;letter-spacing
         <div class="ring">
           <svg width="120" height="120" viewBox="0 0 120 120">
             <circle cx="60" cy="60" r="52" fill="none" stroke="var(--border)" stroke-width="11"/>
-            <circle id="ringFg" cx="60" cy="60" r="52" fill="none" stroke="var(--accent)" stroke-width="11"
+            <circle id="ringFg" cx="60" cy="60" r="52" fill="none" stroke="var(--brand)" stroke-width="11"
               stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7" style="transition:stroke-dashoffset .6s ease,stroke .6s ease"/>
           </svg>
           <div class="ctr"><b id="ringNum">0</b><span>OF 100</span></div>
@@ -295,11 +370,14 @@ h3.sec{font-family:var(--serif);font-size:16px;margin:22px 0 10px;letter-spacing
           <div class="note" style="margin-top:6px">Mark a post office visited from its map card to grow your collection.</div>
         </div>
       </div>
+      <div class="explored"><b id="exploredNum">0</b> / 100 explored</div>
+      <div class="notchbar" id="notchBar" aria-hidden="true"></div>
+      <div class="milestones" id="milestoneBadges"></div>
       <div class="chips" id="gridFilters">
-        <button class="chip on" data-f="all">All</button>
-        <button class="chip" data-f="visited">Visited</button>
-        <button class="chip" data-f="planned">Planned</button>
-        <button class="chip" data-f="unvisited">Unvisited</button>
+        <button class="chip on" data-f="all" aria-pressed="true">All</button>
+        <button class="chip" data-f="visited" aria-pressed="false">Visited</button>
+        <button class="chip" data-f="planned" aria-pressed="false">Planned</button>
+        <button class="chip" data-f="unvisited" aria-pressed="false">Unvisited</button>
       </div>
       <div class="tilegrid" id="tileGrid"></div>
     </div>
@@ -347,7 +425,7 @@ h3.sec{font-family:var(--serif);font-size:16px;margin:22px 0 10px;letter-spacing
     </div>
     <h3 class="sec">Danger zone</h3>
     <div class="card">
-      <button class="btn ghost" id="btnReset" style="width:100%;border-color:var(--red);color:var(--red)">Reset all progress</button>
+      <button class="btn ghost" id="btnReset" style="width:100%;border-color:var(--brand);color:var(--brand)">Reset all progress</button>
     </div>
     <div class="note" style="text-align:center;margin-top:18px">StampQuest · v1.0</div>
   </div>
@@ -370,10 +448,11 @@ h3.sec{font-family:var(--serif);font-size:16px;margin:22px 0 10px;letter-spacing
       <div class="no" id="shNo">Nº —</div>
       <h2 id="shName">—</h2>
       <div class="meta" id="shMeta">—</div>
+      <span class="badge unvisited" id="shBadge">UNVISITED</span>
     </div>
-    <span class="badge unvisited" id="shBadge">UNVISITED</span>
   </div>
   <div class="sheet-body" id="sheetBody"></div>
+  <div class="sheet-foot" id="sheetFoot"></div>
 </div>
 
 <div id="toast" role="status"></div>
@@ -394,7 +473,6 @@ const LOCATIONS = [{"n": 1, "name": "Aihole", "office_type": "BO", "office_type_
 
 /* ================= state ================= */
 const LS_KEY = "stampquest_v1";
-const RED = "#C1272D";
 let state = { visited:{}, planned:{}, theme:"light", firstRun:false, milestones:[] };
 try { const s = JSON.parse(localStorage.getItem(LS_KEY)); if (s && typeof s === "object") state = Object.assign(state, s); } catch(e){}
 function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
@@ -416,10 +494,7 @@ function havKm(a,b,c,d){ const R=6371, r=x=>x*Math.PI/180, dLa=r(c-a), dLo=r(d-b
 /* ================= theme ================= */
 function applyTheme(){ document.documentElement.dataset.theme = state.theme;
   $("themeToggle").checked = state.theme === "dark";
-  document.querySelector('meta[name="theme-color"]').content = state.theme === "dark" ? "#12211C" : "#FAF6EE"; }
-function applyLocTheme(loc){ const r = document.documentElement.style;
-  if (loc && loc.theme){ r.setProperty("--accent", loc.theme.accent); r.setProperty("--soft", loc.theme.soft); }
-  else { r.setProperty("--accent", RED); r.setProperty("--soft", "#F7E9DB"); } }
+  document.querySelector('meta[name="theme-color"]').content = state.theme === "dark" ? "#16120F" : "#F3EBD8"; }
 
 /* ================= map ================= */
 const map = L.map("map", { zoomControl:false, attributionControl:true }).setView([15.0, 76.6], 7);
@@ -441,10 +516,12 @@ const cluster = L.markerClusterGroup({
 });
 function pinIcon(l, sel){
   const st = statusOf(l.n);
-  const cls = "pin" + (st==="planned" ? " planned" : "") + (st==="done" ? "" : "") + (st==="visited" ? " done" : "") + (sel ? " sel" : "");
-  const inner = st === "visited" ? "✓" : l.n;
-  return L.divIcon({ html:'<div class="'+cls+'" style="--c:'+l.district_color+'"><div class="bd"><span>'+inner+'</span></div></div>',
-    className:"", iconSize: sel?[38,38]:[30,30], iconAnchor: sel?[19,36]:[15,28] });
+  const cls = "mk " + st + (sel ? " sel" : "");
+  const inner = st === "visited" ? '<span class="mk-check">✓</span>'
+    : st === "planned" ? '<span class="mk-n">'+l.n+'</span><span class="mk-star">★</span>'
+    : '<span class="mk-n">'+l.n+'</span>';
+  return L.divIcon({ html:'<div class="'+cls+'">'+inner+'</div>',
+    className:"", iconSize: sel?[40,40]:[32,32], iconAnchor: sel?[20,38]:[16,30] });
 }
 LOCATIONS.forEach(l => {
   const m = L.marker([l.lat, l.lng], { icon: pinIcon(l,false), title: fullName(l) });
@@ -468,8 +545,8 @@ $("layerSheet").querySelectorAll("button").forEach(b => b.onclick = () => {
 let selectedN = null;
 const sheet = $("sheet");
 function setSnap(s){ sheet.dataset.snap = s; }
-function openSheet(){ sheet.classList.add("open"); setSnap("half"); }
-function closeSheet(){ sheet.classList.remove("open"); selectedN = null; applyLocTheme(null);
+function openSheet(){ sheet.classList.add("open"); setSnap("half"); document.body.classList.add("sheet-open"); }
+function closeSheet(){ sheet.classList.remove("open"); selectedN = null; document.body.classList.remove("sheet-open");
   if (location.hash.startsWith("#loc=")) history.replaceState(null,"",location.pathname+location.search); }
 $("sheetClose").onclick = closeSheet;
 
@@ -489,7 +566,6 @@ function openLocation(n, opts){
   if (selectedN && markers[selectedN]) refreshMarker(selectedN);
   selectedN = n;
   refreshMarker(n);
-  applyLocTheme(l);
   $("shNo").textContent = "Nº " + l.n;
   $("shName").textContent = fullName(l);
   $("shMeta").textContent = (l.pin + " · " + l.district).toUpperCase();
@@ -498,6 +574,8 @@ function openLocation(n, opts){
   if (opts.pan !== false) map.flyTo([l.lat, l.lng], Math.max(map.getZoom(), 12), { duration:.6 });
   if (location.hash !== "#loc="+n) history.replaceState(null,"","#loc="+n);
 }
+const LANDSCAPE_LABEL = { forest:"Forest", coastal:"Coastal", heritage:"Heritage", urban:"Urban",
+  hills:"Hills", riverside:"Riverside", plains:"Plains", lake:"Lake" };
 function renderSheetBody(l){
   const st = statusOf(l.n);
   const badge = $("shBadge");
@@ -506,22 +584,25 @@ function renderSheetBody(l){
   const old = sheet.querySelector(".stamp-pop"); if (old) old.remove();
   let ppc = "";
   if (l.ppc) ppc = '<div class="kv"><span class="k">CANCELLATION</span><span class="v">'+esc(l.ppc.motif)+'<span class="sub">Introduced '+esc(l.ppc.introduced)+'</span></span></div>';
+  const office = l.office_type_full ? esc(l.office_type_full) : "Office type unknown";
+  const approx = l.approx ? '<div class="hintline">Approximate location — pinned to the town centre.</div>' : "";
   $("sheetBody").innerHTML =
     '<div class="stampcard" id="stampCard">'+
+      '<div class="kv"><span class="k">OFFICE</span><span class="v">'+office+'</span></div>'+
       '<div class="kv"><span class="k">DISTRICT</span><span class="v">'+esc(l.district)+'</span></div>'+
       '<div class="kv"><span class="k">REGION</span><span class="v">'+esc(l.region)+'</span></div>'+
-      '<div class="kv"><span class="k">SETTING</span><span class="v">'+esc(l.theme.label)+'</span></div>'+
+      '<div class="kv"><span class="k">SETTING</span><span class="v">'+esc(LANDSCAPE_LABEL[l.landscape] || l.landscape)+'</span></div>'+
       ppc +
       '<div class="kv"><span class="k">GETTING THERE</span><span class="v">Via '+esc(l.transit_town)+'<span class="sub">Nearest transit town — indicative only</span></span></div>'+
+      approx +
       '<div class="actionrow">'+
-        '<a class="btn primary" style="text-decoration:none;text-align:center" target="_blank" rel="noopener" href="'+gmapsDir(l.lat,l.lng)+'">Directions</a>'+
-        '<a class="btn ghost" style="text-decoration:none;text-align:center" target="_blank" rel="noopener" href="'+gmapsPhotos(l)+'">Photos</a>'+
-      '</div>'+
-      '<div class="actionrow">'+
-        '<button class="btn ghost '+(st==="visited"?"done-on":"")+'" id="btnVisited" style="flex:1">'+(st==="visited"?"✓ Visited":"Mark visited")+'</button>'+
-        '<button class="btn ghost '+(st==="planned"?"planned-on":"")+'" id="btnPlanned" style="flex:1">'+(st==="planned"?"★ Planned":"Plan to visit")+'</button>'+
+        '<a class="btn ghost" style="flex:1;text-decoration:none;text-align:center" target="_blank" rel="noopener" href="'+gmapsPhotos(l)+'">Photos</a>'+
+        '<button class="btn ghost" id="btnPlanned" style="flex:1">'+(st==="planned"?"★ Planned":"Plan to visit")+'</button>'+
       '</div>'+
     '</div>';
+  $("sheetFoot").innerHTML =
+    '<a class="btn primary" style="text-decoration:none;text-align:center" target="_blank" rel="noopener" href="'+gmapsDir(l.lat,l.lng)+'">Directions</a>'+
+    '<button class="btn accent" id="btnVisited">'+(st==="visited"?"✓ Visited":"Mark visited")+'</button>';
   $("btnVisited").onclick = () => toggleVisited(l.n);
   $("btnPlanned").onclick = () => togglePlanned(l.n);
 }
@@ -560,9 +641,9 @@ sInput.addEventListener("input", () => {
   const hits = LOCATIONS.filter(l =>
     l.name.toLowerCase().includes(q) || l.district.toLowerCase().includes(q) ||
     l.pin.includes(q) || String(l.n) === q).slice(0,8);
-  if (!hits.length){ sBox.innerHTML = '<div style="padding:12px;font-size:13px;color:var(--muted)">No matches.</div>'; }
+  if (!hits.length){ sBox.innerHTML = '<div style="padding:12px;font-size:13px;color:var(--ink-2)">No matches.</div>'; }
   else sBox.innerHTML = hits.map(l =>
-    '<button data-n="'+l.n+'"><span class="n">'+l.n+'</span><span><b>'+esc(fullName(l))+'</b><br><span style="color:var(--muted);font-size:11px">'+esc(l.district)+' · '+l.pin+'</span></span></button>').join("");
+    '<button data-n="'+l.n+'"><span class="n">'+l.n+'</span><span><b>'+esc(fullName(l))+'</b><br><span style="color:var(--ink-2);font-size:12px">'+esc(l.district)+' · '+l.pin+'</span></span></button>').join("");
   sBox.style.display = "block";
   sBox.querySelectorAll("button").forEach(b => b.onclick = () => {
     sBox.style.display = "none"; sInput.value = ""; sClear.style.display = "none"; sInput.blur();
@@ -583,7 +664,7 @@ $("btnLocate").onclick = () => {
     { timeout:12000 });
 };
 function nearbyManual(msg){
-  selectedN = null; applyLocTheme(null);
+  selectedN = null;
   $("shNo").textContent = "NEARBY"; $("shName").textContent = "Nearest post offices";
   $("shMeta").textContent = "FIND CLOSEST STAMPS";
   const b = $("shBadge"); b.className = "badge unvisited"; b.textContent = "NEARBY";
@@ -592,6 +673,7 @@ function nearbyManual(msg){
     '<input id="manLat" inputmode="decimal" placeholder="Latitude e.g. 12.87">'+
     '<input id="manLng" inputmode="decimal" placeholder="Longitude e.g. 74.84"></div>'+
     '<div class="actionrow"><button class="btn accent" id="manGo" style="flex:1">Use this location</button></div></div>';
+  $("sheetFoot").innerHTML = "";
   openSheet();
   $("manGo").onclick = () => {
     const la = parseFloat($("manLat").value), ln = parseFloat($("manLng").value);
@@ -603,14 +685,15 @@ function showNearby(){
   if (!myPos) return;
   const sorted = LOCATIONS.map(l => ({ l, d: havKm(myPos.lat, myPos.lng, l.lat, l.lng) }))
     .sort((a,b) => a.d - b.d).slice(0, 12);
-  selectedN = null; applyLocTheme(null);
+  selectedN = null;
   $("shNo").textContent = "NEARBY"; $("shName").textContent = "Nearest post offices";
   $("shMeta").textContent = "SORTED BY DISTANCE";
   const b = $("shBadge"); b.className = "badge unvisited"; b.textContent = "NEARBY";
   $("sheetBody").innerHTML = '<div class="stampcard">' + sorted.map(({l,d}) =>
-    '<button class="nearby-row" data-n="'+l.n+'"><span class="sdot" style="background:'+l.district_color+'"></span>'+
-    '<span><b>'+l.n+'. '+esc(l.name)+'</b><br><span style="color:var(--muted);font-size:11px">'+esc(l.district)+' · '+(statusOf(l.n)==="visited"?"✓ visited":statusOf(l.n))+'</span></span>'+
+    '<button class="nearby-row" data-n="'+l.n+'">'+
+    '<span><b>'+l.n+'. '+esc(l.name)+'</b><br><span style="color:var(--ink-2);font-size:12px">'+esc(l.district)+' · '+(statusOf(l.n)==="visited"?"✓ visited":statusOf(l.n))+'</span></span>'+
     '<span class="d">'+d.toFixed(1)+' km</span></button>').join("") + "</div>";
+  $("sheetFoot").innerHTML = "";
   openSheet();
   $("sheetBody").querySelectorAll(".nearby-row").forEach(r => r.onclick = () => openLocation(+r.dataset.n));
 }
@@ -638,9 +721,9 @@ function renderCircuits(){
       '<div class="note">'+done+'/'+stops.length+' visited</div></div>'+
       '<div class="dbar"><i style="width:'+(stops.length?done/stops.length*100:0)+'%"></i></div>'+
       '<div style="margin-top:10px">'+stops.map(l =>
-        '<button class="rowbtn" data-n="'+l.n+'"><span class="sdot" style="background:'+(state.visited[l.n]?"#2E7D4F":l.district_color)+'"></span>'+
+        '<button class="rowbtn" data-n="'+l.n+'">'+
         '<span class="grow"><span class="t">'+l.n+'. '+esc(l.name)+'</span><span class="s" style="display:block">'+esc(l.district)+' · '+l.pin+'</span></span>'+
-        '<span style="color:var(--muted)">›</span></button>').join("")+'</div>'+
+        '<span style="color:var(--ink-2)">›</span></button>').join("")+'</div>'+
       '<button class="btn ghost" data-fit="'+esc(rg)+'" style="width:100%;margin-top:4px">Show on map</button></div>';
   }).join("");
   $("circuitList").querySelectorAll(".rowbtn").forEach(b => b.onclick = () => { switchTab("explore"); openLocation(+b.dataset.n); });
@@ -661,16 +744,21 @@ function renderProgress(){
   const msgs = [[0,"Your passport is waiting for its first stamp."],[1,"Off to a great start — keep going."],[25,"A quarter century of stamps!"],[50,"Halfway there. The map is filling up."],[75,"The final stretch — almost legendary."],[100,"All 100 collected. Legendary."]];
   let m = msgs[0][1]; msgs.forEach(([t,x]) => { if (c >= t) m = x; });
   $("ringMsg").textContent = m;
+  $("exploredNum").textContent = c;
+  $("notchBar").innerHTML = LOCATIONS.map(l => '<i class="'+(state.visited[l.n]?"hit":"")+'"></i>').join("");
+  $("milestoneBadges").innerHTML = [25,50,75,100].map(mn =>
+    '<span class="mstone'+(c>=mn?" hit":"")+'">'+mn+' stamps</span>').join("");
 }
 $("gridFilters").querySelectorAll(".chip").forEach(ch => ch.onclick = () => {
-  $("gridFilters").querySelectorAll(".chip").forEach(x => x.classList.toggle("on", x === ch));
+  $("gridFilters").querySelectorAll(".chip").forEach(x => { x.classList.toggle("on", x === ch); x.setAttribute("aria-pressed", x === ch ? "true" : "false"); });
   gridFilter = ch.dataset.f; renderGrid();
 });
 function renderGrid(){
   const g = $("tileGrid");
   g.innerHTML = LOCATIONS.filter(l => gridFilter === "all" || statusOf(l.n) === gridFilter).map(l => {
     const st = statusOf(l.n);
-    return '<button class="tile '+st+'" data-n="'+l.n+'" aria-label="'+l.n+". "+esc(l.name)+", "+st+'"><b>'+l.n+'</b><span class="nm">'+esc(l.name)+'</span></button>';
+    const pm = st === "visited" ? '<span class="postmark">'+esc(l.district)+'</span>' : "";
+    return '<button class="tile '+st+'" data-n="'+l.n+'" aria-label="'+l.n+". "+esc(l.name)+", "+st+'"><span class="tno">'+l.n+'</span><span class="nm">'+esc(l.name)+'</span>'+pm+'</button>';
   }).join("");
   g.querySelectorAll(".tile").forEach(t => t.onclick = () => { switchTab("explore"); openLocation(+t.dataset.n); });
 }
@@ -678,41 +766,50 @@ function renderDistricts(){
   const seen = []; LOCATIONS.forEach(l => { if (!seen.includes(l.district)) seen.push(l.district); });
   $("districtProg").innerHTML = seen.map(d => {
     const ds = LOCATIONS.filter(l => l.district === d), done = ds.filter(l => state.visited[l.n]).length;
-    return '<div style="padding:6px 0"><div class="drow"><span><span class="sdot" style="background:'+ds[0].district_color+';display:inline-block;margin-right:8px"></span>'+esc(d)+'</span><b>'+done+'/'+ds.length+'</b></div>'+
+    return '<div style="padding:6px 0"><div class="drow"><span>'+esc(d)+'</span><b>'+done+'/'+ds.length+'</b></div>'+
       '<div class="dbar"><i style="width:'+(done/ds.length*100)+'%"></i></div></div>';
   }).join("");
 }
 
 /* share card */
+function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
 function drawShareCard(){
   const W=1080,H=1350,cv=document.createElement("canvas");cv.width=W;cv.height=H;
   const x=cv.getContext("2d"), dark = state.theme==="dark";
-  x.fillStyle = dark ? "#12211C" : "#FAF6EE"; x.fillRect(0,0,W,H);
-  x.strokeStyle = dark ? "#2C4237" : "#D9CFB4"; x.lineWidth=3; x.strokeRect(40,40,W-80,H-80);
-  x.strokeStyle="#C1272D"; x.lineWidth=6;
+  const paper=cssVar("--paper")||(dark?"#16120F":"#F3EBD8"),
+        surface=cssVar("--surface")||(dark?"#221C17":"#FBF6E9"),
+        ink=cssVar("--ink")||(dark?"#F3EDE0":"#1F1B16"),
+        ink2=cssVar("--ink-2")||(dark?"#B9AF9F":"#54493C"),
+        brand=cssVar("--brand")||(dark?"#F0707A":"#A91F26"),
+        subtle=cssVar("--border-subtle")||(dark?"#3A322A":"#D9CFB4"),
+        collected=cssVar("--collected")||(dark?"#6FCB9A":"#2B6A46");
+  const FD='Fraunces,Georgia,serif', FS='DM Sans,system-ui,sans-serif', FM='DM Mono,ui-monospace,monospace';
+  x.fillStyle=paper; x.fillRect(0,0,W,H);
+  x.strokeStyle=subtle; x.lineWidth=3; x.strokeRect(40,40,W-80,H-80);
+  x.strokeStyle=brand; x.lineWidth=6;
   x.beginPath(); x.arc(W-220,230,110,0,7); x.stroke();
   x.lineWidth=2; x.beginPath(); x.arc(W-220,230,82,0,7); x.stroke();
   x.save(); x.translate(W-220,230); x.rotate(-0.14);
-  x.fillStyle="#C1272D"; x.font="700 64px Georgia,serif"; x.textAlign="center"; x.fillText("100",0,24); x.restore();
-  const ink = dark ? "#F1EEE3" : "#2E2A26", mut = dark ? "#9AA79B" : "#8A8178";
-  x.fillStyle=ink; x.textAlign="center"; x.font="700 54px Georgia,serif";
+  x.fillStyle=brand; x.font="600 64px "+FD; x.textAlign="center"; x.fillText("100",0,24); x.restore();
+  x.fillStyle=ink; x.textAlign="center"; x.font="600 54px "+FD;
   x.fillText("MY PHILATELY JOURNEY", W/2, 420);
   const c=visitedCount();
-  x.font="700 190px Georgia,serif"; x.fillStyle="#C1272D"; x.fillText(c+"", W/2, 640);
-  x.font="400 44px Georgia,serif"; x.fillStyle=mut; x.fillText("of 100 post offices", W/2, 710);
-  x.fillStyle= dark ? "#2C4237" : "#E7DFCB";
+  x.font="600 190px "+FD; x.fillStyle=brand; x.fillText(c+"", W/2, 640);
+  x.font="400 44px "+FS; x.fillStyle=ink2; x.fillText("of 100 post offices", W/2, 710);
+  x.fillStyle=subtle;
   const bw=W-320; x.fillRect((W-bw)/2, 780, bw, 26);
-  x.fillStyle="#C1272D"; x.fillRect((W-bw)/2, 780, bw*c/100, 26);
-  x.font="400 34px Georgia,serif"; x.fillStyle=mut;
+  x.fillStyle=collected; x.fillRect((W-bw)/2, 780, bw*c/100, 26);
+  x.font="500 34px "+FM; x.fillStyle=ink2;
   x.fillText("Karnataka Philately Passport", W/2, 900);
-  x.font="700 40px Georgia,serif"; x.fillStyle=ink; x.fillText("STAMPQUEST", W/2, 1010);
-  x.font="400 30px sans-serif"; x.fillStyle=mut;
+  x.font="600 40px "+FD; x.fillStyle=ink; x.fillText("STAMPQUEST", W/2, 1010);
+  x.font="400 30px "+FS; x.fillStyle=ink2;
   const url = location.origin + location.pathname;
   x.fillText(url.replace(/^https?:\/\//,""), W/2, 1060);
-  x.font="italic 30px Georgia,serif"; x.fillText("Every stamp tells a story.", W/2, 1180);
+  x.font="italic 400 30px "+FD; x.fillText("Every stamp tells a story.", W/2, 1180);
   return cv;
 }
 $("btnShare").onclick = async () => {
+  try { await document.fonts.ready; } catch(e){}
   const cv = drawShareCard();
   const blob = await new Promise(r => cv.toBlob(r,"image/png"));
   const file = new File([blob],"stampquest-journey.png",{type:"image/png"});
@@ -747,13 +844,13 @@ $("fileImport").addEventListener("change", e => {
 });
 
 /* ================= saved ================= */
-const POSTBOX = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#C1272D" stroke-width="1.8" aria-hidden="true"><rect x="4" y="8" width="16" height="11" rx="2"/><path d="M4 8a8 5 0 0 1 16 0"/><rect x="10" y="3.5" width="4" height="3" rx="1"/><path d="M9 19v2M15 19v2"/></svg>';
+const POSTBOX = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" style="stroke:var(--brand)" stroke-width="1.8" aria-hidden="true"><rect x="4" y="8" width="16" height="11" rx="2"/><path d="M4 8a8 5 0 0 1 16 0"/><rect x="10" y="3.5" width="4" height="3" rx="1"/><path d="M9 19v2M15 19v2"/></svg>';
 function renderSaved(){
   const list = LOCATIONS.filter(l => state.planned[l.n]);
   $("savedList").innerHTML = list.length ? list.map(l =>
     '<button class="rowbtn" data-n="'+l.n+'">'+POSTBOX+
     '<span class="grow"><span class="t">'+l.n+'. '+esc(l.name)+'</span><span class="s" style="display:block">'+esc(l.district)+' · '+l.pin+'</span></span>'+
-    '<span style="color:var(--muted)">›</span></button>').join("")
+    '<span style="color:var(--ink-2)">›</span></button>').join("")
     : '<div class="card" style="text-align:center;padding:34px 18px"><div style="display:flex;justify-content:center;margin-bottom:10px">'+POSTBOX.replace('width="26" height="26"','width="44" height="44"')+'</div>'+
       '<div class="serif" style="font-size:16px;margin-bottom:6px">Your postbox is empty.</div>'+
       '<div class="note">Tap "Plan to visit" on any post office to park it here for later.</div></div>';
@@ -777,7 +874,7 @@ function handleHash(){
 window.addEventListener("hashchange", handleHash);
 $("btnFirstOk").onclick = () => { state.firstRun = true; save(); $("firstrun").classList.remove("show"); };
 
-applyTheme(); applyLocTheme(null);
+applyTheme();
 renderProgress(); renderCircuits(); renderGrid(); renderDistricts(); renderSaved();
 if (!state.firstRun) $("firstrun").classList.add("show");
 setTimeout(handleHash, 400);
