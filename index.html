@@ -536,7 +536,7 @@ function applyTheme(){ document.documentElement.dataset.theme = state.theme;
 const map = L.map("map", { zoomControl:false, attributionControl:true }).setView([15.0, 76.6], 7);
 L.control.zoom({ position:"bottomright" }).addTo(map);
 map.attributionControl.setPrefix(false);
-const cartoURL = kind => "https://{s}.basemaps.cartocdn.com/rastertiles/" + kind + "/{z}/{x}/{y}@2x.png" + (state.cartoKey ? "?api_key=" + encodeURIComponent(state.cartoKey) : "");
+const cartoURL = kind => "https://{s}.basemaps.cartocdn.com/rastertiles/" + kind + "/{z}/{x}/{y}@2x.png" + (state.cartoKey ? "?key=" + encodeURIComponent(state.cartoKey) : "");
 const layers = {
   streets: L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom:19, attribution:"© OpenStreetMap contributors" }),
   satellite: L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom:19, attribution:"Imagery © Esri" }),
