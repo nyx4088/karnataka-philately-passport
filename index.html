@@ -808,9 +808,10 @@ fetch("karnataka.geojson").then(r => { if (!r.ok) throw 0; return r.json(); }).t
     const navH = (document.getElementById("nav")?.offsetHeight || 64) + 16;
     const sheetH = document.getElementById("sheet")?.classList.contains("open")
       ? document.getElementById("sheet").offsetHeight : 0;
+    // rail is 40px wide at right:8px = 48px; use 72px to clear it with margin
     map.fitBounds(bounds, {
       paddingTopLeft: L.point(12, headerH),
-      paddingBottomRight: L.point(64, navH + sheetH),
+      paddingBottomRight: L.point(72, navH + sheetH),
       animate: false
     });
     map.setMinZoom(map.getZoom());
@@ -1056,6 +1057,27 @@ function closePhotoPicker(){
   const b = document.getElementById("photoBackdrop");
   if (b) b.remove();
   document.removeEventListener("keydown", photoEscHandler);
+}
+/* tile photo long-press actions */
+function openTilePhotoActions(n){
+  closePhotoPicker();
+  const b = document.createElement("div");
+  b.id = "photoBackdrop";
+  b.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:955";
+  b.onclick = closePhotoPicker;
+  document.body.appendChild(b);
+  const d = document.createElement("div");
+  d.id = "photoChoice"; d.className = "photosheet"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", "Photo options");
+  const l = byN[n];
+  d.innerHTML = '<div style="text-align:center;padding:8px 0 4px;font-weight:600;color:var(--ink)">'+n+'. '+esc(l?l.name:"")+'</div>'+
+    '<button id="tpChange">Change photo</button><button id="tpRemove" style="color:var(--error)">Remove photo</button><button id="tpCancel" class="cancel">Cancel</button>';
+  document.body.appendChild(d);
+  requestAnimationFrame(() => d.classList.add("open"));
+  $("tpChange").onclick = () => { closePhotoPicker(); openPhotoPicker(n); };
+  $("tpRemove").onclick = () => { closePhotoPicker(); removePhoto(n); };
+  $("tpCancel").onclick = closePhotoPicker;
+  document.addEventListener("keydown", photoEscHandler);
+  history.pushState({ photoSheet: true }, "");
 }
 function photoEscHandler(e){ if (e.key === "Escape") closePhotoPicker(); }
 function openPhotoPicker(n){
@@ -1323,6 +1345,24 @@ function renderGrid(){
   }).join("");
   g.querySelectorAll(".tile").forEach(t => t.onclick = () => { switchTab("explore"); openLocation(+t.dataset.n); });
   g.querySelectorAll(".pcam").forEach(b => b.onclick = e => { e.stopPropagation(); openPhotoPicker(+b.dataset.n); });
+  // long-press on photo tile: quick actions (Remove / Change)
+  function attachLongPress(t){
+    if (t.dataset.lp) return;
+    t.dataset.lp = "1";
+    let lpTimer = null;
+    const cancel = () => { if (lpTimer){ clearTimeout(lpTimer); lpTimer = null; } };
+    t.addEventListener("touchstart", e => {
+      cancel();
+      lpTimer = setTimeout(() => {
+        lpTimer = null;
+        if (navigator.vibrate) navigator.vibrate(15);
+        openTilePhotoActions(+t.dataset.n);
+      }, 550);
+    }, { passive:true });
+    t.addEventListener("touchend", cancel, { passive:true });
+    t.addEventListener("touchmove", cancel, { passive:true });
+    t.addEventListener("contextmenu", e => { e.preventDefault(); cancel(); openTilePhotoActions(+t.dataset.n); });
+  }
   // lazy-load photo thumbnails
   const io = new IntersectionObserver(entries => {
     entries.forEach(async en => {
@@ -1340,6 +1380,7 @@ function renderGrid(){
       if (ph) ph.style.backgroundImage = 'url("'+url+'")';
       const pcam = tile.querySelector(".pcam");
       if (pcam){ pcam.classList.add("has"); pcam.setAttribute("aria-label", "Change photo"); pcam.setAttribute("title", "Change photo"); }
+      attachLongPress(tile);
     });
   }, { rootMargin: "100px" });
   g.querySelectorAll(".tile").forEach(t => io.observe(t));
