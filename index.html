@@ -89,26 +89,27 @@ html[data-theme="dark"]{--fog:#2C251F}
   color:var(--ink-2)!important;font-family:var(--font-sans)!important;font-size:11px!important;
   letter-spacing:2.5px!important;text-transform:uppercase;white-space:nowrap}
 .fog-label:before{display:none!important}
-.topbar{position:relative;z-index:500;padding:calc(10px + env(safe-area-inset-top)) 12px 0;pointer-events:none}
+.topbar{position:absolute;z-index:500;top:0;left:0;right:0;padding:calc(8px + env(safe-area-inset-top)) 8px 0;pointer-events:none}
 .topbar>*{pointer-events:auto}
-.brand{display:inline-flex;align-items:center;gap:10px;background:var(--surface);
-  border:1px solid var(--border-subtle);border-radius:16px;padding:8px 16px 8px 10px;
-  box-shadow:var(--shadow);margin-bottom:8px;transition:background-color .6s ease,border-color .6s ease}
-.brand .wm{font-weight:600;font-size:20px;letter-spacing:3px}
-.brand .wm b{color:var(--brand);font-weight:600}
-.brand .sub{font-size:12px;letter-spacing:2.2px;color:var(--ink-2);margin-top:1px}
-.searchrow{display:flex;gap:8px;align-items:center}
-.searchbox{flex:1;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border-subtle);
-  border-radius:22px;padding:0 6px 0 14px;box-shadow:var(--shadow);transition:background-color .6s ease,border-color .6s ease}
-.searchbox input{flex:1;border:0;outline:0;background:transparent;color:var(--ink);font-size:14px;padding:11px 0;min-width:0}
+.hcard{background:var(--surface);border:1px solid var(--border-subtle);border-radius:16px;position:relative;
+  box-shadow:var(--shadow);padding:8px;transition:background-color .6s ease,border-color .6s ease}
+.hrow1{display:flex;align-items:center;justify-content:space-between;min-height:44px}
+.hbrand{display:flex;align-items:center;gap:10px}
+.hbrand .wm{font-family:var(--font-serif);font-weight:600;font-size:20px;letter-spacing:3px;color:var(--ink)}
+.hbrand .wm b{color:var(--brand);font-weight:600}
+.hcard .searchbox{margin-top:8px}
+#searchResults{position:absolute;top:calc(100% + 4px);left:0;right:0;max-height:50vh;overflow-y:auto;z-index:510;
+  background:var(--surface);border:1px solid var(--border-subtle);border-radius:12px;box-shadow:var(--shadow);display:none}
+#searchResults.show{display:block}
+.searchbox{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border-subtle);
+  border-radius:22px;padding:0 6px 0 14px;box-shadow:var(--shadow);transition:background-color .6s ease,border-color .6s ease;min-height:44px}
+.searchbox input{flex:1;border:0;outline:0;background:transparent;color:var(--ink);font-size:16px;padding:11px 0;min-width:0}
 .searchbox input::placeholder{color:var(--ink-2)}
-.sclear{border:0;background:transparent;color:var(--ink-2);font-size:16px;padding:8px;display:none}
+.sclear{border:0;background:transparent;color:var(--ink-2);font-size:16px;padding:8px;display:none;min-width:44px;min-height:44px}
 .progchip{flex:none;display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border-subtle);
-  border-radius:20px;padding:9px 13px;font-size:12px;font-weight:700;box-shadow:var(--shadow);color:var(--ink);
+  border-radius:20px;padding:9px 13px;font-size:14px;font-weight:500;box-shadow:var(--shadow);color:var(--ink);min-height:44px;
   transition:background-color .6s ease;font-family:var(--font-mono)}
 .progchip .dot{width:8px;height:8px;border-radius:50%;background:var(--brand);transition:background-color .6s ease}
-#searchResults{margin-top:8px;max-height:38vh;overflow-y:auto;background:var(--surface);border:1px solid var(--border-subtle);
-  border-radius:12px;box-shadow:var(--shadow);display:none;transition:background-color .6s ease}
 #searchResults button{display:flex;width:100%;text-align:left;gap:10px;align-items:center;background:none;border:0;
   border-bottom:1px solid var(--border-subtle);padding:10px 12px;color:var(--ink);font-size:13px}
 #searchResults button:last-child{border-bottom:0}
@@ -329,6 +330,15 @@ h3.sec{font-size:17px;margin:22px 0 10px;letter-spacing:.5px}
 .segrow .seg.on{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
 .checkrow{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;margin:6px 0;cursor:pointer}
 .checkrow input{width:20px;height:20px;accent-color:var(--brand)}
+/* circuits dropdowns */
+.chead{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px;
+  background:none;border:0;padding:6px 2px;cursor:pointer;color:var(--ink);text-align:left}
+.chead .cmeta{display:flex;align-items:center;gap:8px}
+.chev{display:inline-block;font-size:20px;color:var(--ink-2);transition:transform .2s;line-height:1}
+.chev.open{transform:rotate(90deg)}
+.cbody{display:none}
+.cbody.open{display:block}
+@media (prefers-reduced-motion:reduce){.chev{transition:none}}
 
 /* toggle */
 .togglerow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 2px;font-size:14px;font-weight:600}
@@ -369,26 +379,25 @@ html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,
 <section class="view active" id="view-explore">
   <div id="map"></div>
   <div class="topbar">
-    <div class="brand">
-      <svg width="40" height="40" viewBox="0 0 54 54" style="transform:rotate(-8deg);flex:none" aria-hidden="true">
-        <circle cx="27" cy="27" r="24" fill="none" style="stroke:var(--brand)" stroke-width="3.4"/>
-        <circle cx="27" cy="27" r="17" fill="none" style="stroke:var(--brand)" stroke-width="1.5"/>
-        <text x="27" y="32.5" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="15" font-weight="600" style="fill:var(--brand)">100</text>
-      </svg>
-      <div>
-        <div class="wm">STAMP<b>QUEST</b></div>
-        <div class="sub">KARNATAKA PHILATELY PASSPORT</div>
+    <div class="hcard">
+      <div class="hrow1">
+        <div class="hbrand">
+          <svg width="32" height="32" viewBox="0 0 54 54" style="transform:rotate(-8deg);flex:none" aria-hidden="true">
+            <circle cx="27" cy="27" r="24" fill="none" style="stroke:var(--brand)" stroke-width="3.4"/>
+            <circle cx="27" cy="27" r="17" fill="none" style="stroke:var(--brand)" stroke-width="1.5"/>
+            <text x="27" y="32.5" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="15" font-weight="600" style="fill:var(--brand)">100</text>
+          </svg>
+          <span class="wm">STAMP<b>QUEST</b></span>
+        </div>
+        <button class="progchip" id="progChip" aria-label="Open passport progress"><span class="dot"></span><span id="progChipTxt">0/100</span></button>
       </div>
-    </div>
-    <div class="searchrow">
       <div class="searchbox">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
         <input id="searchInput" type="search" placeholder="Search 100 post offices" autocomplete="off" aria-label="Search post offices">
         <button class="sclear" id="searchClear" aria-label="Clear search">✕</button>
       </div>
-      <button class="progchip" id="progChip" aria-label="Open passport progress"><span class="dot"></span><span id="progChipTxt">0/100</span></button>
+      <div id="searchResults" role="listbox"></div>
     </div>
-    <div id="searchResults" role="listbox"></div>
   </div>
   <div class="mapctl">
     <button id="btnLayers" aria-label="Change map view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg><span class="cap">Layers</span></button>
@@ -533,7 +542,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,
     <div class="card">
       <button class="btn ghost" id="btnReset" style="width:100%;border-color:var(--brand);color:var(--brand)">Reset all progress</button>
     </div>
-    <div class="note" style="text-align:center;margin-top:18px">StampQuest · v1.0</div>
+    <div class="note" style="text-align:center;margin-top:18px">StampQuest · v1.0<br>Karnataka Philately Passport</div>
   </div>
 </section>
 
@@ -627,7 +636,7 @@ function applyTheme(){ document.documentElement.dataset.theme = state.theme;
   document.querySelector('meta[name="theme-color"]').content = state.theme === "dark" ? "#16120F" : "#F3EBD8"; }
 
 /* ================= map ================= */
-const map = L.map("map", { zoomControl:false, attributionControl:true }).setView([15.0, 76.6], 7);
+const map = L.map("map", { zoomControl:false, attributionControl:true, zoomSnap:0.1, zoomDelta:0.5 }).setView([15.0, 76.6], 7);
 L.control.zoom({ position:"bottomright" }).addTo(map);
 map.attributionControl.setPrefix(false);
 /* Karnataka bbox (buffered, from karnataka.geojson) — tiles never load outside this */
@@ -696,16 +705,53 @@ fetch("karnataka.geojson").then(r => { if (!r.ok) throw 0; return r.json(); }).t
   /* subtle "Karnataka only." label over the sea fog */
   L.tooltip({ permanent:true, direction:"center", className:"fog-label", interactive:false })
     .setLatLng([13.6, 72.4]).setContent("Karnataka only.").addTo(map);
-  /* map limits */
-  map.options.maxBoundsViscosity = 1.0;
-  map.setMaxBounds(bounds.pad(0.06));
-  const minZ = map.getBoundsZoom(bounds);
-  map.setMinZoom(minZ);
-  if (map.getZoom() < minZ) map.setZoom(minZ);
+  /* map limits + fit */
+  map.options.maxBoundsViscosity = 0.35; // rubber-band: allow overshoot, snap back on release
+  map.setMaxBounds(bounds.pad(0.12));
+  window.fitKarnataka = function(){
+    const headerH = (document.querySelector(".hcard")?.offsetHeight || 112) + 16;
+    const navH = (document.getElementById("nav")?.offsetHeight || 64) + 16;
+    const sheetH = document.getElementById("sheet")?.classList.contains("open")
+      ? document.getElementById("sheet").offsetHeight : 0;
+    map.fitBounds(bounds, {
+      paddingTopLeft: L.point(12, headerH),
+      paddingBottomRight: L.point(12, navH + sheetH),
+      animate: false
+    });
+    map.setMinZoom(map.getZoom());
+  };
+  fitKarnataka();
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let rsT;
+  window.addEventListener("resize", () => { clearTimeout(rsT); rsT = setTimeout(()=>window.fitKarnataka(), 150); });
+  window.addEventListener("orientationchange", () => setTimeout(()=>window.fitKarnataka(), 300));
+  /* rubber-band: snap back on release */
+  map.on("dragend", () => {
+    const c = map.getCenter();
+    if (bounds.contains(c)) return;
+    const atMin = map.getZoom() <= map.getMinZoom() + 0.05;
+    if (atMin){
+      const target = bounds.getCenter(), z = map.getMinZoom();
+      if (reducedMotion) map.setView(target, z, { animate:false });
+      else map.flyTo(target, z, { duration:0.3 });
+    } else {
+      const target = map.getCenter();
+      // clamp to bounds
+      const cl = L.latLng(
+        Math.max(bounds.getSouth(), Math.min(bounds.getNorth(), target.lat)),
+        Math.max(bounds.getWest(), Math.min(bounds.getEast(), target.lng))
+      );
+      if (reducedMotion) map.setView(cl, map.getZoom(), { animate:false });
+      else map.flyTo(cl, map.getZoom(), { duration:0.3 });
+    }
+  });
+  map.on("zoomend", () => {
+    if (map.getZoom() < map.getMinZoom()) map.setZoom(map.getMinZoom());
+  });
   /* drifting cloud texture above fog, below markers */
   L.DomUtil.create("div", "fog-texture", map.getContainer());
 }).catch(() => {});
-$("btnMapReset").onclick = () => { if (kaRings) map.fitBounds(L.latLngBounds(kaRings.flat())); else map.setView([15.0, 76.6], 7); };
+$("btnMapReset").onclick = () => { if (window.fitKarnataka) window.fitKarnataka(); else map.setView([15.0, 76.6], 7); };
 function refreshMarker(n){ const l = byN[n]; if (l && markers[n]) markers[n].setIcon(pinIcon(l, n === selectedN)); }
 
 /* layer switcher */
@@ -724,7 +770,8 @@ const sheet = $("sheet");
 function setSnap(s){ sheet.dataset.snap = s; }
 function openSheet(){ sheet.classList.add("open"); setSnap("half"); document.body.classList.add("sheet-open"); }
 function closeSheet(){ sheet.classList.remove("open"); selectedN = null; document.body.classList.remove("sheet-open");
-  if (location.hash.startsWith("#loc=")) history.replaceState(null,"",location.pathname+location.search); }
+  if (location.hash.startsWith("#loc=")) history.replaceState(null,"",location.pathname+location.search);
+  if (window.fitKarnataka) setTimeout(()=>window.fitKarnataka(), 350); }
 $("sheetClose").onclick = closeSheet;
 
 /* drag handle */
@@ -1084,20 +1131,34 @@ $("progChip").onclick = () => switchTab("passport");
 
 /* ================= circuits ================= */
 const REGION_ORDER = ["Coastal","Malnad","Mysuru region","Bengaluru region","North Karnataka"];
+/* circuits dropdowns (persist open/closed) */
+let circuitOpen = {};
+try { circuitOpen = JSON.parse(localStorage.getItem("sq_circuits") || "{}"); } catch(e){}
+function saveCircuitOpen(){ try { localStorage.setItem("sq_circuits", JSON.stringify(circuitOpen)); } catch(e){} }
 function renderCircuits(){
-  $("circuitList").innerHTML = REGION_ORDER.map(rg => {
+  const order = REGION_ORDER;
+  if (order.length && !(order[0] in circuitOpen)) circuitOpen[order[0]] = true;
+  $("circuitList").innerHTML = order.map((rg, ri) => {
     const stops = LOCATIONS.filter(l => l.region === rg).sort((a,b)=>a.n-b.n);
     const done = stops.filter(l => state.visited[l.n]).length;
-    return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:baseline">'+
-      '<div class="serif" style="font-size:17px">'+esc(rg)+'</div>'+
-      '<div class="note">'+done+'/'+stops.length+' visited</div></div>'+
+    const open = !!circuitOpen[rg];
+    const cid = "cr-" + ri;
+    return '<div class="card"><button class="chead" aria-expanded="'+open+'" aria-controls="'+cid+'" id="ch-'+ri+'">'+
+      '<span class="serif" style="font-size:17px">'+esc(rg)+'</span>'+
+      '<span class="cmeta"><span class="note">'+done+'/'+stops.length+' collected</span><span class="chev'+(open?" open":"")+'">›</span></span></button>'+
+      '<div class="cbody'+(open?" open":"")+'" id="'+cid+'" role="region" aria-labelledby="ch-'+ri+'">'+
       '<div class="dbar"><i style="width:'+(stops.length?done/stops.length*100:0)+'%"></i></div>'+
       '<div style="margin-top:10px">'+stops.map(l =>
         '<button class="rowbtn" data-n="'+l.n+'">'+
         '<span class="grow"><span class="t">'+l.n+'. '+esc(l.name)+'</span><span class="s" style="display:block">'+esc(l.district)+' · '+l.pin+'</span></span>'+
         '<span style="color:var(--ink-2)">›</span></button>').join("")+'</div>'+
-      '<button class="btn ghost" data-fit="'+esc(rg)+'" style="width:100%;margin-top:4px">Show on map</button></div>';
+      '<button class="btn ghost" data-fit="'+esc(rg)+'" style="width:100%;margin-top:4px">Show on map</button></div></div>';
   }).join("");
+  $("circuitList").querySelectorAll(".chead").forEach(h => h.onclick = () => {
+    const rg = REGION_ORDER[+h.id.split("-")[1]];
+    circuitOpen[rg] = !circuitOpen[rg];
+    saveCircuitOpen(); renderCircuits();
+  });
   $("circuitList").querySelectorAll(".rowbtn").forEach(b => b.onclick = () => { switchTab("explore"); openLocation(+b.dataset.n); });
   $("circuitList").querySelectorAll("[data-fit]").forEach(b => b.onclick = () => {
     const stops = LOCATIONS.filter(l => l.region === b.dataset.fit);
