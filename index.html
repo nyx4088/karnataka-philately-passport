@@ -3,15 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#F3EBD8">
+<meta name="theme-color" content="#6B2236">
 <title>StampQuest — Karnataka Philately Passport Explorer</title>
 <meta name="description" content="Interactive map of all 100 Karnataka Philately Passport post offices. Discover, navigate, and track your stamp collection.">
 <link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<meta property="og:title" content="StampQuest — Karnataka Philately Passport">
+<meta property="og:description" content="Collect all 100 Karnataka Philately Passport stamps. Track your journey across the state.">
+<meta property="og:image" content="icons/og-image.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="StampQuest — Karnataka Philately Passport">
+<meta name="twitter:description" content="Collect all 100 Karnataka Philately Passport stamps.">
+<meta name="twitter:image" content="icons/og-image.png">
 <link rel="preload" href="fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/dmsans-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+<link rel="stylesheet" href="vendor/leaflet.css">
+<link rel="stylesheet" href="vendor/MarkerCluster.css">
+<link rel="stylesheet" href="vendor/MarkerCluster.Default.css">
 <style>
 /* ============ StampQuest — Postmark Modern design system (self-hosted fonts) ============ */
 @font-face{font-family:"Fraunces";font-style:normal;font-weight:100 900;font-display:swap;
@@ -144,6 +153,7 @@ html[data-theme="dark"] .hcard{background:color-mix(in srgb, var(--header-bg) 92
 @keyframes mappulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.25);opacity:.55}}
 
 .rdiv{width:24px;height:1px;background:var(--border-subtle);margin:4px 0;flex:none}
+.toast-undo{background:none;border:0;color:var(--header-gold);font-weight:700;font-size:14px;margin-left:12px;cursor:pointer;padding:4px 8px;min-height:44px}
 /* photo bottom sheet */
 .photosheet{position:fixed;left:0;right:0;bottom:0;z-index:960;background:var(--surface);
   border-top:1px solid var(--border-subtle);border-radius:18px 18px 0 0;box-shadow:var(--shadow);
@@ -295,8 +305,8 @@ h3.sec{font-size:17px;margin:22px 0 10px;letter-spacing:.5px}
     var(--hole) left top/12px 20px repeat-y,var(--hole) right top/12px 20px repeat-y,linear-gradient(#000,#000);
   mask-composite:exclude}
 .tile .tno{font-family:var(--font-mono);font-weight:500;font-size:20px;line-height:1.2;color:var(--ink-2);text-align:center;flex:none}
-.tile .nm{font-size:12px;line-height:1.3;color:var(--ink-2);text-align:center;margin:auto 4px 0;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.tile .nm{font-size:12px;line-height:1.3;color:var(--ink-2);text-align:center;margin:auto 4px 6px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:100%;min-height:2.6em}
 .tile .pcam{position:relative;display:flex;align-items:center;justify-content:center;width:32px;height:32px;flex:none;
   color:var(--ink-2);border-radius:8px;margin-bottom:auto}
 .tile .pcam::after{content:"";position:absolute;inset:-6px}
@@ -310,10 +320,10 @@ h3.sec{font-size:17px;margin:22px 0 10px;letter-spacing:.5px}
   background:var(--collected);color:var(--paper);display:none;align-items:center;justify-content:center;
   font-size:13px;font-weight:700;line-height:1}
 .tile.visited .check{display:flex}
-.tile.visited .postmark{position:absolute;right:2px;bottom:8px;transform:rotate(-8deg);
-  border:2px solid var(--collected);border-radius:50%;width:56px;height:56px;display:flex;align-items:center;justify-content:center;
-  font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--collected);text-transform:uppercase;
-  opacity:.55;pointer-events:none;text-align:center;line-height:1.15;padding:6px;overflow:hidden}
+.tile.visited .postmark{position:absolute;left:50%;top:50%;transform:translate(-50%,-60%) rotate(-8deg);
+  border:2px solid var(--collected);border-radius:50%;width:52px;height:52px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);font-size:10px;font-weight:500;color:var(--collected);text-transform:uppercase;
+  opacity:.4;pointer-events:none;text-align:center;line-height:1.15;padding:6px;overflow:hidden}
 .tile.planned{border:1.5px dashed var(--planned);background:var(--surface)}
 .tile.planned .tno{color:var(--planned)}
 .drow{display:flex;justify-content:space-between;font-size:12px;padding:7px 2px;border-bottom:1px dashed var(--border-subtle)}
@@ -372,7 +382,7 @@ h3.sec{font-size:17px;margin:22px 0 10px;letter-spacing:.5px}
 .tile.hasphoto .tno,.tile.hasphoto .nm{position:absolute;z-index:2;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 .tile.hasphoto .tno{top:8px;left:0;right:0;margin:0;font-size:13px;font-weight:600}
 .tile.hasphoto .nm{bottom:8px;left:8px;right:8px;margin:0;font-size:12px;font-weight:600;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.tile.hasphoto .pcam{position:absolute;z-index:3;right:6px;bottom:6px;width:32px;height:32px;margin:0;
+.tile.hasphoto .pcam{position:absolute;z-index:3;left:6px;top:6px;width:32px;height:32px;margin:0;
   background:color-mix(in srgb, var(--surface) 82%, transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   border:1px solid var(--border-subtle);border-radius:50%;color:var(--ink)}
 .tile.hasphoto .pcam::after{inset:-6px}
@@ -466,8 +476,10 @@ html[data-theme="dark"] [data-region="North Karnataka"] .chead .serif,html[data-
 }
 .leaflet-container{font-family:var(--font-sans)}
 #map .leaflet-bottom{bottom:84px}
-#map .leaflet-control-attribution{font-size:12px;background:rgba(251,246,233,.8)}
-html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,15,.8)}
+#map .leaflet-control-attribution{font-size:12px;background:rgba(251,246,233,.85);color:#3A322A}
+#map .leaflet-control-attribution a{color:#3A322A}
+html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,15,.9);color:#E8DFCF}
+html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 
 </style>
 </head>
@@ -521,7 +533,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,
 
 <!-- PASSPORT -->
 <section class="view" id="view-passport">
-  <div class="pagehead"><h1 class="serif">My Passport</h1><p>Your collection, kept only on this device.</p></div>
+  <div class="pagehead"><h1 class="serif">My Passport</h1><p>Add a stamp photo to mark an office visited. Your collection stays only on this device.</p></div>
   <div class="scroll">
     <div class="card">
       <div class="ringwrap">
@@ -561,6 +573,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,
       <div class="actionrow" style="margin-top:10px">
         <button class="btn accent" id="btnShare">Share my journey</button>
       </div>
+      <div id="sharePreview" style="display:none;margin-top:12px"></div>
       <div class="actionrow">
         <button class="btn ghost" id="btnExport" style="flex:1">Export backup</button>
         <label class="btn ghost filebtn" style="flex:1;text-align:center">Import backup<input type="file" id="fileImport" accept="application/json"></label>
@@ -594,7 +607,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,
     <div class="card faq">
       <details>
         <summary>How do I mark a place visited?</summary>
-        <div class="a">Visit a post office, tap its tile in Passport, add a photo of your stamp — <b>it's marked visited automatically</b>, with the visit date saved. You'll see "Marked visited. Undo" if you want to revert. Prefer no photo? Use <b>Mark visited without photo</b> on the office card.</div>
+        <div class="a">Visit a post office, tap its tile in Passport, add a photo of your stamp — <b>it's marked visited automatically</b>, with the visit date saved. You'll see "Marked visited." with an Undo button if you want to revert. Prefer no photo? Use <b>Mark visited without photo</b> on the office card.</div>
       </details>
       <details>
         <summary>Where are my photos stored?</summary>
@@ -639,6 +652,12 @@ html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,
     <h3 class="sec">Privacy</h3>
     <div class="card note">
       Everything — your visited and planned lists, theme choice, and location (used only when you tap "Near me") — stays in this browser's local storage on your device. No accounts, no servers, no analytics. Clearing browser data erases your progress unless you exported a backup.
+    </div>
+    <h3 class="sec">Map tiles</h3>
+    <div class="card note">
+      <b>Streets:</b> © OpenStreetMap contributors (ODbL)<br>
+      <b>Satellite:</b> Imagery © Esri &amp; contributors<br>
+      <b>Terrain:</b> © OpenStreetMap contributors, SRTM | style: © OpenTopoMap (CC-BY-SA)
     </div>
     <h3 class="sec">Danger zone</h3>
     <div class="card">
@@ -685,7 +704,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,
       </div>
       <div class="tslide">
         <div class="serif" style="font-size:20px;margin-bottom:8px">Collect with a photo</div>
-        <div class="note" style="font-size:13px;color:var(--ink)">Visit a post office, tap its tile in Passport, add a photo of your stamp. It's marked visited automatically.<br><br>Photos stay on this device only — never uploaded.</div>
+        <div class="note" style="font-size:13px;color:var(--ink)">Add a stamp photo to mark an office visited. Tap its tile in Passport, choose a photo — it's marked visited automatically with today's date.<br><br>Photos stay on this device only — never uploaded.</div>
       </div>
       <div class="tslide">
         <div class="serif" style="font-size:20px;margin-bottom:8px">Explore Karnataka</div>
@@ -700,11 +719,11 @@ html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,
   </div>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="vendor/leaflet.js"></script>
+<script src="vendor/leaflet.markercluster.js"></script>
 <script>
 "use strict";
-const LOCATIONS = [{"n": 1, "name": "Aihole", "office_type": "BO", "office_type_full": "Branch Office", "pin": "587124", "district": "Bagalkot", "region": "North Karnataka", "district_color": "#C74141", "lat": 16.01955, "lng": 75.88058, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Badami", "ppc": null, "verified": "approx", "approx": true}, {"n": 2, "name": "Badami", "office_type": "SO", "office_type_full": "Sub Office", "pin": "587201", "district": "Bagalkot", "region": "North Karnataka", "district_color": "#C74141", "lat": 15.91661, "lng": 75.67751, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Badami", "ppc": {"motif": "Nataraja", "introduced": "29 September 1987"}, "verified": "approx", "approx": true}, {"n": 3, "name": "Pattadakal", "office_type": "BA", "office_type_full": "Branch", "pin": "587201", "district": "Bagalkot", "region": "North Karnataka", "district_color": "#C74141", "lat": 15.94963, "lng": 75.81622, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Badami", "ppc": null, "verified": "approx", "approx": true}, {"n": 4, "name": "Bellary Fort", "office_type": "SO", "office_type_full": "Sub Office", "pin": "583102", "district": "Ballari", "region": "North Karnataka", "district_color": "#41C768", "lat": 15.16602, "lng": 76.85858, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Ballari", "ppc": null, "verified": "approx", "approx": true}, {"n": 5, "name": "Sandur", "office_type": "SO", "office_type_full": "Sub Office", "pin": "583119", "district": "Ballari", "region": "North Karnataka", "district_color": "#41C768", "lat": 15.08195, "lng": 76.5435, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Ballari", "ppc": null, "verified": "approx", "approx": true}, {"n": 6, "name": "Belagavi", "office_type": "HO", "office_type_full": "Head Office", "pin": "590001", "district": "Belagavi", "region": "North Karnataka", "district_color": "#8F41C7", "lat": 15.85217, "lng": 74.50984, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Belagavi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 7, "name": "Belagavi Fort", "office_type": "SO", "office_type_full": "Sub Office", "pin": "590016", "district": "Belagavi", "region": "North Karnataka", "district_color": "#8F41C7", "lat": 15.86338, "lng": 74.52521, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Belagavi", "ppc": null, "verified": "approx", "approx": true}, {"n": 8, "name": "Kittur", "office_type": "SO", "office_type_full": "Sub Office", "pin": "591115", "district": "Belagavi", "region": "North Karnataka", "district_color": "#8F41C7", "lat": 15.597688, "lng": 74.790813, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Belagavi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 9, "name": "Nandgad", "office_type": "SO", "office_type_full": "Sub Office", "pin": "591115", "district": "Belagavi", "region": "North Karnataka", "district_color": "#8F41C7", "lat": 15.576438, "lng": 74.571328, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Belagavi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 10, "name": "Halashi", "office_type": "BO", "office_type_full": "Branch Office", "pin": "591142", "district": "Belagavi", "region": "North Karnataka", "district_color": "#8F41C7", "lat": 15.54102, "lng": 74.58998, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Belagavi", "ppc": {"motif": "Kadamba Royal Logo", "introduced": "04 May 1993"}, "verified": "approx", "approx": true}, {"n": 11, "name": "Hooli", "office_type": "BO", "office_type_full": "Branch Office", "pin": "591126", "district": "Belagavi", "region": "North Karnataka", "district_color": "#8F41C7", "lat": 15.794263, "lng": 75.191766, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Belagavi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 12, "name": "Yallamma Hill", "office_type": "SO", "office_type_full": "Sub Office", "pin": "591173", "district": "Belagavi", "region": "North Karnataka", "district_color": "#8F41C7", "lat": 15.754338, "lng": 75.151672, "landscape": "hills", "theme": {"label": "Hills", "accent": "#4A7C59", "soft": "#E4F0E6"}, "transit_town": "Belagavi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 13, "name": "Shiroli", "office_type": "BO", "office_type_full": "Branch Office", "pin": "591302", "district": "Belagavi", "region": "North Karnataka", "district_color": "#8F41C7", "lat": 15.56381, "lng": 74.43828, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Belagavi", "ppc": null, "verified": "approx", "approx": true}, {"n": 14, "name": "Gokak Falls", "office_type": "SO", "office_type_full": "Sub Office", "pin": "591308", "district": "Belagavi", "region": "North Karnataka", "district_color": "#8F41C7", "lat": 16.19012, "lng": 74.77684, "landscape": "riverside", "theme": {"label": "Riverside", "accent": "#3E8E8A", "soft": "#E0F2F0"}, "transit_town": "Gokak Road", "ppc": null, "verified": "near", "approx": false}, {"n": 15, "name": "Bengaluru GPO", "office_type": "PB", "office_type_full": "Philatelic Bureau", "pin": "560001", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 12.98101, "lng": 77.59504, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bengaluru", "ppc": {"motif": "Vidhana Soudha", "introduced": "15 January 1979"}, "verified": "confirmed", "approx": false}, {"n": 16, "name": "High Court", "office_type": "SO", "office_type_full": "Sub Office", "pin": "560001", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 12.97724, "lng": 77.59152, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bengaluru", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 17, "name": "Dr Ambedkar Veedhi", "office_type": "SO", "office_type_full": "Sub Office", "pin": "560001", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 12.976838, "lng": 77.588609, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bengaluru", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 18, "name": "Basavanagudi", "office_type": "HO", "office_type_full": "Head Office", "pin": "560004", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 12.944813, "lng": 77.573937, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bengaluru", "ppc": {"motif": "Kempe Gowda Tower, Basavanagudi", "introduced": "09 October 2013"}, "verified": "confirmed", "approx": false}, {"n": 19, "name": "Rajajinagar", "office_type": "HO", "office_type_full": "Head Office", "pin": "560010", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 12.99341, "lng": 77.55438, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bengaluru", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 20, "name": "Jayanagar 3rd Block", "office_type": "SO", "office_type_full": "Sub Office", "pin": "560011", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 12.930513, "lng": 77.583422, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bengaluru", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 21, "name": "Science Institute", "office_type": "SO", "office_type_full": "Sub Office", "pin": "560012", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 13.01845, "lng": 77.56108, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bengaluru", "ppc": null, "verified": "approx", "approx": true}, {"n": 22, "name": "NAL", "office_type": "SO", "office_type_full": "Sub Office", "pin": "560017", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 12.95846, "lng": 77.66792, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bengaluru", "ppc": null, "verified": "approx", "approx": true}, {"n": 23, "name": "Museum Road", "office_type": "SO", "office_type_full": "Sub Office", "pin": "560025", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 12.97268, "lng": 77.60343, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bengaluru", "ppc": null, "verified": "near", "approx": false}, {"n": 24, "name": "Bannerghatta", "office_type": "SO", "office_type_full": "Sub Office", "pin": "560083", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 12.811588, "lng": 77.580516, "landscape": "forest", "theme": {"label": "Forest", "accent": "#2E6B4F", "soft": "#E3EFE7"}, "transit_town": "Bengaluru", "ppc": {"motif": "Malabar Banded Peacock", "introduced": "23 May 2009"}, "verified": "confirmed", "approx": false}, {"n": 25, "name": "Kamathana", "office_type": "SO", "office_type_full": "Sub Office", "pin": "585226", "district": "Bidar", "region": "North Karnataka", "district_color": "#41B1C7", "lat": 17.85556, "lng": 77.45303, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Bidar", "ppc": null, "verified": "approx", "approx": true}, {"n": 26, "name": "Basavakalyana", "office_type": "SO", "office_type_full": "Sub Office", "pin": "585327", "district": "Bidar", "region": "North Karnataka", "district_color": "#41B1C7", "lat": 17.87082, "lng": 76.94745, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Bidar", "ppc": null, "verified": "approx", "approx": true}, {"n": 27, "name": "Bidar", "office_type": "HO", "office_type_full": "Head Office", "pin": "585401", "district": "Bidar", "region": "North Karnataka", "district_color": "#41B1C7", "lat": 17.913012, "lng": 77.517109, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Bidar", "ppc": {"motif": "Madarsa of Mohammed Gawan", "introduced": "11 December 2005"}, "verified": "confirmed", "approx": false}, {"n": 28, "name": "Bidar Gurunanak Jhira", "office_type": "SO", "office_type_full": "Sub Office", "pin": "585402", "district": "Bidar", "region": "North Karnataka", "district_color": "#41B1C7", "lat": 17.92659, "lng": 77.50915, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Bidar", "ppc": null, "verified": "approx", "approx": true}, {"n": 29, "name": "Bandipur", "office_type": "BO", "office_type_full": "Branch Office", "pin": "571126", "district": "Chamarajanagar", "region": "Mysuru region", "district_color": "#C7418A", "lat": 11.66572, "lng": 76.62764, "landscape": "forest", "theme": {"label": "Forest", "accent": "#2E6B4F", "soft": "#E3EFE7"}, "transit_town": "Mysuru", "ppc": null, "verified": "approx", "approx": true}, {"n": 30, "name": "Kyathadevaragudi", "office_type": "BO", "office_type_full": "Branch Office", "pin": "571342", "district": "Chamarajanagar", "region": "Mysuru region", "district_color": "#C7418A", "lat": 11.93192, "lng": 76.95983, "landscape": "forest", "theme": {"label": "Forest", "accent": "#2E6B4F", "soft": "#E3EFE7"}, "transit_town": "Chamarajanagar", "ppc": null, "verified": "approx", "approx": true}, {"n": 31, "name": "Male Mahadeshwara Hills", "office_type": "SO", "office_type_full": "Sub Office", "pin": "571490", "district": "Chamarajanagar", "region": "Mysuru region", "district_color": "#C7418A", "lat": 12.02989, "lng": 77.59035, "landscape": "hills", "theme": {"label": "Hills", "accent": "#4A7C59", "soft": "#E4F0E6"}, "transit_town": "Chamarajanagar", "ppc": null, "verified": "near", "approx": false}, {"n": 32, "name": "Nandi Hills", "office_type": "BO", "office_type_full": "Branch Office", "pin": "562101", "district": "Chikkaballapura", "region": "Bengaluru region", "district_color": "#62C741", "lat": 13.43373, "lng": 77.73108, "landscape": "hills", "theme": {"label": "Hills", "accent": "#4A7C59", "soft": "#E4F0E6"}, "transit_town": "Chikkaballapur", "ppc": null, "verified": "approx", "approx": true}, {"n": 33, "name": "Chikkamagaluru", "office_type": "HO", "office_type_full": "Head Office", "pin": "577101", "district": "Chikkamagaluru", "region": "Malnad", "district_color": "#4741C7", "lat": 13.31559, "lng": 75.77406, "landscape": "hills", "theme": {"label": "Hills", "accent": "#4A7C59", "soft": "#E4F0E6"}, "transit_town": "Kadur", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 34, "name": "Sringeri", "office_type": "SO", "office_type_full": "Sub Office", "pin": "577139", "district": "Chikkamagaluru", "region": "Malnad", "district_color": "#4741C7", "lat": 13.42502, "lng": 75.25499, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Shivamogga", "ppc": {"motif": "Vidyashankara Temple", "introduced": "27 January 1985"}, "verified": "approx", "approx": true}, {"n": 35, "name": "Chitradurga", "office_type": "HO", "office_type_full": "Head Office", "pin": "577501", "district": "Chitradurga", "region": "North Karnataka", "district_color": "#C76E41", "lat": 14.224687, "lng": 76.395641, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Chitradurga", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 36, "name": "Kateel", "office_type": "SO", "office_type_full": "Sub Office", "pin": "574148", "district": "Dakshina Kannada", "region": "Coastal", "district_color": "#41C795", "lat": 13.04507, "lng": 74.87079, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Mangaluru", "ppc": {"motif": "Sri Durga Parameshwari Temple, Kateel", "introduced": "11 October 2013"}, "verified": "approx", "approx": true}, {"n": 37, "name": "Dharmasthala", "office_type": "SO", "office_type_full": "Sub Office", "pin": "574216", "district": "Dakshina Kannada", "region": "Coastal", "district_color": "#41C795", "lat": 12.95074, "lng": 75.38193, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Subrahmanya Road", "ppc": {"motif": "Sri Manjunatheswara Temple", "introduced": "02 January 1989"}, "verified": "approx", "approx": true}, {"n": 38, "name": "Moodabidri", "office_type": "SO", "office_type_full": "Sub Office", "pin": "574227", "district": "Dakshina Kannada", "region": "Coastal", "district_color": "#41C795", "lat": 13.07035, "lng": 74.99728, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Mangaluru", "ppc": {"motif": "Saavira Kambada Temple", "introduced": "16 December 2016"}, "verified": "approx", "approx": true}, {"n": 39, "name": "Subrahmanya", "office_type": "SO", "office_type_full": "Sub Office", "pin": "574238", "district": "Dakshina Kannada", "region": "Coastal", "district_color": "#41C795", "lat": 12.66606, "lng": 75.61336, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Subrahmanya Road", "ppc": {"motif": "Head of Serpent Vasuki", "introduced": "14 April 2005"}, "verified": "approx", "approx": true}, {"n": 40, "name": "Venur", "office_type": "SO", "office_type_full": "Sub Office", "pin": "574242", "district": "Dakshina Kannada", "region": "Coastal", "district_color": "#41C795", "lat": 13.0124, "lng": 75.14488, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Mangaluru", "ppc": {"motif": "Bahubali (Lord Gommateshwara Statue)", "introduced": "26 December 2016"}, "verified": "approx", "approx": true}, {"n": 41, "name": "Mangaluru", "office_type": "HO", "office_type_full": "Head Office", "pin": "575001", "district": "Dakshina Kannada", "region": "Coastal", "district_color": "#41C795", "lat": 12.85851, "lng": 74.83755, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Mangaluru", "ppc": {"motif": "Light House", "introduced": "11 September 1989"}, "verified": "confirmed", "approx": false}, {"n": 42, "name": "Ullal", "office_type": "SO", "office_type_full": "Sub Office", "pin": "575020", "district": "Dakshina Kannada", "region": "Coastal", "district_color": "#41C795", "lat": 12.82115, "lng": 74.84169, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Mangaluru", "ppc": null, "verified": "approx", "approx": true}, {"n": 43, "name": "Davangere", "office_type": "HO", "office_type_full": "Head Office", "pin": "577001", "district": "Davanagere", "region": "North Karnataka", "district_color": "#BC41C7", "lat": 14.46893, "lng": 75.91995, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Davangere", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 44, "name": "Narayanapura", "office_type": "SO", "office_type_full": "Sub Office", "pin": "580008", "district": "Dharwad", "region": "North Karnataka", "district_color": "#ABC741", "lat": 15.47028, "lng": 75.01811, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Hubballi", "ppc": null, "verified": "approx", "approx": true}, {"n": 45, "name": "Hubli", "office_type": "HO", "office_type_full": "Head Office", "pin": "580020", "district": "Dharwad", "region": "North Karnataka", "district_color": "#ABC741", "lat": 15.35227, "lng": 75.14486, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Hubballi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 46, "name": "Annigeri", "office_type": "SO", "office_type_full": "Sub Office", "pin": "582201", "district": "Dharwad", "region": "North Karnataka", "district_color": "#ABC741", "lat": 15.4303, "lng": 75.43504, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Hubballi", "ppc": null, "verified": "approx", "approx": true}, {"n": 47, "name": "Gadag", "office_type": "HO", "office_type_full": "Head Office", "pin": "582101", "district": "Gadag", "region": "North Karnataka", "district_color": "#4184C7", "lat": 15.432538, "lng": 75.636328, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Gadag", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 48, "name": "Lakkundi", "office_type": "SO", "office_type_full": "Sub Office", "pin": "582115", "district": "Gadag", "region": "North Karnataka", "district_color": "#4184C7", "lat": 15.38891, "lng": 75.71913, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Gadag", "ppc": null, "verified": "approx", "approx": true}, {"n": 49, "name": "Belur", "office_type": "SO", "office_type_full": "Sub Office", "pin": "573115", "district": "Hassan", "region": "Malnad", "district_color": "#C7415D", "lat": 13.16307, "lng": 75.86258, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Hassan", "ppc": {"motif": "Darpana Sundari", "introduced": "02 January 1978"}, "verified": "approx", "approx": true}, {"n": 50, "name": "Halebeedu", "office_type": "SO", "office_type_full": "Sub Office", "pin": "573121", "district": "Hassan", "region": "Malnad", "district_color": "#C7415D", "lat": 13.21416, "lng": 75.99405, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Hassan", "ppc": {"motif": "Shilabalikas", "introduced": "02 January 1978"}, "verified": "approx", "approx": true}, {"n": 51, "name": "Shravanabelagola", "office_type": "SO", "office_type_full": "Sub Office", "pin": "573135", "district": "Hassan", "region": "Malnad", "district_color": "#C7415D", "lat": 12.8597, "lng": 76.48276, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Hassan", "ppc": {"motif": "Gommateshwara", "introduced": "02 January 1978"}, "verified": "approx", "approx": true}, {"n": 52, "name": "Ranebennur", "office_type": "MDG", "office_type_full": "Mukhy Dak Ghar", "pin": "581115", "district": "Haveri", "region": "North Karnataka", "district_color": "#41C74C", "lat": 14.621037, "lng": 75.632922, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Ranebennur", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 53, "name": "Shishuvinahal", "office_type": "BO", "office_type_full": "Branch Office", "pin": "581126", "district": "Haveri", "region": "North Karnataka", "district_color": "#41C74C", "lat": 15.09655, "lng": 75.32394, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Haveri", "ppc": null, "verified": "approx", "approx": true}, {"n": 54, "name": "Kalaburagi", "office_type": "HO", "office_type_full": "Head Office", "pin": "585101", "district": "Kalaburagi", "region": "North Karnataka", "district_color": "#7441C7", "lat": 17.341438, "lng": 76.834609, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Kalaburagi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 55, "name": "Madikeri", "office_type": "HO", "office_type_full": "Head Office", "pin": "571201", "district": "Kodagu", "region": "Malnad", "district_color": "#C79B41", "lat": 12.42244, "lng": 75.74029, "landscape": "hills", "theme": {"label": "Hills", "accent": "#4A7C59", "soft": "#E4F0E6"}, "transit_town": "Mysuru", "ppc": {"motif": "Odikathi and Peechikathi", "introduced": "01 April 1992"}, "verified": "confirmed", "approx": false}, {"n": 56, "name": "Nagarahole", "office_type": "BO", "office_type_full": "Branch Office", "pin": "571258", "district": "Kodagu", "region": "Malnad", "district_color": "#C79B41", "lat": 12.03144, "lng": 76.12068, "landscape": "forest", "theme": {"label": "Forest", "accent": "#2E6B4F", "soft": "#E3EFE7"}, "transit_town": "Mysuru", "ppc": {"motif": "Gloriosa Superba (Wild Lily)", "introduced": "06 November 1987"}, "verified": "approx", "approx": true}, {"n": 57, "name": "Oorgaum", "office_type": "SO", "office_type_full": "Sub Office", "pin": "563120", "district": "Kolar", "region": "Bengaluru region", "district_color": "#41C7C2", "lat": 12.954913, "lng": 78.256859, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bangarapet", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 58, "name": "Masthi", "office_type": "SO", "office_type_full": "Sub Office", "pin": "563139", "district": "Kolar", "region": "Bengaluru region", "district_color": "#41C7C2", "lat": 12.87178, "lng": 77.99655, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Malur", "ppc": null, "verified": "approx", "approx": true}, {"n": 59, "name": "Anegundi", "office_type": "BO", "office_type_full": "Branch Office", "pin": "583227", "district": "Koppal", "region": "North Karnataka", "district_color": "#C741A5", "lat": 15.35011, "lng": 76.4355, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Hosapete", "ppc": null, "verified": "approx", "approx": true}, {"n": 60, "name": "Koppal", "office_type": "HO", "office_type_full": "Head Office", "pin": "583231", "district": "Koppal", "region": "North Karnataka", "district_color": "#C741A5", "lat": 15.349312, "lng": 76.153813, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Koppal", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 61, "name": "Kokkare Bellur", "office_type": "BO", "office_type_full": "Branch Office", "pin": "571433", "district": "Mandya", "region": "Mysuru region", "district_color": "#7EC741", "lat": 12.52017, "lng": 77.0878, "landscape": "riverside", "theme": {"label": "Riverside", "accent": "#3E8E8A", "soft": "#E0F2F0"}, "transit_town": "Maddur", "ppc": {"motif": "Flying Pelican", "introduced": "28 January 1992"}, "verified": "approx", "approx": true}, {"n": 62, "name": "Srirangapatna", "office_type": "HO", "office_type_full": "Head Office", "pin": "571438", "district": "Mandya", "region": "Mysuru region", "district_color": "#7EC741", "lat": 12.41669, "lng": 76.69417, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Srirangapatna", "ppc": {"motif": "Mausoleum of Tipu Sultan (20 Oct 1978) + Sword & Headgear of Tipu Sultan (20 Jun 1987)", "introduced": "20 October 1978 / 20 June 1987"}, "verified": "approx", "approx": true}, {"n": 63, "name": "Mysuru", "office_type": "HO", "office_type_full": "Head Office", "pin": "570001", "district": "Mysuru", "region": "Mysuru region", "district_color": "#4157C7", "lat": 12.31385, "lng": 76.65674, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Mysuru", "ppc": {"motif": "Elephant carrying Howdah", "introduced": "11 October 2002"}, "verified": "confirmed", "approx": false}, {"n": 64, "name": "Lakshmipuram", "office_type": "SO", "office_type_full": "Sub Office", "pin": "570004", "district": "Mysuru", "region": "Mysuru region", "district_color": "#4157C7", "lat": 12.29692, "lng": 76.6457, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Mysuru", "ppc": null, "verified": "approx", "approx": true}, {"n": 65, "name": "Saraswathipuram", "office_type": "HO", "office_type_full": "Head Office", "pin": "570009", "district": "Mysuru", "region": "Mysuru region", "district_color": "#4157C7", "lat": 12.303438, "lng": 76.629688, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Mysuru", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 66, "name": "Chamundi Betta", "office_type": "BO", "office_type_full": "Branch Office", "pin": "570010", "district": "Mysuru", "region": "Mysuru region", "district_color": "#4157C7", "lat": 12.27462, "lng": 76.67061, "landscape": "hills", "theme": {"label": "Hills", "accent": "#4A7C59", "soft": "#E4F0E6"}, "transit_town": "Mysuru", "ppc": null, "verified": "approx", "approx": true}, {"n": 67, "name": "SGS Ashram", "office_type": "SO", "office_type_full": "Sub Office", "pin": "570025", "district": "Mysuru", "region": "Mysuru region", "district_color": "#4157C7", "lat": 12.28355, "lng": 76.65906, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Mysuru", "ppc": {"motif": "Nada Mantapa", "introduced": "31 May 2008"}, "verified": "approx", "approx": true}, {"n": 68, "name": "Somanathapura", "office_type": "BO", "office_type_full": "Branch Office", "pin": "571120", "district": "Mysuru", "region": "Mysuru region", "district_color": "#4157C7", "lat": 12.27599, "lng": 76.88202, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Mysuru", "ppc": {"motif": "Lord Somanatha Temple", "introduced": "08 September 1989"}, "verified": "approx", "approx": true}, {"n": 69, "name": "Talakad", "office_type": "SO", "office_type_full": "Sub Office", "pin": "571122", "district": "Mysuru", "region": "Mysuru region", "district_color": "#4157C7", "lat": 12.19269, "lng": 77.02772, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Mysuru", "ppc": null, "verified": "approx", "approx": true}, {"n": 70, "name": "Bichali", "office_type": "BO", "office_type_full": "Branch Office", "pin": "584140", "district": "Raichur", "region": "North Karnataka", "district_color": "#C75241", "lat": 15.95843, "lng": 77.32276, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Raichur", "ppc": null, "verified": "approx", "approx": true}, {"n": 71, "name": "Helagali", "office_type": "BO", "office_type_full": "Branch Office", "pin": "562117", "district": "Ramanagara", "region": "Bengaluru region", "district_color": "#41C779", "lat": 12.5513, "lng": 77.42313, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Ramanagara", "ppc": null, "verified": "approx", "approx": true}, {"n": 72, "name": "Agumbe", "office_type": "SO", "office_type_full": "Sub Office", "pin": "577411", "district": "Shivamogga", "region": "Malnad", "district_color": "#A141C7", "lat": 13.51173, "lng": 75.15791, "landscape": "forest", "theme": {"label": "Forest", "accent": "#2E6B4F", "soft": "#E3EFE7"}, "transit_town": "Udupi", "ppc": null, "verified": "approx", "approx": true}, {"n": 73, "name": "Kendalbailu", "office_type": "BO", "office_type_full": "Branch Office", "pin": "577411", "district": "Shivamogga", "region": "Malnad", "district_color": "#A141C7", "lat": 13.75021, "lng": 75.20085, "landscape": "forest", "theme": {"label": "Forest", "accent": "#2E6B4F", "soft": "#E3EFE7"}, "transit_town": "Shivamogga", "ppc": null, "verified": "approx", "approx": true}, {"n": 74, "name": "Devangi", "office_type": "SO", "office_type_full": "Sub Office", "pin": "577415", "district": "Shivamogga", "region": "Malnad", "district_color": "#A141C7", "lat": 13.62838, "lng": 75.28355, "landscape": "forest", "theme": {"label": "Forest", "accent": "#2E6B4F", "soft": "#E3EFE7"}, "transit_town": "Shivamogga", "ppc": null, "verified": "approx", "approx": true}, {"n": 75, "name": "Jog Falls", "office_type": "SO", "office_type_full": "Sub Office", "pin": "577435", "district": "Shivamogga", "region": "Malnad", "district_color": "#A141C7", "lat": 14.20995, "lng": 74.81566, "landscape": "riverside", "theme": {"label": "Riverside", "accent": "#3E8E8A", "soft": "#E0F2F0"}, "transit_town": "Talguppa", "ppc": null, "verified": "approx", "approx": true}, {"n": 76, "name": "Humcha", "office_type": "BO", "office_type_full": "Branch Office", "pin": "577436", "district": "Shivamogga", "region": "Malnad", "district_color": "#A141C7", "lat": 13.86369, "lng": 75.20667, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Shivamogga", "ppc": null, "verified": "approx", "approx": true}, {"n": 77, "name": "Siddaganga Mutt", "office_type": "SO", "office_type_full": "Sub Office", "pin": "572104", "district": "Tumakuru", "region": "Bengaluru region", "district_color": "#C7C741", "lat": 13.32234, "lng": 77.14891, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Tumakuru", "ppc": null, "verified": "approx", "approx": true}, {"n": 78, "name": "Hirehalli", "office_type": "SO", "office_type_full": "Sub Office", "pin": "572168", "district": "Tumakuru", "region": "Bengaluru region", "district_color": "#C7C741", "lat": 13.28266, "lng": 77.18462, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Tumakuru", "ppc": null, "verified": "approx", "approx": true}, {"n": 79, "name": "Karkala", "office_type": "HO", "office_type_full": "Head Office", "pin": "574104", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.212787, "lng": 74.994703, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Udupi", "ppc": {"motif": "Seated Tirthankara", "introduced": "05 February 1991"}, "verified": "confirmed", "approx": false}, {"n": 80, "name": "Katapadi", "office_type": "SO", "office_type_full": "Sub Office", "pin": "574105", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.28445, "lng": 74.75032, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Udupi", "ppc": null, "verified": "approx", "approx": true}, {"n": 81, "name": "Kaup", "office_type": "SO", "office_type_full": "Sub Office", "pin": "574106", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.23617, "lng": 74.74631, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Udupi", "ppc": null, "verified": "approx", "approx": true}, {"n": 82, "name": "Varanga", "office_type": "BO", "office_type_full": "Branch Office", "pin": "574108", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.38371, "lng": 75.00196, "landscape": "lake", "theme": {"label": "Lake", "accent": "#2F6F9F", "soft": "#E0EFF7"}, "transit_town": "Udupi", "ppc": null, "verified": "approx", "approx": true}, {"n": 83, "name": "Shankarapura", "office_type": "SO", "office_type_full": "Sub Office", "pin": "574115", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.25955, "lng": 74.77012, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Udupi", "ppc": null, "verified": "approx", "approx": true}, {"n": 84, "name": "Udupi", "office_type": "HO", "office_type_full": "Head Office", "pin": "576101", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.340613, "lng": 74.748797, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Udupi", "ppc": {"motif": "Sri Krishna, Udupi Temple", "introduced": "23 January 1985"}, "verified": "confirmed", "approx": false}, {"n": 85, "name": "Manipal", "office_type": "HO", "office_type_full": "Head Office", "pin": "576104", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.348937, "lng": 74.785937, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Udupi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 86, "name": "Malpe", "office_type": "SO", "office_type_full": "Sub Office", "pin": "576108", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.34737, "lng": 74.723, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Udupi", "ppc": {"motif": "St. Mary's Islands", "introduced": "13 February 2015"}, "verified": "approx", "approx": true}, {"n": 87, "name": "Nandalike", "office_type": "BO", "office_type_full": "Branch Office", "pin": "576111", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.22165, "lng": 74.98529, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Udupi", "ppc": {"motif": "Kannada poet and writer Muddana, Nandalike", "introduced": "24 February 2015"}, "verified": "approx", "approx": true}, {"n": 88, "name": "Someshwara", "office_type": "BO", "office_type_full": "Branch Office", "pin": "576112", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.49038, "lng": 75.06775, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Udupi", "ppc": null, "verified": "approx", "approx": true}, {"n": 89, "name": "Attur", "office_type": "BO", "office_type_full": "Branch Office", "pin": "576117", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.20793, "lng": 74.97171, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Udupi", "ppc": null, "verified": "approx", "approx": true}, {"n": 90, "name": "Kundapura", "office_type": "HO", "office_type_full": "Head Office", "pin": "576201", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.631913, "lng": 74.691859, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Udupi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 91, "name": "Barkur", "office_type": "SO", "office_type_full": "Sub Office", "pin": "576210", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.46477, "lng": 74.74583, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Udupi", "ppc": {"motif": "Kathale Basadi", "introduced": "12 February 2015"}, "verified": "approx", "approx": true}, {"n": 92, "name": "Kollur", "office_type": "SO", "office_type_full": "Sub Office", "pin": "576220", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.86269, "lng": 74.81087, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Mookambika Road", "ppc": {"motif": "Kollur Mookambika Temple", "introduced": "13 October 2002"}, "verified": "confirmed", "approx": false}, {"n": 93, "name": "Kota", "office_type": "SO", "office_type_full": "Sub Office", "pin": "576221", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.52753, "lng": 74.70483, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Udupi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 94, "name": "Mandarthi", "office_type": "SO", "office_type_full": "Sub Office", "pin": "576223", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.49617, "lng": 74.81134, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Udupi", "ppc": {"motif": "Yakshagana of Mandarthi", "introduced": "14 October 2005"}, "verified": "confirmed", "approx": false}, {"n": 95, "name": "Manjuguni", "office_type": "BO", "office_type_full": "Branch Office", "pin": "581315", "district": "Uttara Kannada", "region": "Coastal", "district_color": "#C74178", "lat": 14.5678, "lng": 74.66958, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Kumta", "ppc": null, "verified": "approx", "approx": true}, {"n": 96, "name": "Murudeshwara", "office_type": "SO", "office_type_full": "Sub Office", "pin": "581350", "district": "Uttara Kannada", "region": "Coastal", "district_color": "#C74178", "lat": 14.09475, "lng": 74.48993, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Murdeshwar", "ppc": null, "verified": "approx", "approx": true}, {"n": 97, "name": "Hampi", "office_type": "SO", "office_type_full": "Sub Office", "pin": "583239", "district": "Vijayanagara", "region": "North Karnataka", "district_color": "#51C741", "lat": 15.32637, "lng": 76.45588, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Hosapete", "ppc": null, "verified": "approx", "approx": true}, {"n": 98, "name": "Kannada University Campus", "office_type": "SO", "office_type_full": "Sub Office", "pin": "583276", "district": "Vijayanagara", "region": "North Karnataka", "district_color": "#51C741", "lat": 15.28607, "lng": 76.49164, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Hosapete", "ppc": {"motif": "Sloth Bear", "introduced": "05 January 2011"}, "verified": "approx", "approx": true}, {"n": 99, "name": "Vijayapura", "office_type": "HO", "office_type_full": "Head Office", "pin": "586101", "district": "Vijayapura", "region": "North Karnataka", "district_color": "#5841C7", "lat": 16.829913, "lng": 75.716078, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Vijayapura", "ppc": {"motif": "Gol Gumbaz", "introduced": "28 September 1987"}, "verified": "confirmed", "approx": false}, {"n": 100, "name": "Bonal", "office_type": "BO", "office_type_full": "Branch Office", "pin": "585224", "district": "Yadagiri", "region": "North Karnataka", "district_color": "#C77F41", "lat": 16.57304, "lng": 77.25328, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Yadgir", "ppc": null, "verified": "approx", "approx": true}];
+const LOCATIONS = [{"n": 1, "name": "Aihole", "office_type": "BO", "office_type_full": "Branch Office", "pin": "587124", "district": "Bagalkot", "region": "North Karnataka", "district_color": "#C74141", "lat": 16.01955, "lng": 75.88058, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Badami", "ppc": null, "verified": "approx", "approx": true}, {"n": 2, "name": "Badami", "office_type": "SO", "office_type_full": "Sub Office", "pin": "587201", "district": "Bagalkot", "region": "North Karnataka", "district_color": "#C74141", "lat": 15.91661, "lng": 75.67751, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Badami", "ppc": {"motif": "Nataraja", "introduced": "29 September 1987"}, "verified": "approx", "approx": true}, {"n": 3, "name": "Pattadakal", "office_type": "BA", "office_type_full": "Branch", "pin": "587201", "district": "Bagalkot", "region": "North Karnataka", "district_color": "#C74141", "lat": 15.94963, "lng": 75.81622, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Badami", "ppc": null, "verified": "approx", "approx": true}, {"n": 4, "name": "Bellary Fort", "office_type": "SO", "office_type_full": "Sub Office", "pin": "583102", "district": "Ballari", "region": "North Karnataka", "district_color": "#41C768", "lat": 15.16602, "lng": 76.85858, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Ballari", "ppc": null, "verified": "approx", "approx": true}, {"n": 5, "name": "Sandur", "office_type": "SO", "office_type_full": "Sub Office", "pin": "583119", "district": "Ballari", "region": "North Karnataka", "district_color": "#41C768", "lat": 15.08195, "lng": 76.5435, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Ballari", "ppc": null, "verified": "approx", "approx": true}, {"n": 6, "name": "Belagavi", "office_type": "HO", "office_type_full": "Head Office", "pin": "590001", "district": "Belagavi", "region": "North Karnataka", "district_color": "#8F41C7", "lat": 15.85217, "lng": 74.50984, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Belagavi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 7, "name": "Belagavi Fort", "office_type": "SO", "office_type_full": "Sub Office", "pin": "590016", "district": "Belagavi", "region": "North Karnataka", "district_color": "#8F41C7", "lat": 15.86338, "lng": 74.52521, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Belagavi", "ppc": null, "verified": "approx", "approx": true}, {"n": 8, "name": "Kittur", "office_type": "SO", "office_type_full": "Sub Office", "pin": "591115", "district": "Belagavi", "region": "North Karnataka", "district_color": "#8F41C7", "lat": 15.597688, "lng": 74.790813, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Belagavi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 9, "name": "Nandgad", "office_type": "SO", "office_type_full": "Sub Office", "pin": "591115", "district": "Belagavi", "region": "North Karnataka", "district_color": "#8F41C7", "lat": 15.576438, "lng": 74.571328, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Belagavi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 10, "name": "Halashi", "office_type": "BO", "office_type_full": "Branch Office", "pin": "591142", "district": "Belagavi", "region": "North Karnataka", "district_color": "#8F41C7", "lat": 15.54102, "lng": 74.58998, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Belagavi", "ppc": {"motif": "Kadamba Royal Logo", "introduced": "04 May 1993"}, "verified": "approx", "approx": true}, {"n": 11, "name": "Hooli", "office_type": "BO", "office_type_full": "Branch Office", "pin": "591126", "district": "Belagavi", "region": "North Karnataka", "district_color": "#8F41C7", "lat": 15.794263, "lng": 75.191766, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Belagavi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 12, "name": "Yallamma Hill", "office_type": "SO", "office_type_full": "Sub Office", "pin": "591173", "district": "Belagavi", "region": "North Karnataka", "district_color": "#8F41C7", "lat": 15.754338, "lng": 75.151672, "landscape": "hills", "theme": {"label": "Hills", "accent": "#4A7C59", "soft": "#E4F0E6"}, "transit_town": "Belagavi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 13, "name": "Shiroli", "office_type": "BO", "office_type_full": "Branch Office", "pin": "591302", "district": "Belagavi", "region": "North Karnataka", "district_color": "#8F41C7", "lat": 15.56381, "lng": 74.43828, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Belagavi", "ppc": null, "verified": "approx", "approx": true}, {"n": 14, "name": "Gokak Falls", "office_type": "SO", "office_type_full": "Sub Office", "pin": "591308", "district": "Belagavi", "region": "North Karnataka", "district_color": "#8F41C7", "lat": 16.19012, "lng": 74.77684, "landscape": "riverside", "theme": {"label": "Riverside", "accent": "#3E8E8A", "soft": "#E0F2F0"}, "transit_town": "Gokak Road", "ppc": null, "verified": "near", "approx": false}, {"n": 15, "name": "Bengaluru GPO", "office_type": "PB", "office_type_full": "Philatelic Bureau", "pin": "560001", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 12.98101, "lng": 77.59504, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bengaluru", "ppc": {"motif": "Vidhana Soudha", "introduced": "15 January 1979"}, "verified": "confirmed", "approx": false}, {"n": 16, "name": "High Court", "office_type": "SO", "office_type_full": "Sub Office", "pin": "560001", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 12.97724, "lng": 77.59152, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bengaluru", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 17, "name": "Dr Ambedkar Veedhi", "office_type": "SO", "office_type_full": "Sub Office", "pin": "560001", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 12.976838, "lng": 77.588609, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bengaluru", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 18, "name": "Basavanagudi", "office_type": "HO", "office_type_full": "Head Office", "pin": "560004", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 12.944813, "lng": 77.573937, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bengaluru", "ppc": {"motif": "Kempe Gowda Tower, Basavanagudi", "introduced": "09 October 2013"}, "verified": "confirmed", "approx": false}, {"n": 19, "name": "Rajajinagar", "office_type": "HO", "office_type_full": "Head Office", "pin": "560010", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 12.99341, "lng": 77.55438, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bengaluru", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 20, "name": "Jayanagar 3rd Block", "office_type": "SO", "office_type_full": "Sub Office", "pin": "560011", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 12.930513, "lng": 77.583422, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bengaluru", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 21, "name": "Science Institute", "office_type": "SO", "office_type_full": "Sub Office", "pin": "560012", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 13.01845, "lng": 77.56108, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bengaluru", "ppc": null, "verified": "approx", "approx": true}, {"n": 22, "name": "NAL", "office_type": "SO", "office_type_full": "Sub Office", "pin": "560017", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 12.95846, "lng": 77.66792, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bengaluru", "ppc": null, "verified": "approx", "approx": true}, {"n": 23, "name": "Museum Road", "office_type": "SO", "office_type_full": "Sub Office", "pin": "560025", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 12.97268, "lng": 77.60343, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bengaluru", "ppc": null, "verified": "near", "approx": false}, {"n": 24, "name": "Bannerghatta", "office_type": "SO", "office_type_full": "Sub Office", "pin": "560083", "district": "Bengaluru", "region": "Bengaluru region", "district_color": "#C7B741", "lat": 12.811588, "lng": 77.580516, "landscape": "forest", "theme": {"label": "Forest", "accent": "#2E6B4F", "soft": "#E3EFE7"}, "transit_town": "Bengaluru", "ppc": {"motif": "Malabar Banded Peacock", "introduced": "23 May 2009"}, "verified": "confirmed", "approx": false}, {"n": 25, "name": "Kamathana", "office_type": "SO", "office_type_full": "Sub Office", "pin": "585226", "district": "Bidar", "region": "North Karnataka", "district_color": "#41B1C7", "lat": 17.85556, "lng": 77.45303, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Bidar", "ppc": null, "verified": "approx", "approx": true}, {"n": 26, "name": "Basavakalyana", "office_type": "SO", "office_type_full": "Sub Office", "pin": "585327", "district": "Bidar", "region": "North Karnataka", "district_color": "#41B1C7", "lat": 17.87082, "lng": 76.94745, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Bidar", "ppc": null, "verified": "approx", "approx": true}, {"n": 27, "name": "Bidar", "office_type": "HO", "office_type_full": "Head Office", "pin": "585401", "district": "Bidar", "region": "North Karnataka", "district_color": "#41B1C7", "lat": 17.913012, "lng": 77.517109, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Bidar", "ppc": {"motif": "Madarsa of Mohammed Gawan", "introduced": "11 December 2005"}, "verified": "confirmed", "approx": false}, {"n": 28, "name": "Bidar Gurunanak Jhira", "office_type": "SO", "office_type_full": "Sub Office", "pin": "585402", "district": "Bidar", "region": "North Karnataka", "district_color": "#41B1C7", "lat": 17.92659, "lng": 77.50915, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Bidar", "ppc": null, "verified": "approx", "approx": true}, {"n": 29, "name": "Bandipur", "office_type": "BO", "office_type_full": "Branch Office", "pin": "571126", "district": "Chamarajanagar", "region": "Mysuru region", "district_color": "#C7418A", "lat": 11.66572, "lng": 76.62764, "landscape": "forest", "theme": {"label": "Forest", "accent": "#2E6B4F", "soft": "#E3EFE7"}, "transit_town": "Mysuru", "ppc": null, "verified": "approx", "approx": true}, {"n": 30, "name": "Kyathadevaragudi", "office_type": "BO", "office_type_full": "Branch Office", "pin": "571342", "district": "Chamarajanagar", "region": "Mysuru region", "district_color": "#C7418A", "lat": 11.93192, "lng": 76.95983, "landscape": "forest", "theme": {"label": "Forest", "accent": "#2E6B4F", "soft": "#E3EFE7"}, "transit_town": "Chamarajanagar", "ppc": null, "verified": "approx", "approx": true}, {"n": 31, "name": "Male Mahadeshwara Hills", "office_type": "SO", "office_type_full": "Sub Office", "pin": "571490", "district": "Chamarajanagar", "region": "Mysuru region", "district_color": "#C7418A", "lat": 12.02989, "lng": 77.59035, "landscape": "hills", "theme": {"label": "Hills", "accent": "#4A7C59", "soft": "#E4F0E6"}, "transit_town": "Chamarajanagar", "ppc": null, "verified": "near", "approx": false}, {"n": 32, "name": "Nandi Hills", "office_type": "BO", "office_type_full": "Branch Office", "pin": "562101", "district": "Chikkaballapura", "region": "Bengaluru region", "district_color": "#62C741", "lat": 13.43373, "lng": 77.73108, "landscape": "hills", "theme": {"label": "Hills", "accent": "#4A7C59", "soft": "#E4F0E6"}, "transit_town": "Chikkaballapur", "ppc": null, "verified": "approx", "approx": true}, {"n": 33, "name": "Chikkamagaluru", "office_type": "HO", "office_type_full": "Head Office", "pin": "577101", "district": "Chikkamagaluru", "region": "Malnad", "district_color": "#4741C7", "lat": 13.31559, "lng": 75.77406, "landscape": "hills", "theme": {"label": "Hills", "accent": "#4A7C59", "soft": "#E4F0E6"}, "transit_town": "Kadur", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 34, "name": "Sringeri", "office_type": "SO", "office_type_full": "Sub Office", "pin": "577139", "district": "Chikkamagaluru", "region": "Malnad", "district_color": "#4741C7", "lat": 13.42502, "lng": 75.25499, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Shivamogga", "ppc": {"motif": "Vidyashankara Temple", "introduced": "27 January 1985"}, "verified": "approx", "approx": true}, {"n": 35, "name": "Chitradurga", "office_type": "HO", "office_type_full": "Head Office", "pin": "577501", "district": "Chitradurga", "region": "North Karnataka", "district_color": "#C76E41", "lat": 14.224687, "lng": 76.395641, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Chitradurga", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 36, "name": "Kateel", "office_type": "SO", "office_type_full": "Sub Office", "pin": "574148", "district": "Dakshina Kannada", "region": "Coastal", "district_color": "#41C795", "lat": 13.04507, "lng": 74.87079, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Mangaluru", "ppc": {"motif": "Sri Durga Parameshwari Temple, Kateel", "introduced": "11 October 2013"}, "verified": "approx", "approx": true}, {"n": 37, "name": "Dharmasthala", "office_type": "SO", "office_type_full": "Sub Office", "pin": "574216", "district": "Dakshina Kannada", "region": "Coastal", "district_color": "#41C795", "lat": 12.95074, "lng": 75.38193, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Subrahmanya Road", "ppc": {"motif": "Sri Manjunatheswara Temple", "introduced": "02 January 1989"}, "verified": "approx", "approx": true}, {"n": 38, "name": "Moodabidri", "office_type": "SO", "office_type_full": "Sub Office", "pin": "574227", "district": "Dakshina Kannada", "region": "Coastal", "district_color": "#41C795", "lat": 13.07035, "lng": 74.99728, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Mangaluru", "ppc": {"motif": "Saavira Kambada Temple", "introduced": "16 December 2016"}, "verified": "approx", "approx": true}, {"n": 39, "name": "Subrahmanya", "office_type": "SO", "office_type_full": "Sub Office", "pin": "574238", "district": "Dakshina Kannada", "region": "Coastal", "district_color": "#41C795", "lat": 12.66606, "lng": 75.61336, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Subrahmanya Road", "ppc": {"motif": "Head of Serpent Vasuki", "introduced": "14 April 2005"}, "verified": "approx", "approx": true}, {"n": 40, "name": "Venur", "office_type": "SO", "office_type_full": "Sub Office", "pin": "574242", "district": "Dakshina Kannada", "region": "Coastal", "district_color": "#41C795", "lat": 13.0124, "lng": 75.14488, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Mangaluru", "ppc": {"motif": "Bahubali (Lord Gommateshwara Statue)", "introduced": "26 December 2016"}, "verified": "approx", "approx": true}, {"n": 41, "name": "Mangaluru", "office_type": "HO", "office_type_full": "Head Office", "pin": "575001", "district": "Dakshina Kannada", "region": "Coastal", "district_color": "#41C795", "lat": 12.85851, "lng": 74.83755, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Mangaluru", "ppc": {"motif": "Light House", "introduced": "11 September 1989"}, "verified": "confirmed", "approx": false}, {"n": 42, "name": "Ullal", "office_type": "SO", "office_type_full": "Sub Office", "pin": "575020", "district": "Dakshina Kannada", "region": "Coastal", "district_color": "#41C795", "lat": 12.82115, "lng": 74.84169, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Mangaluru", "ppc": null, "verified": "approx", "approx": true}, {"n": 43, "name": "Davangere", "office_type": "HO", "office_type_full": "Head Office", "pin": "577001", "district": "Davangere", "region": "North Karnataka", "district_color": "#BC41C7", "lat": 14.46893, "lng": 75.91995, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Davangere", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 44, "name": "Narayanapura", "office_type": "SO", "office_type_full": "Sub Office", "pin": "580008", "district": "Dharwad", "region": "North Karnataka", "district_color": "#ABC741", "lat": 15.47028, "lng": 75.01811, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Hubballi", "ppc": null, "verified": "approx", "approx": true}, {"n": 45, "name": "Hubli", "office_type": "HO", "office_type_full": "Head Office", "pin": "580020", "district": "Dharwad", "region": "North Karnataka", "district_color": "#ABC741", "lat": 15.35227, "lng": 75.14486, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Hubballi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 46, "name": "Annigeri", "office_type": "SO", "office_type_full": "Sub Office", "pin": "582201", "district": "Dharwad", "region": "North Karnataka", "district_color": "#ABC741", "lat": 15.4303, "lng": 75.43504, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Hubballi", "ppc": null, "verified": "approx", "approx": true}, {"n": 47, "name": "Gadag", "office_type": "HO", "office_type_full": "Head Office", "pin": "582101", "district": "Gadag", "region": "North Karnataka", "district_color": "#4184C7", "lat": 15.432538, "lng": 75.636328, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Gadag", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 48, "name": "Lakkundi", "office_type": "SO", "office_type_full": "Sub Office", "pin": "582115", "district": "Gadag", "region": "North Karnataka", "district_color": "#4184C7", "lat": 15.38891, "lng": 75.71913, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Gadag", "ppc": null, "verified": "approx", "approx": true}, {"n": 49, "name": "Belur", "office_type": "SO", "office_type_full": "Sub Office", "pin": "573115", "district": "Hassan", "region": "Malnad", "district_color": "#C7415D", "lat": 13.16307, "lng": 75.86258, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Hassan", "ppc": {"motif": "Darpana Sundari", "introduced": "02 January 1978"}, "verified": "approx", "approx": true}, {"n": 50, "name": "Halebeedu", "office_type": "SO", "office_type_full": "Sub Office", "pin": "573121", "district": "Hassan", "region": "Malnad", "district_color": "#C7415D", "lat": 13.21416, "lng": 75.99405, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Hassan", "ppc": {"motif": "Shilabalikas", "introduced": "02 January 1978"}, "verified": "approx", "approx": true}, {"n": 51, "name": "Shravanabelagola", "office_type": "SO", "office_type_full": "Sub Office", "pin": "573135", "district": "Hassan", "region": "Malnad", "district_color": "#C7415D", "lat": 12.8597, "lng": 76.48276, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Hassan", "ppc": {"motif": "Gommateshwara", "introduced": "02 January 1978"}, "verified": "approx", "approx": true}, {"n": 52, "name": "Ranebennur", "office_type": "MDG", "office_type_full": "Mukhy Dak Ghar", "pin": "581115", "district": "Haveri", "region": "North Karnataka", "district_color": "#41C74C", "lat": 14.621037, "lng": 75.632922, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Ranebennur", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 53, "name": "Shishuvinahal", "office_type": "BO", "office_type_full": "Branch Office", "pin": "581126", "district": "Haveri", "region": "North Karnataka", "district_color": "#41C74C", "lat": 15.09655, "lng": 75.32394, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Haveri", "ppc": null, "verified": "approx", "approx": true}, {"n": 54, "name": "Kalaburagi", "office_type": "HO", "office_type_full": "Head Office", "pin": "585101", "district": "Kalaburagi", "region": "North Karnataka", "district_color": "#7441C7", "lat": 17.341438, "lng": 76.834609, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Kalaburagi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 55, "name": "Madikeri", "office_type": "HO", "office_type_full": "Head Office", "pin": "571201", "district": "Kodagu", "region": "Malnad", "district_color": "#C79B41", "lat": 12.42244, "lng": 75.74029, "landscape": "hills", "theme": {"label": "Hills", "accent": "#4A7C59", "soft": "#E4F0E6"}, "transit_town": "Mysuru", "ppc": {"motif": "Odikathi and Peechikathi", "introduced": "01 April 1992"}, "verified": "confirmed", "approx": false}, {"n": 56, "name": "Nagarahole", "office_type": "BO", "office_type_full": "Branch Office", "pin": "571258", "district": "Kodagu", "region": "Malnad", "district_color": "#C79B41", "lat": 12.03144, "lng": 76.12068, "landscape": "forest", "theme": {"label": "Forest", "accent": "#2E6B4F", "soft": "#E3EFE7"}, "transit_town": "Mysuru", "ppc": {"motif": "Gloriosa Superba (Wild Lily)", "introduced": "06 November 1987"}, "verified": "approx", "approx": true}, {"n": 57, "name": "Oorgaum", "office_type": "SO", "office_type_full": "Sub Office", "pin": "563120", "district": "Kolar", "region": "Bengaluru region", "district_color": "#41C7C2", "lat": 12.954913, "lng": 78.256859, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Bangarapet", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 58, "name": "Masthi", "office_type": "SO", "office_type_full": "Sub Office", "pin": "563139", "district": "Kolar", "region": "Bengaluru region", "district_color": "#41C7C2", "lat": 12.87178, "lng": 77.99655, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Malur", "ppc": null, "verified": "approx", "approx": true}, {"n": 59, "name": "Anegundi", "office_type": "BO", "office_type_full": "Branch Office", "pin": "583227", "district": "Koppal", "region": "North Karnataka", "district_color": "#C741A5", "lat": 15.35011, "lng": 76.4355, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Hosapete", "ppc": null, "verified": "approx", "approx": true}, {"n": 60, "name": "Koppal", "office_type": "HO", "office_type_full": "Head Office", "pin": "583231", "district": "Koppal", "region": "North Karnataka", "district_color": "#C741A5", "lat": 15.349312, "lng": 76.153813, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Koppal", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 61, "name": "Kokkare Bellur", "office_type": "BO", "office_type_full": "Branch Office", "pin": "571433", "district": "Mandya", "region": "Mysuru region", "district_color": "#7EC741", "lat": 12.52017, "lng": 77.0878, "landscape": "riverside", "theme": {"label": "Riverside", "accent": "#3E8E8A", "soft": "#E0F2F0"}, "transit_town": "Maddur", "ppc": {"motif": "Flying Pelican", "introduced": "28 January 1992"}, "verified": "approx", "approx": true}, {"n": 62, "name": "Srirangapatna", "office_type": "HO", "office_type_full": "Head Office", "pin": "571438", "district": "Mandya", "region": "Mysuru region", "district_color": "#7EC741", "lat": 12.41669, "lng": 76.69417, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Srirangapatna", "ppc": {"motif": "Mausoleum of Tipu Sultan (20 Oct 1978) + Sword & Headgear of Tipu Sultan (20 Jun 1987)", "introduced": "20 October 1978 / 20 June 1987"}, "verified": "approx", "approx": true}, {"n": 63, "name": "Mysuru", "office_type": "HO", "office_type_full": "Head Office", "pin": "570001", "district": "Mysuru", "region": "Mysuru region", "district_color": "#4157C7", "lat": 12.31385, "lng": 76.65674, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Mysuru", "ppc": {"motif": "Elephant carrying Howdah", "introduced": "11 October 2002"}, "verified": "confirmed", "approx": false}, {"n": 64, "name": "Lakshmipuram", "office_type": "SO", "office_type_full": "Sub Office", "pin": "570004", "district": "Mysuru", "region": "Mysuru region", "district_color": "#4157C7", "lat": 12.29692, "lng": 76.6457, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Mysuru", "ppc": null, "verified": "approx", "approx": true}, {"n": 65, "name": "Saraswathipuram", "office_type": "HO", "office_type_full": "Head Office", "pin": "570009", "district": "Mysuru", "region": "Mysuru region", "district_color": "#4157C7", "lat": 12.303438, "lng": 76.629688, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Mysuru", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 66, "name": "Chamundi Betta", "office_type": "BO", "office_type_full": "Branch Office", "pin": "570010", "district": "Mysuru", "region": "Mysuru region", "district_color": "#4157C7", "lat": 12.27462, "lng": 76.67061, "landscape": "hills", "theme": {"label": "Hills", "accent": "#4A7C59", "soft": "#E4F0E6"}, "transit_town": "Mysuru", "ppc": null, "verified": "approx", "approx": true}, {"n": 67, "name": "SGS Ashram", "office_type": "SO", "office_type_full": "Sub Office", "pin": "570025", "district": "Mysuru", "region": "Mysuru region", "district_color": "#4157C7", "lat": 12.28355, "lng": 76.65906, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Mysuru", "ppc": {"motif": "Nada Mantapa", "introduced": "31 May 2008"}, "verified": "approx", "approx": true}, {"n": 68, "name": "Somanathapura", "office_type": "BO", "office_type_full": "Branch Office", "pin": "571120", "district": "Mysuru", "region": "Mysuru region", "district_color": "#4157C7", "lat": 12.27599, "lng": 76.88202, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Mysuru", "ppc": {"motif": "Lord Somanatha Temple", "introduced": "08 September 1989"}, "verified": "approx", "approx": true}, {"n": 69, "name": "Talakad", "office_type": "SO", "office_type_full": "Sub Office", "pin": "571122", "district": "Mysuru", "region": "Mysuru region", "district_color": "#4157C7", "lat": 12.19269, "lng": 77.02772, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Mysuru", "ppc": null, "verified": "approx", "approx": true}, {"n": 70, "name": "Bichali", "office_type": "BO", "office_type_full": "Branch Office", "pin": "584140", "district": "Raichur", "region": "North Karnataka", "district_color": "#C75241", "lat": 15.95843, "lng": 77.32276, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Raichur", "ppc": null, "verified": "approx", "approx": true}, {"n": 71, "name": "Helagali", "office_type": "BO", "office_type_full": "Branch Office", "pin": "562117", "district": "Ramanagara", "region": "Bengaluru region", "district_color": "#41C779", "lat": 12.5513, "lng": 77.42313, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Ramanagara", "ppc": null, "verified": "approx", "approx": true}, {"n": 72, "name": "Agumbe", "office_type": "SO", "office_type_full": "Sub Office", "pin": "577411", "district": "Shivamogga", "region": "Malnad", "district_color": "#A141C7", "lat": 13.51173, "lng": 75.15791, "landscape": "forest", "theme": {"label": "Forest", "accent": "#2E6B4F", "soft": "#E3EFE7"}, "transit_town": "Udupi", "ppc": null, "verified": "approx", "approx": true}, {"n": 73, "name": "Kendalbailu", "office_type": "BO", "office_type_full": "Branch Office", "pin": "577411", "district": "Shivamogga", "region": "Malnad", "district_color": "#A141C7", "lat": 13.75021, "lng": 75.20085, "landscape": "forest", "theme": {"label": "Forest", "accent": "#2E6B4F", "soft": "#E3EFE7"}, "transit_town": "Shivamogga", "ppc": null, "verified": "approx", "approx": true}, {"n": 74, "name": "Devangi", "office_type": "SO", "office_type_full": "Sub Office", "pin": "577415", "district": "Shivamogga", "region": "Malnad", "district_color": "#A141C7", "lat": 13.62838, "lng": 75.28355, "landscape": "forest", "theme": {"label": "Forest", "accent": "#2E6B4F", "soft": "#E3EFE7"}, "transit_town": "Shivamogga", "ppc": null, "verified": "approx", "approx": true}, {"n": 75, "name": "Jog Falls", "office_type": "SO", "office_type_full": "Sub Office", "pin": "577435", "district": "Shivamogga", "region": "Malnad", "district_color": "#A141C7", "lat": 14.20995, "lng": 74.81566, "landscape": "riverside", "theme": {"label": "Riverside", "accent": "#3E8E8A", "soft": "#E0F2F0"}, "transit_town": "Talguppa", "ppc": null, "verified": "approx", "approx": true}, {"n": 76, "name": "Humcha", "office_type": "BO", "office_type_full": "Branch Office", "pin": "577436", "district": "Shivamogga", "region": "Malnad", "district_color": "#A141C7", "lat": 13.86369, "lng": 75.20667, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Shivamogga", "ppc": null, "verified": "approx", "approx": true}, {"n": 77, "name": "Siddaganga Mutt", "office_type": "SO", "office_type_full": "Sub Office", "pin": "572104", "district": "Tumakuru", "region": "Bengaluru region", "district_color": "#C7C741", "lat": 13.32234, "lng": 77.14891, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Tumakuru", "ppc": null, "verified": "approx", "approx": true}, {"n": 78, "name": "Hirehalli", "office_type": "SO", "office_type_full": "Sub Office", "pin": "572168", "district": "Tumakuru", "region": "Bengaluru region", "district_color": "#C7C741", "lat": 13.28266, "lng": 77.18462, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Tumakuru", "ppc": null, "verified": "approx", "approx": true}, {"n": 79, "name": "Karkala", "office_type": "HO", "office_type_full": "Head Office", "pin": "574104", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.212787, "lng": 74.994703, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Udupi", "ppc": {"motif": "Seated Tirthankara", "introduced": "05 February 1991"}, "verified": "confirmed", "approx": false}, {"n": 80, "name": "Katapadi", "office_type": "SO", "office_type_full": "Sub Office", "pin": "574105", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.28445, "lng": 74.75032, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Udupi", "ppc": null, "verified": "approx", "approx": true}, {"n": 81, "name": "Kaup", "office_type": "SO", "office_type_full": "Sub Office", "pin": "574106", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.23617, "lng": 74.74631, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Udupi", "ppc": null, "verified": "approx", "approx": true}, {"n": 82, "name": "Varanga", "office_type": "BO", "office_type_full": "Branch Office", "pin": "574108", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.38371, "lng": 75.00196, "landscape": "lake", "theme": {"label": "Lake", "accent": "#2F6F9F", "soft": "#E0EFF7"}, "transit_town": "Udupi", "ppc": null, "verified": "approx", "approx": true}, {"n": 83, "name": "Shankarapura", "office_type": "SO", "office_type_full": "Sub Office", "pin": "574115", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.25955, "lng": 74.77012, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Udupi", "ppc": null, "verified": "approx", "approx": true}, {"n": 84, "name": "Udupi", "office_type": "HO", "office_type_full": "Head Office", "pin": "576101", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.340613, "lng": 74.748797, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Udupi", "ppc": {"motif": "Sri Krishna, Udupi Temple", "introduced": "23 January 1985"}, "verified": "confirmed", "approx": false}, {"n": 85, "name": "Manipal", "office_type": "HO", "office_type_full": "Head Office", "pin": "576104", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.348937, "lng": 74.785937, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Udupi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 86, "name": "Malpe", "office_type": "SO", "office_type_full": "Sub Office", "pin": "576108", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.34737, "lng": 74.723, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Udupi", "ppc": {"motif": "St. Mary's Islands", "introduced": "13 February 2015"}, "verified": "approx", "approx": true}, {"n": 87, "name": "Nandalike", "office_type": "BO", "office_type_full": "Branch Office", "pin": "576111", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.22165, "lng": 74.98529, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Udupi", "ppc": {"motif": "Kannada poet and writer Muddana, Nandalike", "introduced": "24 February 2015"}, "verified": "approx", "approx": true}, {"n": 88, "name": "Someshwara", "office_type": "BO", "office_type_full": "Branch Office", "pin": "576112", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.49038, "lng": 75.06775, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Udupi", "ppc": null, "verified": "approx", "approx": true}, {"n": 89, "name": "Attur", "office_type": "BO", "office_type_full": "Branch Office", "pin": "576117", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.20793, "lng": 74.97171, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Udupi", "ppc": null, "verified": "approx", "approx": true}, {"n": 90, "name": "Kundapura", "office_type": "HO", "office_type_full": "Head Office", "pin": "576201", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.631913, "lng": 74.691859, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Udupi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 91, "name": "Barkur", "office_type": "SO", "office_type_full": "Sub Office", "pin": "576210", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.46477, "lng": 74.74583, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Udupi", "ppc": {"motif": "Kathale Basadi", "introduced": "12 February 2015"}, "verified": "approx", "approx": true}, {"n": 92, "name": "Kollur", "office_type": "SO", "office_type_full": "Sub Office", "pin": "576220", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.86269, "lng": 74.81087, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Mookambika Road", "ppc": {"motif": "Kollur Mookambika Temple", "introduced": "13 October 2002"}, "verified": "confirmed", "approx": false}, {"n": 93, "name": "Kota", "office_type": "SO", "office_type_full": "Sub Office", "pin": "576221", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.52753, "lng": 74.70483, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Udupi", "ppc": null, "verified": "confirmed", "approx": false}, {"n": 94, "name": "Mandarthi", "office_type": "SO", "office_type_full": "Sub Office", "pin": "576223", "district": "Udupi", "region": "Coastal", "district_color": "#41A0C7", "lat": 13.49617, "lng": 74.81134, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Udupi", "ppc": {"motif": "Yakshagana of Mandarthi", "introduced": "14 October 2005"}, "verified": "confirmed", "approx": false}, {"n": 95, "name": "Manjuguni", "office_type": "BO", "office_type_full": "Branch Office", "pin": "581315", "district": "Uttara Kannada", "region": "Coastal", "district_color": "#C74178", "lat": 14.5678, "lng": 74.66958, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Kumta", "ppc": null, "verified": "approx", "approx": true}, {"n": 96, "name": "Murudeshwara", "office_type": "SO", "office_type_full": "Sub Office", "pin": "581350", "district": "Uttara Kannada", "region": "Coastal", "district_color": "#C74178", "lat": 14.09475, "lng": 74.48993, "landscape": "coastal", "theme": {"label": "Coastal", "accent": "#2A7FA8", "soft": "#E0F0F7"}, "transit_town": "Murdeshwar", "ppc": null, "verified": "approx", "approx": true}, {"n": 97, "name": "Hampi", "office_type": "SO", "office_type_full": "Sub Office", "pin": "583239", "district": "Vijayanagara", "region": "North Karnataka", "district_color": "#51C741", "lat": 15.32637, "lng": 76.45588, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Hosapete", "ppc": null, "verified": "approx", "approx": true}, {"n": 98, "name": "Kannada University Campus", "office_type": "SO", "office_type_full": "Sub Office", "pin": "583276", "district": "Vijayanagara", "region": "North Karnataka", "district_color": "#51C741", "lat": 15.28607, "lng": 76.49164, "landscape": "heritage", "theme": {"label": "Heritage", "accent": "#B4622A", "soft": "#F7E9DB"}, "transit_town": "Hosapete", "ppc": {"motif": "Sloth Bear", "introduced": "05 January 2011"}, "verified": "approx", "approx": true}, {"n": 99, "name": "Vijayapura", "office_type": "HO", "office_type_full": "Head Office", "pin": "586101", "district": "Vijayapura", "region": "North Karnataka", "district_color": "#5841C7", "lat": 16.829913, "lng": 75.716078, "landscape": "urban", "theme": {"label": "Urban", "accent": "#5A6B7C", "soft": "#E8ECF0"}, "transit_town": "Vijayapura", "ppc": {"motif": "Gol Gumbaz", "introduced": "28 September 1987"}, "verified": "confirmed", "approx": false}, {"n": 100, "name": "Bonal", "office_type": "BO", "office_type_full": "Branch Office", "pin": "585224", "district": "Yadagiri", "region": "North Karnataka", "district_color": "#C77F41", "lat": 16.57304, "lng": 77.25328, "landscape": "plains", "theme": {"label": "Plains", "accent": "#A8894A", "soft": "#F5EEDC"}, "transit_town": "Yadgir", "ppc": null, "verified": "approx", "approx": true}];
 
 /* ================= state ================= */
 const LS_KEY = "stampquest_v1";
@@ -718,14 +737,22 @@ const visitedCount = () => LOCATIONS.filter(l => state.visited[l.n]).length;
 /* ================= helpers ================= */
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function toast(msg){ const t = $("toast"); t.textContent = msg; t.classList.add("show");
-  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove("show"), 2600); }
+function toast(msg, undoFn){ const t = $("toast"); t.innerHTML = "";
+  const s = document.createElement("span"); s.textContent = msg; t.appendChild(s);
+  if (undoFn){
+    const b = document.createElement("button");
+    b.textContent = "Undo"; b.className = "toast-undo";
+    b.onclick = (e) => { e.stopPropagation(); t.classList.remove("show"); undoFn(); };
+    t.appendChild(b);
+  }
+  t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove("show"), 4000); }
 function gmapsDir(lat,lng){ return "https://www.google.com/maps/dir/?api=1&destination="+lat+","+lng; }
 function gmapsSearch(l){ return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(l.name+" post office "+l.pin+", Karnataka"); }
 function reportLink(l){
-  const subj = encodeURIComponent("StampQuest location report: #"+l.n+" "+l.name);
+  const title = encodeURIComponent("Location report: #"+l.n+" "+l.name);
   const body = encodeURIComponent("Office #"+l.n+" — "+l.name+" ("+l.pin+")\n\nWhat is wrong with the location:\n");
-  return "mailto:maanarp@gmail.com?subject="+subj+"&body="+body;
+  return "https://github.com/nyx4088/karnataka-philately-passport/issues/new?title="+title+"&body="+body;
 }
 function gmapsPhotos(l){ return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(l.name+" "+l.office_type_full+" "+l.transit_town+" "+l.pin); }
 function fullName(l){ return l.name + (l.office_type_full ? " " + l.office_type_full : ""); }
@@ -1025,10 +1052,28 @@ async function photoTotalBytes(){
     const cur = tx.objectStore("photos").openCursor();
     cur.onsuccess = () => {
       const c = cur.result;
-      if (c){ total += (c.value.full?.size || 0) + (c.value.thumb?.size || 0); c.continue(); }
+      if (c){ total += (c.value.full?.size||0) + (c.value.thumb?.size||0); c.continue(); }
       else res(total);
     };
     cur.onerror = () => rej(cur.error);
+  });
+}
+async function photoCountAll(){
+  const db = await photoDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction("photos", "readonly");
+    const rq = tx.objectStore("photos").count();
+    rq.onsuccess = () => res(rq.result);
+    rq.onerror = () => rej(rq.error);
+  });
+}
+async function photoClearAll(){
+  const db = await photoDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction("photos", "readwrite");
+    tx.objectStore("photos").clear();
+    tx.oncomplete = () => res();
+    tx.onerror = () => rej(tx.error);
   });
 }
 async function photoHas(n){ return !!(await photoGet(n)); }
@@ -1051,12 +1096,22 @@ function resizeBlob(file, maxPx, quality){
   });
 }
 
+let photoSheetPushed = false;
 function closePhotoPicker(){
   const d = document.getElementById("photoChoice");
   if (d) d.remove();
   const b = document.getElementById("photoBackdrop");
   if (b) b.remove();
   document.removeEventListener("keydown", photoEscHandler);
+  if (photoSheetPushed){
+    photoSheetPushed = false;
+    try { history.back(); } catch(e){}
+  }
+}
+function pushPhotoSheet(){
+  if (photoSheetPushed) return;
+  photoSheetPushed = true;
+  pushPhotoSheet();
 }
 /* tile photo long-press actions */
 function openTilePhotoActions(n){
@@ -1077,7 +1132,7 @@ function openTilePhotoActions(n){
   $("tpRemove").onclick = () => { closePhotoPicker(); removePhoto(n); };
   $("tpCancel").onclick = closePhotoPicker;
   document.addEventListener("keydown", photoEscHandler);
-  history.pushState({ photoSheet: true }, "");
+  pushPhotoSheet();
 }
 function photoEscHandler(e){ if (e.key === "Escape") closePhotoPicker(); }
 function openPhotoPicker(n){
@@ -1098,10 +1153,13 @@ function openPhotoPicker(n){
   $("pcCancel").onclick = closePhotoPicker;
   document.addEventListener("keydown", photoEscHandler);
   // close on browser back
-  history.pushState({ photoSheet: true }, "");
+  pushPhotoSheet();
 }
 window.addEventListener("popstate", (e) => {
-  if (document.getElementById("photoChoice")) { closePhotoPicker(); }
+  if (document.getElementById("photoChoice")) {
+    photoSheetPushed = false; // already popped, don't go back again
+    closePhotoPicker();
+  }
 });
 $("photoCam").addEventListener("change", e => { if (e.target.files[0]) handlePhotoFile(photoTargetN, e.target.files[0]); e.target.value = ""; });
 $("photoGal").addEventListener("change", e => { if (e.target.files[0]) handlePhotoFile(photoTargetN, e.target.files[0]); e.target.value = ""; });
@@ -1129,13 +1187,13 @@ async function handlePhotoFile(n, file){
     save();
     refreshMarker(n); renderSheetBody(byN[n]); renderProgress(); renderGrid(); renderDistricts(); renderSaved();
     if (!wasVisited){ stampPop(); checkMilestones(); }
-    toastAction("Marked visited. Undo", "Undo", async () => {
-      await photoDel(n);
+    toastAction("Marked visited.", "Undo", async () => {
+      if (old) await photoPut(old); else await photoDel(n);
       if (!wasVisited) delete state.visited[n];
       if (wasPlanned) state.planned[n] = true;
       save();
       refreshMarker(n); renderSheetBody(byN[n]); renderProgress(); renderGrid(); renderDistricts(); renderSaved();
-      toast("Photo removed, visit undone.");
+      toast(old ? "Previous photo restored." : "Photo removed, visit undone.");
     });
   } catch(err){
     toast("Couldn't read that photo. Try another.");
@@ -1438,96 +1496,142 @@ function drawPostmark(x, cx, cy, r, brand){
   x.beginPath(); x.arc(cx, cy, r, 0, 7); x.stroke();
   x.lineWidth = r*0.02; x.beginPath(); x.arc(cx, cy, r*0.74, 0, 7); x.stroke();
 }
+/* polaroid helper: draws a polaroid with photo (or number/name), hanging from thread */
+async function drawPolaroid(x, px, py, pw, ph, photo, num, name, C){
+  const FD='Fraunces,Georgia,serif', FS='DM Sans,system-ui,sans-serif';
+  // shadow
+  x.save(); x.shadowColor="rgba(0,0,0,.18)"; x.shadowBlur=12; x.shadowOffsetY=4;
+  x.fillStyle="#FFFFFF"; x.fillRect(px, py, pw, ph); x.restore();
+  // photo area (top 72%)
+  const iw=pw-24, ih=Math.floor(ph*0.62), ix=px+12, iy=py+12;
+  if (photo){
+    try {
+      const bmp = await createImageBitmap(photo.thumb || photo);
+      x.save(); x.beginPath(); x.rect(ix, iy, iw, ih); x.clip();
+      const s=Math.max(iw/bmp.width, ih/bmp.height);
+      x.drawImage(bmp, ix-(bmp.width*s-iw)/2, iy-(bmp.height*s-ih)/2, bmp.width*s, bmp.height*s);
+      x.restore();
+    } catch(e){
+      x.fillStyle=C.locked; x.fillRect(ix, iy, iw, ih);
+    }
+  } else {
+    x.fillStyle=C.locked; x.fillRect(ix, iy, iw, ih);
+    x.fillStyle=C.ink2; x.font="600 44px "+FD; x.textAlign="center";
+    x.fillText(num+"", px+pw/2, iy+ih/2+8);
+  }
+  // caption (number + name)
+  x.fillStyle=C.ink; x.textAlign="center";
+  x.font="600 30px "+FD;
+  const label = num+". "+name;
+  // truncate if too long
+  let txt = label;
+  while (x.measureText(txt).width > pw-24 && txt.length > 10) txt = txt.slice(0,-2);
+  if (txt !== label) txt = txt.slice(0,-1)+"…";
+  x.fillText(txt, px+pw/2, py+ph-22);
+  // clip at top
+  x.fillStyle=C.ink2; x.beginPath();
+  const cxp=px+pw/2;
+  x.roundRect(cxp-14, py-10, 28, 26, 6); x.fill();
+}
+function drawThread(x, x0, y0, x1, y1, C){
+  x.strokeStyle=C.subtle; x.lineWidth=3; x.beginPath();
+  x.moveTo(x0, y0);
+  x.quadraticCurveTo((x0+x1)/2, Math.max(y0,y1)+40, x1, y1);
+  x.stroke();
+}
 async function drawStoryCard(withPhotos){
   const W=1080, H=1920, cv=document.createElement("canvas"); cv.width=W; cv.height=H;
   const x=cv.getContext("2d"), C=shareColors();
-  const FD='Fraunces,Georgia,serif', FS='DM Sans,system-ui,sans-serif', FM='DM Mono,ui-monospace,monospace';
+  const FD='Fraunces,Georgia,serif', FS='DM Sans,system-ui,sans-serif';
   x.fillStyle=C.paper; x.fillRect(0,0,W,H);
   x.strokeStyle=C.subtle; x.lineWidth=3; x.strokeRect(40,40,W-80,H-80);
-  // content lives between y=250 and y=1670 (top/bottom 250px clear)
   const cx=W/2, c=visitedCount();
-  drawPostmark(x, cx, 420, 95, C.brand);
-  x.save(); x.translate(cx,420); x.rotate(-0.12);
-  x.fillStyle=C.brand; x.font="600 56px "+FD; x.textAlign="center"; x.fillText("100",0,20); x.restore();
-  x.fillStyle=C.ink; x.textAlign="center"; x.font="600 50px "+FD;
-  x.fillText("MY PHILATELY JOURNEY", cx, 600);
-  x.font="600 170px "+FD; x.fillStyle=C.brand; x.fillText(c+"", cx, 800);
-  x.font="400 40px "+FS; x.fillStyle=C.ink2; x.fillText("of 100 post offices", cx, 860);
-  // progress bar
-  const bw=W-360; x.fillStyle=C.subtle; x.fillRect((W-bw)/2, 910, bw, 24);
-  x.fillStyle=C.collected; x.fillRect((W-bw)/2, 910, bw*c/100, 24);
-  // 100-dot grid (10x10)
-  const dotR=16, gap=56, gw=9*gap, gx0=cx-gw/2, gy0=1000;
-  LOCATIONS.forEach((l,i) => {
-    const dx=gx0+(i%10)*gap, dy=gy0+Math.floor(i/10)*gap;
-    x.beginPath(); x.arc(dx,dy,dotR,0,7);
-    if (state.visited[l.n]){ x.fillStyle=C.collected; x.fill(); }
-    else { x.strokeStyle=C.subtle; x.lineWidth=2.5; x.stroke(); }
-  });
-  // top districts
-  const tops=topDistricts();
-  x.font="600 34px "+FS; x.fillStyle=C.ink2; x.fillText("TOP DISTRICTS", cx, 1640-180);
-  x.font="500 36px "+FS; x.fillStyle=C.ink;
-  tops.forEach((t,i) => x.fillText(t.d+" · "+t.done+"/"+t.total, cx, 1640-130+i*52));
-  // stamp photos strip
-  if (withPhotos){
-    const photos=await recentPhotos(5);
-    if (photos.length){
-      const pw=170, ph=170, pgap=20, tw=photos.length*pw+(photos.length-1)*pgap, tx0=cx-tw/2, ty=1330;
-      x.font="600 30px "+FS; x.fillStyle=C.ink2; x.fillText("LATEST STAMPS", cx, ty-24);
-      for (let i=0;i<photos.length;i++){
-        try {
-          const bmp=await createImageBitmap(photos[i].thumb);
-          x.save();
-          x.beginPath(); x.rect(tx0+i*(pw+pgap), ty, pw, ph); x.clip();
-          const s=Math.max(pw/bmp.width, ph/bmp.height);
-          x.drawImage(bmp, tx0+i*(pw+pgap)-(bmp.width*s-pw)/2, ty-(bmp.height*s-ph)/2, bmp.width*s, bmp.height*s);
-          x.restore();
-          x.strokeStyle=C.subtle; x.lineWidth=2; x.strokeRect(tx0+i*(pw+pgap), ty, pw, ph);
-        } catch(e){}
-      }
-    }
+  // header (y 250-860)
+  drawPostmark(x, cx, 400, 90, C.brand);
+  x.save(); x.translate(cx,400); x.rotate(-0.12);
+  x.fillStyle=C.brand; x.font="600 54px "+FD; x.textAlign="center"; x.fillText("100",0,19); x.restore();
+  x.fillStyle=C.ink; x.font="600 48px "+FD; x.fillText("MY PHILATELY JOURNEY", cx, 560);
+  x.font="600 160px "+FD; x.fillStyle=C.brand; x.fillText(c+"", cx, 740);
+  x.font="400 38px "+FS; x.fillStyle=C.ink2; x.fillText("of 100 post offices", cx, 800);
+  const bw=W-400; x.fillStyle=C.subtle; x.fillRect((W-bw)/2, 850, bw, 22);
+  x.fillStyle=C.collected; x.fillRect((W-bw)/2, 850, bw*c/100, 22);
+  // polaroids on thread (y 920-1560): 9 max, 3 per row
+  const photos = withPhotos ? await recentPhotos(9) : [];
+  const visited = LOCATIONS.filter(l => state.visited[l.n]).sort((a,b)=>b.n-a.n);
+  const items = [];
+  for (let i=0; i<9 && i<visited.length; i++){
+    const l = visited[i];
+    const ph = photos.find(p => p.n === l.n);
+    items.push({ n:l.n, name:l.name, photo:ph });
   }
-  // footer (above bottom clear zone)
-  x.font="600 38px "+FD; x.fillStyle=C.ink; x.fillText("STAMPQUEST", cx, 1560);
-  x.font="400 28px "+FS; x.fillStyle=C.ink2;
+  const pw=300, ph=200, gapX=30, gapY=20;
+  const cols=3, rows=Math.ceil(items.length/cols);
+  const tw=cols*pw+(cols-1)*gapX, tx0=cx-tw/2;
+  const ty0=920;
+  // thread across top
+  drawThread(x, tx0-20, ty0-28, tx0+tw+20, ty0-28, C);
+  for (let i=0; i<items.length; i++){
+    const r=Math.floor(i/cols), col=i%cols;
+    const px=tx0+col*(pw+gapX), py=ty0+r*(ph+gapY);
+    await drawPolaroid(x, px, py, pw, ph, items[i].photo, items[i].n, items[i].name, C);
+  }
+  // "+N more"
+  const remaining = c - items.length;
+  let fy = ty0 + rows*(ph+gapY) + 10;
+  if (remaining > 0){
+    x.font="500 32px "+FS; x.fillStyle=C.ink2; x.textAlign="center";
+    x.fillText("+"+remaining+" more", cx, fy); fy += 40;
+  }
+  // footer (above 1670)
+  x.font="600 34px "+FD; x.fillStyle=C.ink; x.textAlign="center";
+  x.fillText("STAMPQUEST", cx, 1620);
+  x.font="400 24px "+FS; x.fillStyle=C.ink2;
   const url=(location.origin+location.pathname).replace(/^https?:\/\//,"");
-  x.fillText(url, cx, 1605);
+  x.fillText(url, cx, 1655);
   return cv;
 }
-function drawShareCard(){
+async function drawShareCard(withPhotos){
   const W=1080,H=1350,cv=document.createElement("canvas");cv.width=W;cv.height=H;
-  const x=cv.getContext("2d"), dark = state.theme==="dark";
-  const paper=cssVar("--paper")||(dark?"#16120F":"#F3EBD8"),
-        surface=cssVar("--surface")||(dark?"#221C17":"#FBF6E9"),
-        ink=cssVar("--ink")||(dark?"#F3EDE0":"#1F1B16"),
-        ink2=cssVar("--ink-2")||(dark?"#B9AF9F":"#54493C"),
-        brand=cssVar("--brand")||(dark?"#F0707A":"#A91F26"),
-        subtle=cssVar("--border-subtle")||(dark?"#3A322A":"#D9CFB4"),
-        collected=cssVar("--collected")||(dark?"#6FCB9A":"#2B6A46");
-  const FD='Fraunces,Georgia,serif', FS='DM Sans,system-ui,sans-serif', FM='DM Mono,ui-monospace,monospace';
-  x.fillStyle=paper; x.fillRect(0,0,W,H);
-  x.strokeStyle=subtle; x.lineWidth=3; x.strokeRect(40,40,W-80,H-80);
-  x.strokeStyle=brand; x.lineWidth=6;
-  x.beginPath(); x.arc(W-220,230,110,0,7); x.stroke();
-  x.lineWidth=2; x.beginPath(); x.arc(W-220,230,82,0,7); x.stroke();
-  x.save(); x.translate(W-220,230); x.rotate(-0.14);
-  x.fillStyle=brand; x.font="600 64px "+FD; x.textAlign="center"; x.fillText("100",0,24); x.restore();
-  x.fillStyle=ink; x.textAlign="center"; x.font="600 54px "+FD;
-  x.fillText("MY PHILATELY JOURNEY", W/2, 420);
-  const c=visitedCount();
-  x.font="600 190px "+FD; x.fillStyle=brand; x.fillText(c+"", W/2, 640);
-  x.font="400 44px "+FS; x.fillStyle=ink2; x.fillText("of 100 post offices", W/2, 710);
-  x.fillStyle=subtle;
-  const bw=W-320; x.fillRect((W-bw)/2, 780, bw, 26);
-  x.fillStyle=collected; x.fillRect((W-bw)/2, 780, bw*c/100, 26);
-  x.font="500 34px "+FM; x.fillStyle=ink2;
-  x.fillText("Karnataka Philately Passport", W/2, 900);
-  x.font="600 40px "+FD; x.fillStyle=ink; x.fillText("STAMPQUEST", W/2, 1010);
-  x.font="400 30px "+FS; x.fillStyle=ink2;
-  const url = location.origin + location.pathname;
-  x.fillText(url.replace(/^https?:\/\//,""), W/2, 1060);
-  x.font="italic 400 30px "+FD; x.fillText("Every stamp tells a story.", W/2, 1180);
+  const x=cv.getContext("2d"), C=shareColors();
+  const FD='Fraunces,Georgia,serif', FS='DM Sans,system-ui,sans-serif';
+  x.fillStyle=C.paper; x.fillRect(0,0,W,H);
+  x.strokeStyle=C.subtle; x.lineWidth=3; x.strokeRect(40,40,W-80,H-80);
+  const cx=W/2, c=visitedCount();
+  // header
+  drawPostmark(x, cx, 220, 70, C.brand);
+  x.save(); x.translate(cx,220); x.rotate(-0.12);
+  x.fillStyle=C.brand; x.font="600 44px "+FD; x.textAlign="center"; x.fillText("100",0,15); x.restore();
+  x.fillStyle=C.ink; x.font="600 44px "+FD; x.fillText("MY PHILATELY JOURNEY", cx, 340);
+  x.font="600 120px "+FD; x.fillStyle=C.brand; x.fillText(c+"", cx, 480);
+  x.font="400 34px "+FS; x.fillStyle=C.ink2; x.fillText("of 100 post offices", cx, 530);
+  const bw=W-400; x.fillStyle=C.subtle; x.fillRect((W-bw)/2, 570, bw, 20);
+  x.fillStyle=C.collected; x.fillRect((W-bw)/2, 570, bw*c/100, 20);
+  // polaroids: 6 max, 3 per row x 2 rows
+  const photos = withPhotos ? await recentPhotos(6) : [];
+  const visited = LOCATIONS.filter(l => state.visited[l.n]).sort((a,b)=>b.n-a.n);
+  const items = [];
+  for (let i=0; i<6 && i<visited.length; i++){
+    const l = visited[i];
+    const ph = photos.find(p => p.n === l.n);
+    items.push({ n:l.n, name:l.name, photo:ph });
+  }
+  const pw=280, ph=240, gapX=32, gapY=25;
+  const cols=3, tw=cols*pw+(cols-1)*gapX, tx0=cx-tw/2, ty0=650;
+  drawThread(x, tx0-20, ty0-28, tx0+tw+20, ty0-28, C);
+  for (let i=0; i<items.length; i++){
+    const r=Math.floor(i/cols), col=i%cols;
+    await drawPolaroid(x, tx0+col*(pw+gapX), ty0+r*(ph+gapY), pw, ph, items[i].photo, items[i].n, items[i].name, C);
+  }
+  const remaining = c - items.length;
+  let fy = ty0 + 2*(ph+gapY) + 15;
+  if (remaining > 0){
+    x.font="500 28px "+FS; x.fillStyle=C.ink2; x.textAlign="center";
+    x.fillText("+"+remaining+" more", cx, fy); fy += 38;
+  }
+  x.font="600 32px "+FD; x.fillStyle=C.ink; x.textAlign="center"; x.fillText("STAMPQUEST", cx, 1220);
+  x.font="400 22px "+FS; x.fillStyle=C.ink2;
+  const url=(location.origin+location.pathname).replace(/^https?:\/\//,"");
+  x.fillText(url, cx, 1270);
   return cv;
 }
 let shareFmt = "post";
@@ -1538,7 +1642,18 @@ document.querySelectorAll("#shareFmt .seg").forEach(b => b.onclick = () => {
 $("btnShare").onclick = async () => {
   try { await document.fonts.ready; } catch(e){}
   const withPhotos = $("sharePhotos").checked;
-  const cv = shareFmt === "story" ? await drawStoryCard(withPhotos) : drawShareCard();
+  const cv = shareFmt === "story" ? await drawStoryCard(withPhotos) : await drawShareCard(withPhotos);
+  // preview
+  const prev = document.getElementById("sharePreview");
+  if (prev){
+    prev.innerHTML = "";
+    const img = document.createElement("img");
+    img.src = cv.toDataURL("image/png");
+    img.alt = "Share card preview";
+    img.style.cssText = "max-width:100%;border-radius:12px;border:1px solid var(--border-subtle)";
+    prev.appendChild(img);
+    prev.style.display = "block";
+  }
   const blob = await new Promise(r => cv.toBlob(r,"image/png"));
   const fname = shareFmt === "story" ? "stampquest-story.png" : "stampquest-journey.png";
   const file = new File([blob], fname, {type:"image/png"});
@@ -1548,7 +1663,6 @@ $("btnShare").onclick = async () => {
   }
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=fname; a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
-  toast("Card downloaded.");
   toast("Progress card downloaded — share it anywhere.");
 };
 
@@ -1563,12 +1677,31 @@ $("fileImport").addEventListener("change", e => {
   const r = new FileReader();
   r.onload = () => { try{
       const j = JSON.parse(r.result); const s = j.state || j;
-      if (s && typeof s === "object"){
-        state.visited = s.visited || {}; state.planned = s.planned || {};
-        if (s.theme) state.theme = s.theme; state.milestones = s.milestones || [];
+      // validate: visited/planned must be plain objects with keys 1-100 and date-string values
+      const bad = "That doesn't look like a StampQuest backup.";
+      if (!s || typeof s !== "object" || Array.isArray(s)){ toast(bad); return; }
+      const checkObj = (o) => {
+        if (!o || typeof o !== "object" || Array.isArray(o)) return false;
+        return Object.entries(o).every(([k,v]) => {
+          const n = +k; return n >= 1 && n <= 100 && typeof v === "string" && !isNaN(Date.parse(v));
+        });
+      };
+      if (!checkObj(s.visited) || !checkObj(s.planned)){ toast(bad); return; }
+      const curV = Object.keys(state.visited).length;
+      const newV = Object.keys(s.visited).length;
+      if (!confirm("Replace your current progress ("+curV+" visited) with this backup ("+newV+" visited)?")) return;
+      // keep previous state for Undo
+      const prev = JSON.parse(JSON.stringify({ visited:state.visited, planned:state.planned, theme:state.theme, milestones:state.milestones }));
+      state.visited = s.visited || {}; state.planned = s.planned || {};
+      if (s.theme) state.theme = s.theme; state.milestones = s.milestones || [];
+      save(); applyTheme(); LOCATIONS.forEach(l => refreshMarker(l.n));
+      renderProgress(); renderGrid(); renderDistricts(); renderSaved();
+      toast("Backup imported. Undo", () => {
+        state.visited = prev.visited; state.planned = prev.planned;
+        state.theme = prev.theme; state.milestones = prev.milestones;
         save(); applyTheme(); LOCATIONS.forEach(l => refreshMarker(l.n));
-        renderProgress(); renderGrid(); renderDistricts(); renderSaved(); toast("Backup imported.");
-      } else toast("That file doesn't look like a StampQuest backup.");
+        renderProgress(); renderGrid(); renderDistricts(); renderSaved();
+      });
     }catch(err){ toast("Couldn't read that file."); } e.target.value = ""; };
   r.readAsText(f);
 });
@@ -1589,17 +1722,29 @@ function renderSaved(){
 
 /* ================= settings ================= */
 $("themeToggle").addEventListener("change", e => { state.theme = e.target.checked ? "dark" : "light"; save(); applyTheme(); });
-$("btnReset").onclick = () => {
-  if (!confirm("Reset all progress? This clears your visited and planned lists on this device.")) return;
+$("btnReset").onclick = async () => {
+  const vCount = Object.keys(state.visited).length;
+  const photoCount = await photoCountAll().catch(()=>0);
+  const photoMsg = photoCount > 0 ? " Your "+photoCount+" stamp photo"+(photoCount>1?"s":"")+" will be kept." : "";
+  if (!confirm("Reset all progress ("+vCount+" visited)? This clears your visited and planned lists on this device."+photoMsg)) return;
+  let delPhotos = false;
+  if (photoCount > 0){
+    delPhotos = confirm("Also delete your "+photoCount+" stamp photo"+(photoCount>1?"s":"")+"? (Cancel keeps them.)");
+  }
   state.visited = {}; state.planned = {}; state.milestones = []; save();
+  if (delPhotos) await photoClearAll().catch(()=>{});
   LOCATIONS.forEach(l => refreshMarker(l.n));
-  renderProgress(); renderGrid(); renderDistricts(); renderSaved(); toast("Progress reset.");
+  renderProgress(); renderGrid(); renderDistricts(); renderSaved(); renderPhotoMeter();
+  toast(delPhotos ? "Progress and photos reset." : "Progress reset. Photos kept.");
 };
 
 /* ================= deep link / first run / init ================= */
 function handleHash(){
   const m = location.hash.match(/^#loc=(\d+)$/);
-  if (m && byN[+m[1]]) openLocation(+m[1]);
+  if (!m) return;
+  const n = +m[1];
+  if (byN[n]) openLocation(n);
+  else { toast("Office not found."); history.replaceState(null, "", location.pathname + location.search); }
 }
 window.addEventListener("hashchange", handleHash);
 /* ---- 3-card swipeable tutorial ---- */
@@ -1636,6 +1781,9 @@ applyTheme();
 renderProgress(); renderCircuits(); renderGrid(); renderDistricts(); renderSaved();
 if (!state.firstRun) $("firstrun").classList.add("show");
 setTimeout(handleHash, 400);
+if ("serviceWorker" in navigator){
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
 </script>
 </body>
 </html>
