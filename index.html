@@ -154,6 +154,14 @@ html[data-theme="dark"] .hcard{background:color-mix(in srgb, var(--header-bg) 92
 
 .rdiv{width:24px;height:1px;background:var(--border-subtle);margin:4px 0;flex:none}
 .toast-undo{background:none;border:0;color:var(--header-gold);font-weight:700;font-size:14px;margin-left:12px;cursor:pointer;padding:4px 8px;min-height:44px}
+/* fullscreen photo viewer */
+#photoViewer{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
+#photoViewer.open{opacity:1}
+#photoViewer #pvImg{max-width:94vw;max-height:82vh;object-fit:contain;border-radius:8px}
+#photoViewer .pv-top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;color:#fff;font-size:15px}
+#photoViewer #pvClose{background:rgba(255,255,255,.15);border:0;color:#fff;font-size:18px;width:44px;height:44px;border-radius:50%;cursor:pointer}
+#photoViewer .pv-nav{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);display:flex;justify-content:space-between;padding:0 8px;pointer-events:none}
+#photoViewer .pv-nav button{pointer-events:auto;background:rgba(255,255,255,.15);border:0;color:#fff;font-size:32px;width:52px;height:52px;border-radius:50%;cursor:pointer;line-height:1}
 /* photo bottom sheet */
 .photosheet{position:fixed;left:0;right:0;bottom:0;z-index:960;background:var(--surface);
   border-top:1px solid var(--border-subtle);border-radius:18px 18px 0 0;box-shadow:var(--shadow);
@@ -1213,15 +1221,72 @@ async function renderPhotoSection(l){
   const rec = await photoGet(l.n);
   if (rec){
     const url = URL.createObjectURL(rec.thumb);
-    el.innerHTML = '<img class="thumb" alt="Your stamp photo">'+
+    el.innerHTML = '<img class="thumb" alt="Your stamp photo" style="cursor:zoom-in">'+
       '<div class="prow"><button class="btn ghost" id="btnPhotoRm">Remove photo</button></div>';
-    el.querySelector(".thumb").src = url;
+    const img = el.querySelector(".thumb");
+    img.src = url;
+    img.onclick = () => openPhotoViewer(l.n);
     $("btnPhotoRm").onclick = () => removePhoto(l.n);
   } else {
     el.innerHTML = '<button class="btn primary" id="btnPhotoAdd" style="width:100%">Add stamp photo</button>'+
       '<div class="note" style="margin-top:6px">Take or pick a photo — the office is marked visited automatically.</div>';
     $("btnPhotoAdd").onclick = () => openPhotoPicker(l.n);
   }
+}
+/* fullscreen photo viewer with swipe */
+let pvList = [], pvIdx = 0, pvUrl = null;
+async function openPhotoViewer(n){
+  pvList = [];
+  for (const l of LOCATIONS){
+    if (await photoHas(l.n)) pvList.push(l.n);
+  }
+  pvIdx = Math.max(0, pvList.indexOf(n));
+  if (pvIdx < 0) return;
+  const v = document.createElement("div");
+  v.id = "photoViewer";
+  v.innerHTML = '<div class="pv-top"><span id="pvCap"></span><button id="pvClose" aria-label="Close">✕</button></div>'+
+    '<img id="pvImg" alt="Stamp photo"><div class="pv-nav"><button id="pvPrev" aria-label="Previous">‹</button><button id="pvNext" aria-label="Next">›</button></div>';
+  document.body.appendChild(v);
+  requestAnimationFrame(() => v.classList.add("open"));
+  $("pvClose").onclick = closePhotoViewer;
+  $("pvPrev").onclick = (e) => { e.stopPropagation(); pvShow(pvIdx - 1); };
+  $("pvNext").onclick = (e) => { e.stopPropagation(); pvShow(pvIdx + 1); };
+  v.onclick = (e) => { if (e.target === v || e.target.id === "pvImg") closePhotoViewer(); };
+  // swipe
+  let sx = 0;
+  v.addEventListener("touchstart", e => { sx = e.touches[0].clientX; }, { passive:true });
+  v.addEventListener("touchend", e => {
+    const dx = e.changedTouches[0].clientX - sx;
+    if (Math.abs(dx) > 60) pvShow(pvIdx + (dx < 0 ? 1 : -1));
+  }, { passive:true });
+  document.addEventListener("keydown", pvKey);
+  pvShow(pvIdx);
+}
+function pvKey(e){
+  if (!document.getElementById("photoViewer")) return;
+  if (e.key === "Escape") closePhotoViewer();
+  else if (e.key === "ArrowLeft") pvShow(pvIdx - 1);
+  else if (e.key === "ArrowRight") pvShow(pvIdx + 1);
+}
+async function pvShow(i){
+  if (!pvList.length) return;
+  pvIdx = (i + pvList.length) % pvList.length;
+  const n = pvList[pvIdx], l = byN[n];
+  const rec = await photoGet(n);
+  if (!rec) return;
+  if (pvUrl) URL.revokeObjectURL(pvUrl);
+  pvUrl = URL.createObjectURL(rec.full);
+  $("pvImg").src = pvUrl;
+  $("pvCap").textContent = n + ". " + (l ? l.name : "") + "  (" + (pvIdx+1) + "/" + pvList.length + ")";
+  $("pvPrev").style.visibility = pvList.length > 1 ? "visible" : "hidden";
+  $("pvNext").style.visibility = pvList.length > 1 ? "visible" : "hidden";
+}
+function closePhotoViewer(){
+  const v = document.getElementById("photoViewer");
+  if (v) v.remove();
+  if (pvUrl){ URL.revokeObjectURL(pvUrl); pvUrl = null; }
+  document.removeEventListener("keydown", pvKey);
+  pvList = [];
 }
 
 async function renderPhotoMeter(){
@@ -1407,12 +1472,12 @@ function renderGrid(){
   function attachLongPress(t){
     if (t.dataset.lp) return;
     t.dataset.lp = "1";
-    let lpTimer = null;
+    let lpTimer = null, lpFired = false;
     const cancel = () => { if (lpTimer){ clearTimeout(lpTimer); lpTimer = null; } };
     t.addEventListener("touchstart", e => {
-      cancel();
+      cancel(); lpFired = false;
       lpTimer = setTimeout(() => {
-        lpTimer = null;
+        lpTimer = null; lpFired = true;
         if (navigator.vibrate) navigator.vibrate(15);
         openTilePhotoActions(+t.dataset.n);
       }, 550);
@@ -1420,6 +1485,16 @@ function renderGrid(){
     t.addEventListener("touchend", cancel, { passive:true });
     t.addEventListener("touchmove", cancel, { passive:true });
     t.addEventListener("contextmenu", e => { e.preventDefault(); cancel(); openTilePhotoActions(+t.dataset.n); });
+    // tap photo directly: fullscreen viewer (not if long-press fired)
+    const ph = t.querySelector(".tphoto");
+    if (ph){
+      ph.style.cursor = "zoom-in";
+      ph.addEventListener("click", e => {
+        if (lpFired) return;
+        e.stopPropagation();
+        openPhotoViewer(+t.dataset.n);
+      });
+    }
   }
   // lazy-load photo thumbnails
   const io = new IntersectionObserver(entries => {
