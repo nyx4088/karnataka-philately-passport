@@ -186,9 +186,9 @@ body.sheet-open .mapctl{display:none}
 .mk.planned{background:var(--surface);border:2px dashed var(--planned);color:var(--ink)}
 .mk.planned .mk-star{position:absolute;top:-8px;right:-5px;font-size:13px;color:var(--planned);line-height:1;
   text-shadow:0 0 2px var(--surface),0 0 2px var(--surface)}
-.mk.done{background:var(--collected);border:2px solid var(--collected);color:var(--paper);
+.mk.visited{background:var(--collected);border:2px solid var(--collected);color:var(--paper);
   box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--collected),0 2px 6px rgba(0,0,0,.3)}
-.mk.done .mk-check{font-size:15px;font-weight:700}
+.mk.visited .mk-check{font-size:15px;font-weight:700}
 .mk.sel{width:40px;height:40px;border:3px solid var(--brand);font-size:15px;
   box-shadow:0 0 0 2px var(--paper),0 0 0 5px var(--brand),0 2px 8px rgba(0,0,0,.4)}
 .mk-cluster{background:var(--ink);color:var(--paper);border-radius:50%;display:flex;align-items:center;justify-content:center;
@@ -1631,16 +1631,16 @@ async function drawStoryCard(withPhotos){
   x.fillStyle=C.paper; x.fillRect(0,0,W,H);
   x.strokeStyle=C.subtle; x.lineWidth=3; x.strokeRect(40,40,W-80,H-80);
   const cx=W/2, c=visitedCount();
-  // header (y 250-860)
-  drawPostmark(x, cx, 400, 90, C.brand);
-  x.save(); x.translate(cx,400); x.rotate(-0.12);
-  x.fillStyle=C.brand; x.font="600 54px "+FD; x.textAlign="center"; x.fillText("100",0,19); x.restore();
-  x.fillStyle=C.ink; x.font="600 48px "+FD; x.fillText("MY PHILATELY JOURNEY", cx, 560);
-  x.font="600 160px "+FD; x.fillStyle=C.brand; x.fillText(c+"", cx, 740);
-  x.font="400 38px "+FS; x.fillStyle=C.ink2; x.fillText("of 100 post offices", cx, 800);
-  const bw=W-400; x.fillStyle=C.subtle; x.fillRect((W-bw)/2, 850, bw, 22);
-  x.fillStyle=C.collected; x.fillRect((W-bw)/2, 850, bw*c/100, 22);
-  // polaroids on thread (y 920-1560): 9 max, 3 per row
+  // compact header (y 250-680)
+  drawPostmark(x, cx, 330, 62, C.brand);
+  x.save(); x.translate(cx,330); x.rotate(-0.12);
+  x.fillStyle=C.brand; x.font="600 38px "+FD; x.textAlign="center"; x.fillText("100",0,13); x.restore();
+  x.fillStyle=C.ink; x.font="600 40px "+FD; x.fillText("MY PHILATELY JOURNEY", cx, 440);
+  x.font="600 110px "+FD; x.fillStyle=C.brand; x.fillText(c+"", cx, 570);
+  x.font="400 32px "+FS; x.fillStyle=C.ink2; x.fillText("of 100 post offices", cx, 620);
+  const bw=W-400; x.fillStyle=C.subtle; x.fillRect((W-bw)/2, 650, bw, 18);
+  x.fillStyle=C.collected; x.fillRect((W-bw)/2, 650, bw*c/100, 18);
+  // polaroids on thread (y 720-1560): 9 max, 3 per row
   const photos = withPhotos ? await recentPhotos(9) : [];
   const visited = LOCATIONS.filter(l => state.visited[l.n]).sort((a,b)=>b.n-a.n);
   const items = [];
@@ -1649,10 +1649,10 @@ async function drawStoryCard(withPhotos){
     const ph = photos.find(p => p.n === l.n);
     items.push({ n:l.n, name:l.name, photo:ph });
   }
-  const pw=300, ph=200, gapX=30, gapY=20;
-  const cols=3, rows=Math.ceil(items.length/cols);
+  const pw=300, ph=220, gapX=30, gapY=24;
+  const cols=3, rows=Math.max(3, Math.ceil(items.length/cols));
   const tw=cols*pw+(cols-1)*gapX, tx0=cx-tw/2;
-  const ty0=920;
+  const ty0=730;
   // thread across top
   drawThread(x, tx0-20, ty0-28, tx0+tw+20, ty0-28, C);
   for (let i=0; i<items.length; i++){
@@ -1662,7 +1662,7 @@ async function drawStoryCard(withPhotos){
   }
   // "+N more"
   const remaining = c - items.length;
-  let fy = ty0 + rows*(ph+gapY) + 10;
+  let fy = ty0 + rows*(ph+gapY) + 12;
   if (remaining > 0){
     x.font="500 32px "+FS; x.fillStyle=C.ink2; x.textAlign="center";
     x.fillText("+"+remaining+" more", cx, fy); fy += 40;
@@ -1742,8 +1742,9 @@ $("btnShare").onclick = async () => {
   const blob = await new Promise(r => cv.toBlob(r,"image/png"));
   const fname = shareFmt === "story" ? "stampquest-story.png" : "stampquest-journey.png";
   const file = new File([blob], fname, {type:"image/png"});
+  const url = location.origin + location.pathname;
   if (navigator.canShare && navigator.canShare({ files:[file] })){
-    try{ await navigator.share({ files:[file], title:"My StampQuest journey", text:"I've collected "+visitedCount()+" of 100 Karnataka Philately Passport stamps!" }); return; }
+    try{ await navigator.share({ files:[file], title:"My StampQuest journey", text:"I've collected "+visitedCount()+" of 100 Karnataka Philately Passport stamps! "+url }); return; }
     catch(e){ if (e && e.name === "AbortError") return; }
   }
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=fname; a.click();
