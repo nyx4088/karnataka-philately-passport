@@ -1665,7 +1665,7 @@ async function drawStoryCard(withPhotos){
   let fy = ty0 + rows*(ph+gapY) + 12;
   if (remaining > 0){
     x.font="500 32px "+FS; x.fillStyle=C.ink2; x.textAlign="center";
-    x.fillText("+"+remaining+" more", cx, fy); fy += 40;
+    x.fillText("+"+remaining+" more stamp"+(remaining>1?"s":"")+" collected", cx, fy); fy += 40;
   }
   // footer (above 1670)
   x.font="600 34px "+FD; x.fillStyle=C.ink; x.textAlign="center";
@@ -1711,7 +1711,7 @@ async function drawShareCard(withPhotos){
   let fy = ty0 + 2*(ph+gapY) + 15;
   if (remaining > 0){
     x.font="500 28px "+FS; x.fillStyle=C.ink2; x.textAlign="center";
-    x.fillText("+"+remaining+" more", cx, fy); fy += 38;
+    x.fillText("+"+remaining+" more stamp"+(remaining>1?"s":"")+" collected", cx, fy); fy += 38;
   }
   x.font="600 32px "+FD; x.fillStyle=C.ink; x.textAlign="center"; x.fillText("STAMPQUEST", cx, 1220);
   x.font="400 22px "+FS; x.fillStyle=C.ink2;
