@@ -8,6 +8,7 @@ const SHELL = [
   "vendor/leaflet.markercluster.js",
   "vendor/MarkerCluster.css",
   "vendor/MarkerCluster.Default.css",
+  "vendor/supabase-js.js",
   "karnataka.geojson",
   "icons/icon-192.png",
   "icons/icon-512.png",
