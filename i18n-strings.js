@@ -82,6 +82,12 @@ en: {
 "officetype.BO": "Branch Office", "officetype.SO": "Sub Office", "officetype.HO": "Head Office", "officetype.BA": "Branch",
 
 
+
+// About sections
+"settings.about_data_body": "Locations are the 100 post offices from the Karnataka Philately Passport booklet (₹600, issued October 2026 by the Department of Posts, Karnataka Circle). Coordinates were geocoded per post office — 34 hand-verified to the actual office, 3 near-verified, the rest town-level approximations labelled \"Approximate location\" on their cards; the Directions button searches the post office on Google Maps, and \"Directions to map pin\" navigates to the exact pinned point.<br><br>Pictorial-cancellation motifs and introduction dates shown come from India Post's published permanent pictorial cancellation lists. No complete public registry of the passport's 100 motifs exists — the booklet itself is the definitive source. Where no published entry matched, the motif section is omitted — check your booklet on the ground.<br><br>\"Getting there\" names the nearest major transit town as an indicative hint only — use Directions for live routing. Nothing here is live transport data and there are no fares.",
+"settings.privacy_body": "Everything — your visited and planned lists, theme choice, and location (used only when you tap \"Near me\") — stays in this browser's local storage on your device. No analytics. Rivals uses an anonymous account (no sign-up) storing your display name, friend code and visited-office list, publicly readable by other collectors. Photos upload only if \"Share stamp photos\" is switched on. A linked email is used only for sign-in. Clearing browser data erases your local passport unless you exported a backup.",
+"settings.about_app_body": "StampQuest was built solo by a fellow passport holder, with a little AI help along the way — so you may run into a glitch or a wrong detail. Spotted something? I'd genuinely like to hear about it. Loving it? Share it with your fellow collectors.",
+
 // FAQ
 "faq.visited.q": "How do I mark a place visited?",
 "faq.visited.a": "Visit a post office, tap its tile in Passport, add a photo of your stamp — <b>it's marked visited automatically</b>, with the visit date saved. You'll see \"Marked visited.\" with an Undo button if you want to revert. Prefer no photo? Use <b>Mark visited without photo</b> on the office card.",
@@ -200,6 +206,12 @@ kn: {
 "officetype.BO": "ಶಾಖಾ ಕಚೇರಿ", "officetype.SO": "ಉಪ ಕಚೇರಿ", "officetype.HO": "ಮುಖ್ಯ ಕಚೇರಿ", "officetype.BA": "ಶಾಖೆ",
 
 
+
+// About sections
+"settings.about_data_body": "Locations are the 100 post offices from the Karnataka Philately Passport booklet (₹600, issued October 2026 by the Department of Posts, Karnataka Circle). Coordinates were geocoded per post office — 34 hand-verified to the actual office, 3 near-verified, the rest town-level approximations labelled \"Approximate location\" on their cards; the Directions button searches the post office on Google Maps, and \"Directions to map pin\" navigates to the exact pinned point.<br><br>Pictorial-cancellation motifs and introduction dates shown come from India Post's published permanent pictorial cancellation lists. No complete public registry of the passport's 100 motifs exists — the booklet itself is the definitive source. Where no published entry matched, the motif section is omitted — check your booklet on the ground.<br><br>\"Getting there\" names the nearest major transit town as an indicative hint only — use Directions for live routing. Nothing here is live transport data and there are no fares.",
+"settings.privacy_body": "Everything — your visited and planned lists, theme choice, and location (used only when you tap \"Near me\") — stays in this browser's local storage on your device. No analytics. Rivals uses an anonymous account (no sign-up) storing your display name, friend code and visited-office list, publicly readable by other collectors. Photos upload only if \"Share stamp photos\" is switched on. A linked email is used only for sign-in. Clearing browser data erases your local passport unless you exported a backup.",
+"settings.about_app_body": "StampQuest was built solo by a fellow passport holder, with a little AI help along the way — so you may run into a glitch or a wrong detail. Spotted something? I'd genuinely like to hear about it. Loving it? Share it with your fellow collectors.",
+
 // FAQ
 "faq.visited.q": "How do I mark a place visited?",
 "faq.visited.a": "Visit a post office, tap its tile in Passport, add a photo of your stamp — <b>it's marked visited automatically</b>, with the visit date saved. You'll see \"Marked visited.\" with an Undo button if you want to revert. Prefer no photo? Use <b>Mark visited without photo</b> on the office card.",
@@ -218,6 +230,18 @@ kn: {
 "faq.karnataka.q": "Why is only Karnataka on the map?",
 "faq.karnataka.a": "That's the whole quest — the passport covers Karnataka's 100 post offices only. Everything outside the state is hidden by design.",
 
+
+
+// About sections
+"settings.about_data_body": "Locations are the 100 post offices from the Karnataka Philately Passport booklet (₹600, issued October 2026 by the Department of Posts, Karnataka Circle). Coordinates were geocoded per post office — 34 hand-verified to the actual office, 3 near-verified, the rest town-level approximations labelled \"Approximate location\" on their cards; the Directions button searches the post office on Google Maps, and \"Directions to map pin\" navigates to the exact pinned point.<br><br>Pictorial-cancellation motifs and introduction dates shown come from India Post's published permanent pictorial cancellation lists. No complete public registry of the passport's 100 motifs exists — the booklet itself is the definitive source. Where no published entry matched, the motif section is omitted — check your booklet on the ground.<br><br>\"Getting there\" names the nearest major transit town as an indicative hint only — use Directions for live routing. Nothing here is live transport data and there are no fares.",
+"settings.privacy_body": "Everything — your visited and planned lists, theme choice, and location (used only when you tap \"Near me\") — stays in this browser's local storage on your device. No analytics. Rivals uses an anonymous account (no sign-up) storing your display name, friend code and visited-office list, publicly readable by other collectors. Photos upload only if \"Share stamp photos\" is switched on. A linked email is used only for sign-in. Clearing browser data erases your local passport unless you exported a backup.",
+"settings.about_app_body": "StampQuest was built solo by a fellow passport holder, with a little AI help along the way — so you may run into a glitch or a wrong detail. Spotted something? I'd genuinely like to hear about it. Loving it? Share it with your fellow collectors.",
+
+
+// About sections
+"settings.about_data_body": "ಸ್ಥಳಗಳು ಕರ್ನಾಟಕ ಫಿಲಾಟೆಲಿ ಪಾಸ್‌ಪೋರ್ಟ್ ಪುಸ್ತಕದ 100 ಅಂಚೆ ಕಚೇರಿಗಳು (₹600, ಅಂಚೆ ಇಲಾಖೆ, ಕರ್ನಾಟಕ ವೃತ್ತದಿಂದ ಅಕ್ಟೋಬರ್ 2026 ರಲ್ಲಿ ಬಿಡುಗಡೆ). ಪ್ರತಿ ಅಂಚೆ ಕಚೇರಿಗೆ ನಿರ್ದೇಶಾಂಕಗಳನ್ನು ಜಿಯೋಕೋಡ್ ಮಾಡಲಾಗಿದೆ — 34 ನೈಜ ಕಚೇರಿಗೆ ಹಸ್ತಚಾಲಿತವಾಗಿ ಪರಿಶೀಲಿಸಲಾಗಿದೆ, 3 ಹತ್ತಿರ-ಪರಿಶೀಲಿತ, ಉಳಿದವು ಪಟ್ಟಣ-ಮಟ್ಟದ ಅಂದಾಜುಗಳು ಅವುಗಳ ಕಾರ್ಡ್‌ಗಳಲ್ಲಿ \"Approximate location\" ಎಂದು ಲೇಬಲ್ ಮಾಡಲಾಗಿದೆ; Directions ಬಟನ್ ಅಂಚೆ ಕಚೇರಿಯನ್ನು Google Maps ನಲ್ಲಿ ಹುಡುಕುತ್ತದೆ, ಮತ್ತು \"Directions to map pin\" ನಿಖರ ಪಿನ್ ಬಿಂದುವಿಗೆ ನ್ಯಾವಿಗೇಟ್ ಮಾಡುತ್ತದೆ.<br><br>ತೋರಿಸಲಾದ ಚಿತ್ರಾತ್ಮಕ-ರದ್ದತಿ ಮೋಟಿಫ್‌ಗಳು ಮತ್ತು ಪರಿಚಯ ದಿನಾಂಕಗಳು India Post ನ ಪ್ರಕಟಿತ ಶಾಶ್ವತ ಚಿತ್ರಾತ್ಮಕ ರದ್ದತಿ ಪಟ್ಟಿಗಳಿಂದ ಬಂದಿವೆ. ಪಾಸ್‌ಪೋರ್ಟ್‌ನ 100 ಮೋಟಿಫ್‌ಗಳ ಸಂಪೂರ್ಣ ಸಾರ್ವಜನಿಕ ನೋಂದಣಿ ಅಸ್ತಿತ್ವದಲ್ಲಿಲ್ಲ — ಪುಸ್ತಕವೇ ನಿರ್ಣಾಯಕ ಮೂಲ. ಯಾವುದೇ ಪ್ರಕಟಿತ ನಮೂದು ಹೊಂದಿಕೆಯಾಗದಿದ್ದಲ್ಲಿ, ಮೋಟಿಫ್ ವಿಭಾಗವನ್ನು ಬಿಡಲಾಗಿದೆ — ನೆಲದ ಮೇಲೆ ನಿಮ್ಮ ಪುಸ್ತಕ ಪರಿಶೀಲಿಸಿ.<br><br>\"Getting there\" ಹತ್ತಿರದ ಪ್ರಮುಖ ಸಾರಿಗೆ ಪಟ್ಟಣವನ್ನು ಸೂಚನಾತ್ಮಕ ಸುಳಿವಾಗಿ ಮಾತ್ರ ಹೆಸರಿಸುತ್ತದೆ — ಲೈವ್ ರೂಟಿಂಗ್‌ಗಾಗಿ Directions ಬಳಸಿ. ಇಲ್ಲಿ ಯಾವುದೂ ಲೈವ್ ಸಾರಿಗೆ ಡೇಟಾ ಅಲ್ಲ ಮತ್ತು ಯಾವುದೇ ದರಗಳಿಲ್ಲ.",
+"settings.privacy_body": "ಎಲ್ಲವೂ — ನಿಮ್ಮ ಭೇಟಿ ಮತ್ತು ಯೋಜಿತ ಪಟ್ಟಿಗಳು, ಥೀಮ್ ಆಯ್ಕೆ, ಮತ್ತು ಸ್ಥಳ (ನೀವು \"Near me\" ಒತ್ತಿದಾಗ ಮಾತ್ರ ಬಳಸಲಾಗುತ್ತದೆ) — ನಿಮ್ಮ ಸಾಧನದಲ್ಲಿ ಈ ಬ್ರೌಸರ್‌ನ ಸ್ಥಳೀಯ ಸಂಗ್ರಹದಲ್ಲಿರುತ್ತದೆ. ಯಾವುದೇ ವಿಶ್ಲೇಷಣೆ ಇಲ್ಲ. Rivals ಅನಾಮಧೇಯ ಖಾತೆಯನ್ನು (ಸೈನ್-ಅಪ್ ಇಲ್ಲ) ಬಳಸುತ್ತದೆ, ನಿಮ್ಮ ಪ್ರದರ್ಶನ ಹೆಸರು, ಸ್ನೇಹಿತ ಕೋಡ್ ಮತ್ತು ಭೇಟಿ-ಕಚೇರಿ ಪಟ್ಟಿಯನ್ನು ಸಂಗ್ರಹಿಸುತ್ತದೆ, ಇತರ ಸಂಗ್ರಾಹಕರಿಗೆ ಸಾರ್ವಜನಿಕವಾಗಿ ಓದಬಹುದು. \"Share stamp photos\" ಆನ್ ಮಾಡಿದರೆ ಮಾತ್ರ ಫೋಟೋಗಳು ಅಪ್‌ಲೋಡ್ ಆಗುತ್ತವೆ. ಲಿಂಕ್ ಮಾಡಿದ ಇಮೇಲ್ ಸೈನ್-ಇನ್‌ಗೆ ಮಾತ್ರ ಬಳಸಲಾಗುತ್ತದೆ. ನೀವು ಬ್ಯಾಕಪ್ ರಫ್ತು ಮಾಡದಿದ್ದರೆ ಬ್ರೌಸರ್ ಡೇಟಾ ಅಳಿಸುವುದರಿಂದ ನಿಮ್ಮ ಸ್ಥಳೀಯ ಪಾಸ್‌ಪೋರ್ಟ್ ಅಳಿಸಲ್ಪಡುತ್ತದೆ.",
+"settings.about_app_body": "StampQuest ಅನ್ನು ಸಹ ಪಾಸ್‌ಪೋರ್ಟ್ ಹೊಂದಿರುವವರು ಏಕಾಂಗಿಯಾಗಿ ನಿರ್ಮಿಸಿದ್ದಾರೆ, ದಾರಿಯುದ್ದಕ್ಕೂ ಸ್ವಲ್ಪ AI ಸಹಾಯದೊಂದಿಗೆ — ಆದ್ದರಿಂದ ನೀವು ದೋಷ ಅಥವಾ ತಪ್ಪು ವಿವರವನ್ನು ಎದುರಿಸಬಹುದು. ಏನಾದರೂ ಕಂಡುಬಂದಿದೆಯೇ? ನಾನು ಅದರ ಬಗ್ಗೆ ಕೇಳಲು ನಿಜವಾಗಿಯೂ ಇಷ್ಟಪಡುತ್ತೇನೆ. ಇಷ್ಟವಾಯಿತೇ? ನಿಮ್ಮ ಸಹ ಸಂಗ್ರಾಹಕರೊಂದಿಗೆ ಹಂಚಿಕೊಳ್ಳಿ.",
 
 // FAQ
 "faq.visited.q": "ಭೇಟಿ ನೀಡಿದ ಸ್ಥಳವನ್ನು ಹೇಗೆ ಗುರುತಿಸುವುದು?",
