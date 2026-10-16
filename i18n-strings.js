@@ -1,0 +1,211 @@
+// StampQuest i18n string table — Stage 2D
+// Uncertain translations marked with ⚠️ in comments
+const STRINGS = {
+en: {
+// nav
+"nav.explore": "Explore", "nav.circuits": "Circuits", "nav.passport": "Passport",
+"nav.rivals": "Rivals", "nav.settings": "Settings", "nav.aria": "Main navigation",
+// search
+"search.placeholder": "Search 100 post offices", "search.aria": "Search post offices",
+"search.clear": "Clear search", "search.no_matches": "No matches.",
+// map
+"map.controls": "Map controls", "map.layers": "Change map view", "map.locate": "Find nearest to me",
+"map.locate_title": "Near me", "map.reset": "Reset map view", "map.reset_title": "Reset view",
+"map.zoom_in": "Zoom in", "map.zoom_out": "Zoom out",
+"map.layer_streets": "Streets", "map.layer_satellite": "Satellite", "map.layer_terrain": "Terrain",
+// circuits
+"circuits.title": "Circuits", "circuits.subtitle": "Suggested region-wise routes. Neutral for everyone — start wherever you are.",
+"circuits.collected": "{done}/{total} collected", "circuits.show_on_map": "Show on map",
+// regions
+"region.Coastal": "Coastal", "region.Malnad": "Malnad", "region.Mysuru region": "Mysuru region",
+"region.Bengaluru region": "Bengaluru region", "region.North Karnataka": "North Karnataka",
+// passport
+"passport.title": "My Passport",
+"passport.subtitle": "Add a stamp photo to mark an office visited. Your stamps and dates stay on this device; your stamp count joins the Rivals leaderboard.",
+"passport.of_100": "OF 100", "passport.ring_empty": "Your passport is waiting for its first stamp.",
+"passport.mark_hint": "Mark a post office visited from its map card to grow your collection.",
+"passport.explored": "/ 100 explored",
+"passport.filter_all": "All", "passport.filter_visited": "Visited", "passport.filter_planned": "Planned", "passport.filter_unvisited": "Unvisited",
+"passport.district_progress": "District progress", "passport.share_backup": "Share & backup",
+"passport.share_format": "Share card format", "passport.fmt_post": "Post · 4:5", "passport.fmt_story": "Story · 9:16",
+"passport.include_photos": "Include my stamp photos", "passport.share_journey": "Share my journey",
+"passport.export": "Export backup", "passport.import": "Import backup",
+"passport.backup_note": "Your progress lives in this browser. Your stamp count also syncs to the Rivals leaderboard, but it cannot restore your passport on a new device — export a backup file before clearing browser data or switching devices. Stamp photos are not included in the JSON backup.",
+"passport.photos_section": "Stamp photos", "passport.photo_meter": "{x} MB of 25 MB used · kept on this device, not included in JSON backups",
+// rivals
+"rivals.title": "Rivals", "rivals.subtitle": "Compete with fellow collectors. Tap anyone to see their stamps.",
+"rivals.copy_code": "Copy code", "rivals.name_ph": "Your display name", "rivals.save": "Save",
+"rivals.email_ph": "Email to save progress across devices", "rivals.link": "Link",
+"rivals.email_note": "Share your code with friends so they can add you. Link your email to keep your progress if you switch devices.",
+"rivals.add_friend": "Add a friend", "rivals.code_ph": "Enter friend's code", "rivals.add": "Add",
+"rivals.leaderboard": "Leaderboard", "rivals.loading": "Loading…", "rivals.my_friends": "My friends",
+"rivals.no_friends": "No friends added yet.",
+"rivals.offline": "You're offline — the leaderboard needs an internet connection. Your progress is safe on this device.",
+"rivals.your_code": "Your code: {code}",
+"rivals.signed_in": "Signed in as {email}. Keeps your friend code and leaderboard spot. Restoring your passport on a new device is not available yet — use Export backup.",
+"rivals.not_connected": "Leaderboard not connected yet.", "rivals.no_collectors": "No collectors yet — be the first!",
+"rivals.load_error": "Could not load leaderboard.", "rivals.you": " (you)", "rivals.stamps": "{n} / 100 stamps",
+"rivals.collector": "Collector",
+// rival sheet
+"rivalsheet.aria": "Collector profile", "rivalsheet.photos_note": "Photos below were shared by this collector.",
+"rivalsheet.no_photos": "No photos shared yet.", "rivalsheet.load_error": "Could not load profile.", "rivalsheet.photo_alt": "Stamp photo",
+// settings
+"settings.title": "Settings", "settings.subtitle": "App preferences and information.",
+"settings.dark": "Dark theme", "settings.dark_aria": "Toggle dark theme",
+"settings.dark_note": "Theme preference is saved on this device only.",
+"settings.kannada": "ಕನ್ನಡ / Kannada", "settings.kannada_aria": "Toggle Kannada language",
+"settings.kannada_note": "Show the app in Kannada.",
+"settings.share": "Share stamp photos", "settings.share_aria": "Share stamp photos publicly on Rivals",
+"settings.share_note": "Off by default. When on, a small copy of each stamp photo is shown publicly on Rivals. Turning it off deletes the shared copies.",
+"settings.faq": "FAQ", "settings.tutorial": "Tutorial", "settings.replay": "Replay tutorial",
+"settings.tutorial_note": "The 3-card intro from your first visit.",
+"settings.about_data": "About this data", "settings.privacy": "Privacy", "settings.tiles": "Map tiles",
+"settings.about_app": "About this app", "settings.danger": "Danger zone", "settings.reset": "Reset all progress",
+"settings.feedback": "Send feedback", "settings.version": "StampQuest · v1.0<br>Karnataka Philately Passport",
+// districts
+"district.bagalkot": "Bagalkot", "district.ballari": "Ballari", "district.belagavi": "Belagavi",
+"district.bengaluru": "Bengaluru", "district.bidar": "Bidar", "district.chamarajanagar": "Chamarajanagar",
+"district.chikkaballapur": "Chikkaballapur", "district.chikkamagaluru": "Chikkamagaluru",
+"district.chitradurga": "Chitradurga", "district.dakshina_kannada": "Dakshina Kannada",
+"district.davangere": "Davangere", "district.dharwad": "Dharwad", "district.gadag": "Gadag",
+"district.hassan": "Hassan", "district.haveri": "Haveri", "district.kalaburagi": "Kalaburagi",
+"district.kodagu": "Kodagu", "district.kolar": "Kolar", "district.koppal": "Koppal",
+"district.mandya": "Mandya", "district.mysuru": "Mysuru", "district.raichur": "Raichur",
+"district.ramanagara": "Ramanagara", "district.shivamogga": "Shivamogga", "district.tumakuru": "Tumakuru",
+"district.udupi": "Udupi", "district.uttara_kannada": "Uttara Kannada",
+"district.vijayanagara": "Vijayanagara", "district.vijayapura": "Vijayapura", "district.yadgir": "Yadgir",
+// landscapes
+"landscape.forest": "Forest", "landscape.coastal": "Coastal", "landscape.heritage": "Heritage",
+"landscape.urban": "Urban", "landscape.hills": "Hills", "landscape.riverside": "Riverside",
+"landscape.plains": "Plains", "landscape.lake": "Lake",
+// office types
+"officetype.BO": "Branch Office", "officetype.SO": "Sub Office", "officetype.HO": "Head Office", "officetype.BA": "Branch",
+
+// toasts
+"toast.beyond": "Beyond Karnataka. Nothing to stamp here.",
+"toast.removed": "Removed from visited.", "toast.already": "Already visited — unmark visited first.",
+"toast.share_on": "Photo sharing on.", "toast.share_off": "Photo sharing off. Shared copies deleted.",
+"toast.copied": "Code copied!", "toast.saved": "Name saved.", "toast.email_invalid": "Enter a valid email.",
+"toast.email_sent": "Check your inbox — tap the confirmation link to finish linking.",
+"toast.del_fail": "Couldn't delete the shared copy. Try again online.",
+"toast.own_code": "That's your own code!", "toast.not_found": "Code not found.",
+"toast.already_added": "Already added.", "toast.not_found_office": "Office not found.",
+"toast.processing": "Processing photo…", "toast.full": "Photo storage is full (25MB). Remove a photo to add more.",
+"toast.restored": "Previous photo restored.", "toast.removed_undone": "Photo removed, visit undone.",
+"toast.unreadable": "Couldn't read that photo. Try another.", "toast.photo_removed": "Photo removed.",
+"toast.locating": "Locating…", "toast.outside": "You're outside Karnataka. Showing the nearest post offices.",
+"toast.latlng": "Enter a valid latitude and longitude.",
+"toast.downloaded": "Progress card downloaded — share it anywhere.", "toast.exported": "Backup exported.",
+"toast.invalid": "That doesn't look like a StampQuest backup.", "toast.unreadable_file": "Couldn't read that file.",
+"toast.imported": "Backup imported.", "toast.reset_photos": "Progress and photos reset.",
+"toast.reset_kept": "Progress reset. Photos kept.", "toast.marked": "Marked visited.",
+},
+kn: {
+// nav
+"nav.explore": "ಅನ್ವೇಷಣೆ", "nav.circuits": "ಸರ್ಕ್ಯೂಟ್‌ಗಳು", "nav.passport": "ಪಾಸ್‌ಪೋರ್ಟ್",
+"nav.rivals": "ಪೈಪೋಟಿ", "nav.settings": "ಸೆಟ್ಟಿಂಗ್‌ಗಳು", "nav.aria": "ಮುಖ್ಯ ಸಂಚಾರ",
+// search
+"search.placeholder": "100 ಅಂಚೆ ಕಚೇರಿಗಳನ್ನು ಹುಡುಕಿ", "search.aria": "ಅಂಚೆ ಕಚೇರಿಗಳನ್ನು ಹುಡುಕಿ",
+"search.clear": "ಹುಡುಕಾಟ ಅಳಿಸಿ", "search.no_matches": "ಯಾವುದೂ ಸಿಗಲಿಲ್ಲ.",
+// map
+"map.controls": "ನಕ್ಷೆ ನಿಯಂತ್ರಣಗಳು", "map.layers": "ನಕ್ಷೆ ನೋಟ ಬದಲಾಯಿಸಿ", "map.locate": "ನನ್ನ ಹತ್ತಿರದ ಕಚೇರಿ ಹುಡುಕಿ",
+"map.locate_title": "ನನ್ನ ಹತ್ತಿರ", "map.reset": "ನಕ್ಷೆ ನೋಟ ಮರುಹೊಂದಿಸಿ", "map.reset_title": "ನೋಟ ಮರುಹೊಂದಿಸಿ",
+"map.zoom_in": "ಜೂಮ್ ಇನ್", "map.zoom_out": "ಜೂಮ್ ಔಟ್",
+"map.layer_streets": "ರಸ್ತೆಗಳು", "map.layer_satellite": "ಉಪಗ್ರಹ", "map.layer_terrain": "ಭೂಪ್ರದೇಶ",
+// circuits
+"circuits.title": "ಸರ್ಕ್ಯೂಟ್‌ಗಳು", "circuits.subtitle": "ಪ್ರದೇಶವಾರು ಸೂಚಿತ ಮಾರ್ಗಗಳು. ಎಲ್ಲರಿಗೂ ತಟಸ್ಥ — ನೀವು ಇರುವಲ್ಲಿಂದ ಪ್ರಾರಂಭಿಸಿ.",
+"circuits.collected": "{done}/{total} ಸಂಗ್ರಹಿಸಲಾಗಿದೆ", "circuits.show_on_map": "ನಕ್ಷೆಯಲ್ಲಿ ತೋರಿಸಿ",
+// regions
+"region.Coastal": "ಕರಾವಳಿ", "region.Malnad": "ಮಲೆನಾಡು", "region.Mysuru region": "ಮೈಸೂರು ಪ್ರದೇಶ",
+"region.Bengaluru region": "ಬೆಂಗಳೂರು ಪ್ರದೇಶ", "region.North Karnataka": "ಉತ್ತರ ಕರ್ನಾಟಕ",
+// passport
+"passport.title": "ನನ್ನ ಪಾಸ್‌ಪೋರ್ಟ್",
+"passport.subtitle": "ಅಂಚೆ ಕಚೇರಿಗೆ ಭೇಟಿ ನೀಡಿದ್ದೀರಿ ಎಂದು ಗುರುತಿಸಲು ಸ್ಟ್ಯಾಂಪ್ ಫೋಟೋ ಸೇರಿಸಿ. ನಿಮ್ಮ ಸ್ಟ್ಯಾಂಪ್‌ಗಳು ಮತ್ತು ದಿನಾಂಕಗಳು ಈ ಸಾಧನದಲ್ಲೇ ಇರುತ್ತವೆ; ನಿಮ್ಮ ಸ್ಟ್ಯಾಂಪ್ ಎಣಿಕೆ ಪೈಪೋಟಿ ಪಟ್ಟಿಗೆ ಸೇರುತ್ತದೆ.",
+"passport.of_100": "/ 100", "passport.ring_empty": "ನಿಮ್ಮ ಪಾಸ್‌ಪೋರ್ಟ್ ಮೊದಲ ಸ್ಟ್ಯಾಂಪ್‌ಗಾಗಿ ಕಾಯುತ್ತಿದೆ.",
+"passport.mark_hint": "ನಿಮ್ಮ ಸಂಗ್ರಹ ಬೆಳೆಸಲು ನಕ್ಷೆ ಕಾರ್ಡ್‌ನಿಂದ ಅಂಚೆ ಕಚೇರಿಗೆ ಭೇಟಿ ನೀಡಿದ್ದೀರಿ ಎಂದು ಗುರುತಿಸಿ.",
+"passport.explored": "/ 100 ಅನ್ವೇಷಿಸಲಾಗಿದೆ",
+"passport.filter_all": "ಎಲ್ಲಾ", "passport.filter_visited": "ಭೇಟಿ ನೀಡಿದ", "passport.filter_planned": "ಯೋಜಿತ", "passport.filter_unvisited": "ಭೇಟಿ ನೀಡದ",
+"passport.district_progress": "ಜಿಲ್ಲಾ ಪ್ರಗತಿ", "passport.share_backup": "ಹಂಚಿಕೊಳ್ಳಿ & ಬ್ಯಾಕಪ್",
+"passport.share_format": "ಹಂಚಿಕೆ ಕಾರ್ಡ್ ಸ್ವರೂಪ", "passport.fmt_post": "ಪೋಸ್ಟ್ · 4:5", "passport.fmt_story": "ಸ್ಟೋರಿ · 9:16",
+"passport.include_photos": "ನನ್ನ ಸ್ಟ್ಯಾಂಪ್ ಫೋಟೋಗಳನ್ನು ಸೇರಿಸಿ", "passport.share_journey": "ನನ್ನ ಪ್ರಯಾಣ ಹಂಚಿಕೊಳ್ಳಿ",
+"passport.export": "ಬ್ಯಾಕಪ್ ರಫ್ತು", "passport.import": "ಬ್ಯಾಕಪ್ ಆಮದು",
+"passport.backup_note": "ನಿಮ್ಮ ಪ್ರಗತಿ ಈ ಬ್ರೌಸರ್‌ನಲ್ಲಿದೆ. ನಿಮ್ಮ ಸ್ಟ್ಯಾಂಪ್ ಎಣಿಕೆ ಪೈಪೋಟಿ ಪಟ್ಟಿಗೂ ಸಿಂಕ್ ಆಗುತ್ತದೆ, ಆದರೆ ಹೊಸ ಸಾಧನದಲ್ಲಿ ನಿಮ್ಮ ಪಾಸ್‌ಪೋರ್ಟ್ ಮರುಸ್ಥಾಪಿಸಲಾಗುವುದಿಲ್ಲ — ಬ್ರೌಸರ್ ಡೇಟಾ ಅಳಿಸುವ ಮೊದಲು ಅಥವಾ ಸಾಧನ ಬದಲಾಯಿಸುವ ಮೊದಲು ಬ್ಯಾಕಪ್ ಫೈಲ್ ರಫ್ತು ಮಾಡಿ. JSON ಬ್ಯಾಕಪ್‌ನಲ್ಲಿ ಸ್ಟ್ಯಾಂಪ್ ಫೋಟೋಗಳು ಸೇರಿಲ್ಲ.",
+"passport.photos_section": "ಸ್ಟ್ಯಾಂಪ್ ಫೋಟೋಗಳು", "passport.photo_meter": "25 MB ಯಲ್ಲಿ {x} MB ಬಳಸಲಾಗಿದೆ · ಈ ಸಾಧನದಲ್ಲೇ ಇದೆ, JSON ಬ್ಯಾಕಪ್‌ನಲ್ಲಿ ಸೇರಿಲ್ಲ",
+// rivals
+"rivals.title": "ಪೈಪೋಟಿ", "rivals.subtitle": "ಸಹ ಸಂಗ್ರಾಹಕರೊಂದಿಗೆ ಸ್ಪರ್ಧಿಸಿ. ಯಾರನ್ನಾದರೂ ಒತ್ತಿ ಅವರ ಸ್ಟ್ಯಾಂಪ್‌ಗಳನ್ನು ನೋಡಿ.",
+"rivals.copy_code": "ಕೋಡ್ ನಕಲಿಸಿ", "rivals.name_ph": "ನಿಮ್ಮ ಪ್ರದರ್ಶನ ಹೆಸರು", "rivals.save": "ಉಳಿಸಿ",
+"rivals.email_ph": "ಸಾಧನಗಳ ನಡುವೆ ಪ್ರಗತಿ ಉಳಿಸಲು ಇಮೇಲ್", "rivals.link": "ಲಿಂಕ್",
+"rivals.email_note": "ಸ್ನೇಹಿತರು ನಿಮ್ಮನ್ನು ಸೇರಿಸಲು ನಿಮ್ಮ ಕೋಡ್ ಹಂಚಿಕೊಳ್ಳಿ. ಸಾಧನ ಬದಲಾಯಿಸಿದರೂ ಪ್ರಗತಿ ಉಳಿಯಲು ಇಮೇಲ್ ಲಿಂಕ್ ಮಾಡಿ.",
+"rivals.add_friend": "ಸ್ನೇಹಿತರನ್ನು ಸೇರಿಸಿ", "rivals.code_ph": "ಸ್ನೇಹಿತರ ಕೋಡ್ ನಮೂದಿಸಿ", "rivals.add": "ಸೇರಿಸಿ",
+"rivals.leaderboard": "ಲೀಡರ್‌ಬೋರ್ಡ್", "rivals.loading": "ಲೋಡ್ ಆಗುತ್ತಿದೆ…", "rivals.my_friends": "ನನ್ನ ಸ್ನೇಹಿತರು",
+"rivals.no_friends": "ಇನ್ನೂ ಸ್ನೇಹಿತರನ್ನು ಸೇರಿಸಿಲ್ಲ.",
+"rivals.offline": "ನೀವು ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿದ್ದೀರಿ — ಲೀಡರ್‌ಬೋರ್ಡ್‌ಗೆ ಇಂಟರ್ನೆಟ್ ಬೇಕು. ನಿಮ್ಮ ಪ್ರಗತಿ ಈ ಸಾಧನದಲ್ಲಿ ಸುರಕ್ಷಿತವಾಗಿದೆ.",
+"rivals.your_code": "ನಿಮ್ಮ ಕೋಡ್: {code}",
+"rivals.signed_in": "{email} ಆಗಿ ಸೈನ್ ಇನ್ ಆಗಿದ್ದೀರಿ. ನಿಮ್ಮ ಸ್ನೇಹಿತ ಕೋಡ್ ಮತ್ತು ಲೀಡರ್‌ಬೋರ್ಡ್ ಸ್ಥಾನ ಉಳಿಯುತ್ತದೆ. ಹೊಸ ಸಾಧನದಲ್ಲಿ ಪಾಸ್‌ಪೋರ್ಟ್ ಮರುಸ್ಥಾಪನೆ ಇನ್ನೂ ಲಭ್ಯವಿಲ್ಲ — ಬ್ಯಾಕಪ್ ರಫ್ತು ಬಳಸಿ.",
+"rivals.not_connected": "ಲೀಡರ್‌ಬೋರ್ಡ್ ಇನ್ನೂ ಸಂಪರ್ಕಗೊಂಡಿಲ್ಲ.", "rivals.no_collectors": "ಇನ್ನೂ ಸಂಗ್ರಾಹಕರು ಇಲ್ಲ — ಮೊದಲಿಗರಾಗಿ!",
+"rivals.load_error": "ಲೀಡರ್‌ಬೋರ್ಡ್ ಲೋಡ್ ಆಗಲಿಲ್ಲ.", "rivals.you": " (ನೀವು)", "rivals.stamps": "{n} / 100 ಸ್ಟ್ಯಾಂಪ್‌ಗಳು",
+"rivals.collector": "ಸಂಗ್ರಾಹಕ",
+// rival sheet
+"rivalsheet.aria": "ಸಂಗ್ರಾಹಕ ಪ್ರೊಫೈಲ್", "rivalsheet.photos_note": "ಕೆಳಗಿನ ಫೋಟೋಗಳನ್ನು ಈ ಸಂಗ್ರಾಹಕರು ಹಂಚಿಕೊಂಡಿದ್ದಾರೆ.",
+"rivalsheet.no_photos": "ಇನ್ನೂ ಫೋಟೋಗಳನ್ನು ಹಂಚಿಕೊಂಡಿಲ್ಲ.", "rivalsheet.load_error": "ಪ್ರೊಫೈಲ್ ಲೋಡ್ ಆಗಲಿಲ್ಲ.", "rivalsheet.photo_alt": "ಸ್ಟ್ಯಾಂಪ್ ಫೋಟೋ",
+// settings
+"settings.title": "ಸೆಟ್ಟಿಂಗ್‌ಗಳು", "settings.subtitle": "ಅಪ್ಲಿಕೇಶನ್ ಆದ್ಯತೆಗಳು ಮತ್ತು ಮಾಹಿತಿ.",
+"settings.dark": "ಡಾರ್ಕ್ ಥೀಮ್", "settings.dark_aria": "ಡಾರ್ಕ್ ಥೀಮ್ ಬದಲಾಯಿಸಿ",
+"settings.dark_note": "ಥೀಮ್ ಆದ್ಯತೆ ಈ ಸಾಧನದಲ್ಲಿ ಮಾತ್ರ ಉಳಿಯುತ್ತದೆ.",
+"settings.kannada": "ಕನ್ನಡ / Kannada", "settings.kannada_aria": "ಕನ್ನಡ ಭಾಷೆ ಬದಲಾಯಿಸಿ",
+"settings.kannada_note": "ಅಪ್ಲಿಕೇಶನ್ ಅನ್ನು ಕನ್ನಡದಲ್ಲಿ ತೋರಿಸಿ.",
+"settings.share": "ಸ್ಟ್ಯಾಂಪ್ ಫೋಟೋಗಳನ್ನು ಹಂಚಿಕೊಳ್ಳಿ", "settings.share_aria": "ಪೈಪೋಟಿಯಲ್ಲಿ ಸ್ಟ್ಯಾಂಪ್ ಫೋಟೋಗಳನ್ನು ಸಾರ್ವಜನಿಕವಾಗಿ ಹಂಚಿಕೊಳ್ಳಿ",
+"settings.share_note": "ಪೂರ್ವನಿಯೋಜಿತವಾಗಿ ಆಫ್. ಆನ್ ಮಾಡಿದರೆ, ಪ್ರತಿ ಸ್ಟ್ಯಾಂಪ್ ಫೋಟೋದ ಸಣ್ಣ ನಕಲು ಪೈಪೋಟಿಯಲ್ಲಿ ಸಾರ್ವಜನಿಕವಾಗಿ ತೋರಿಸಲಾಗುತ್ತದೆ. ಆಫ್ ಮಾಡಿದರೆ ಹಂಚಿದ ನಕಲುಗಳನ್ನು ಅಳಿಸಲಾಗುತ್ತದೆ.",
+"settings.faq": "FAQ", "settings.tutorial": "ಟ್ಯುಟೋರಿಯಲ್", "settings.replay": "ಟ್ಯುಟೋರಿಯಲ್ ಮತ್ತೆ ನೋಡಿ",
+"settings.tutorial_note": "ನಿಮ್ಮ ಮೊದಲ ಭೇಟಿಯ 3-ಕಾರ್ಡ್ ಪರಿಚಯ.",
+"settings.about_data": "ಈ ಡೇಟಾ ಬಗ್ಗೆ", "settings.privacy": "ಗೌಪ್ಯತೆ", "settings.tiles": "ನಕ್ಷೆ ಟೈಲ್‌ಗಳು",
+"settings.about_app": "ಈ ಅಪ್ಲಿಕೇಶನ್ ಬಗ್ಗೆ", "settings.danger": "ಅಪಾಯದ ವಲಯ", "settings.reset": "ಎಲ್ಲಾ ಪ್ರಗತಿ ಮರುಹೊಂದಿಸಿ",
+"settings.feedback": "ಪ್ರತಿಕ್ರಿಯೆ ಕಳುಹಿಸಿ", "settings.version": "StampQuest · v1.0<br>ಕರ್ನಾಟಕ ಫಿಲಾಟೆಲಿ ಪಾಸ್‌ಪೋರ್ಟ್",
+// districts
+"district.bagalkot": "ಬಾಗಲಕೋಟೆ", "district.ballari": "ಬಳ್ಳಾರಿ", "district.belagavi": "ಬೆಳಗಾವಿ",
+"district.bengaluru": "ಬೆಂಗಳೂರು", "district.bidar": "ಬೀದರ್", "district.chamarajanagar": "ಚಾಮರಾಜನಗರ",
+"district.chikkaballapur": "ಚಿಕ್ಕಬಳ್ಳಾಪುರ", "district.chikkamagaluru": "ಚಿಕ್ಕಮಗಳೂರು",
+"district.chitradurga": "ಚಿತ್ರದುರ್ಗ", "district.dakshina_kannada": "ದಕ್ಷಿಣ ಕನ್ನಡ",
+"district.davangere": "ದಾವಣಗೆರೆ", "district.dharwad": "ಧಾರವಾಡ", "district.gadag": "ಗದಗ",
+"district.hassan": "ಹಾಸನ", "district.haveri": "ಹಾವೇರಿ", "district.kalaburagi": "ಕಲಬುರಗಿ",
+"district.kodagu": "ಕೊಡಗು", "district.kolar": "ಕೋಲಾರ", "district.koppal": "ಕೊಪ್ಪಳ",
+"district.mandya": "ಮಂಡ್ಯ", "district.mysuru": "ಮೈಸೂರು", "district.raichur": "ರಾಯಚೂರು",
+"district.ramanagara": "ರಾಮನಗರ", "district.shivamogga": "ಶಿವಮೊಗ್ಗ", "district.tumakuru": "ತುಮಕೂರು",
+"district.udupi": "ಉಡುಪಿ", "district.uttara_kannada": "ಉತ್ತರ ಕನ್ನಡ",
+"district.vijayanagara": "ವಿಜಯನಗರ", "district.vijayapura": "ವಿಜಯಪುರ", "district.yadgir": "ಯಾದಗಿರಿ",
+// landscapes
+"landscape.forest": "ಅರಣ್ಯ", "landscape.coastal": "ಕರಾವಳಿ", "landscape.heritage": "ಪಾರಂಪರಿಕ",
+"landscape.urban": "ನಗರ", "landscape.hills": "ಬೆಟ್ಟಗಳು", "landscape.riverside": "ನದಿ ತೀರ",
+"landscape.plains": "ಬಯಲು", "landscape.lake": "ಕೆರೆ",
+// office types
+"officetype.BO": "ಶಾಖಾ ಕಚೇರಿ", "officetype.SO": "ಉಪ ಕಚೇರಿ", "officetype.HO": "ಮುಖ್ಯ ಕಚೇರಿ", "officetype.BA": "ಶಾಖೆ",
+
+// toasts
+"toast.beyond": "ಕರ್ನಾಟಕದ ಹೊರಗೆ. ಇಲ್ಲಿ ಸ್ಟ್ಯಾಂಪ್ ಮಾಡಲು ಏನೂ ಇಲ್ಲ.",
+"toast.removed": "ಭೇಟಿಯಿಂದ ತೆಗೆದುಹಾಕಲಾಗಿದೆ.", "toast.already": "ಈಗಾಗಲೇ ಭೇಟಿ ನೀಡಲಾಗಿದೆ — ಮೊದಲು ಭೇಟಿಯನ್ನು ರದ್ದುಮಾಡಿ.",
+"toast.share_on": "ಫೋಟೋ ಹಂಚಿಕೆ ಆನ್.", "toast.share_off": "ಫೋಟೋ ಹಂಚಿಕೆ ಆಫ್. ಹಂಚಿದ ನಕಲುಗಳನ್ನು ಅಳಿಸಲಾಗಿದೆ.",
+"toast.copied": "ಕೋಡ್ ನಕಲಿಸಲಾಗಿದೆ!", "toast.saved": "ಹೆಸರು ಉಳಿಸಲಾಗಿದೆ.", "toast.email_invalid": "ಸರಿಯಾದ ಇಮೇಲ್ ನಮೂದಿಸಿ.",
+"toast.email_sent": "ನಿಮ್ಮ ಇನ್‌ಬಾಕ್ಸ್ ಪರಿಶೀಲಿಸಿ — ಲಿಂಕ್ ಮಾಡಲು ದೃಢೀಕರಣ ಲಿಂಕ್ ಒತ್ತಿ.",
+"toast.del_fail": "ಹಂಚಿದ ನಕಲನ್ನು ಅಳಿಸಲಾಗಲಿಲ್ಲ. ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+"toast.own_code": "ಅದು ನಿಮ್ಮದೇ ಕೋಡ್!", "toast.not_found": "ಕೋಡ್ ಸಿಗಲಿಲ್ಲ.",
+"toast.already_added": "ಈಗಾಗಲೇ ಸೇರಿಸಲಾಗಿದೆ.", "toast.not_found_office": "ಕಚೇರಿ ಸಿಗಲಿಲ್ಲ.",
+"toast.processing": "ಫೋಟೋ ಸಂಸ್ಕರಿಸಲಾಗುತ್ತಿದೆ…", "toast.full": "ಫೋಟೋ ಸಂಗ್ರಹ ತುಂಬಿದೆ (25MB). ಇನ್ನೊಂದನ್ನು ಸೇರಿಸಲು ಫೋಟೋ ತೆಗೆದುಹಾಕಿ.",
+"toast.restored": "ಹಿಂದಿನ ಫೋಟೋ ಮರುಸ್ಥಾಪಿಸಲಾಗಿದೆ.", "toast.removed_undone": "ಫೋಟೋ ತೆಗೆದುಹಾಕಲಾಗಿದೆ, ಭೇಟಿ ರದ್ದುಗೊಂಡಿದೆ.",
+"toast.unreadable": "ಆ ಫೋಟೋ ಓದಲಾಗಲಿಲ್ಲ. ಇನ್ನೊಂದನ್ನು ಪ್ರಯತ್ನಿಸಿ.", "toast.photo_removed": "ಫೋಟೋ ತೆಗೆದುಹಾಕಲಾಗಿದೆ.",
+"toast.locating": "ಸ್ಥಳ ಗುರುತಿಸಲಾಗುತ್ತಿದೆ…", "toast.outside": "ನೀವು ಕರ್ನಾಟಕದ ಹೊರಗಿದ್ದೀರಿ. ಹತ್ತಿರದ ಅಂಚೆ ಕಚೇರಿಗಳನ್ನು ತೋರಿಸಲಾಗುತ್ತಿದೆ.",
+"toast.latlng": "ಸರಿಯಾದ ಅಕ್ಷಾಂಶ ಮತ್ತು ರೇಖಾಂಶ ನಮೂದಿಸಿ.",
+"toast.downloaded": "ಪ್ರಗತಿ ಕಾರ್ಡ್ ಡೌನ್‌ಲೋಡ್ ಆಗಿದೆ — ಎಲ್ಲಾದರೂ ಹಂಚಿಕೊಳ್ಳಿ.", "toast.exported": "ಬ್ಯಾಕಪ್ ರಫ್ತಾಗಿದೆ.",
+"toast.invalid": "ಅದು StampQuest ಬ್ಯಾಕಪ್‌ನಂತೆ ಕಾಣುತ್ತಿಲ್ಲ.", "toast.unreadable_file": "ಆ ಫೈಲ್ ಓದಲಾಗಲಿಲ್ಲ.",
+"toast.imported": "ಬ್ಯಾಕಪ್ ಆಮದಾಗಿದೆ.", "toast.reset_photos": "ಪ್ರಗತಿ ಮತ್ತು ಫೋಟೋಗಳನ್ನು ಮರುಹೊಂದಿಸಲಾಗಿದೆ.",
+"toast.reset_kept": "ಪ್ರಗತಿ ಮರುಹೊಂದಿಸಲಾಗಿದೆ. ಫೋಟೋಗಳನ್ನು ಉಳಿಸಲಾಗಿದೆ.", "toast.marked": "ಭೇಟಿ ಗುರುತಿಸಲಾಗಿದೆ.",
+}};
+function t(key, params){
+  const lang = (typeof state !== 'undefined' && state.lang) || 'en';
+  let s = (STRINGS[lang] && STRINGS[lang][key]) || STRINGS.en[key] || key;
+  if (params) for (const k in params) s = s.replace('{'+k+'}', params[k]);
+  return s;
+}
+function tDistrict(name){
+  const slug = name.toLowerCase().replace(/ /g, '_');
+  return t('district.'+slug) !== 'district.'+slug ? t('district.'+slug) : name;
+}
