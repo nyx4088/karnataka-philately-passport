@@ -14,6 +14,29 @@ const visitedCount = () => LOCATIONS.filter(l => state.visited[l.n]).length;
 /* ================= helpers ================= */
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+// Focus trap utility: traps Tab/Shift+Tab within container, restores focus on close
+function trapFocus(container, onClose){
+  const prevFocus = document.activeElement;
+  const sel = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  function handler(e){
+    if (e.key === "Escape" && onClose){ onClose(); return; }
+    if (e.key !== "Tab") return;
+    const items = [...container.querySelectorAll(sel)].filter(el => el.offsetParent !== null);
+    if (!items.length) return;
+    const first = items[0], last = items[items.length-1];
+    if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
+  container.addEventListener("keydown", handler);
+  // Focus first focusable element
+  const first = container.querySelector(sel);
+  if (first) first.focus();
+  return function release(){
+    container.removeEventListener("keydown", handler);
+    if (prevFocus && prevFocus.focus) prevFocus.focus();
+  };
+}
+
 function toast(msg, undoFn){ const t = $("toast"); t.innerHTML = "";
   const s = document.createElement("span"); s.textContent = msg; t.appendChild(s);
   if (undoFn){
@@ -171,8 +194,9 @@ $("layerSheet").querySelectorAll("button").forEach(b => b.onclick = () => {
 let selectedN = null;
 const sheet = $("sheet");
 function setSnap(s){ sheet.dataset.snap = s; }
-function openSheet(){ sheet.classList.add("open"); sheet.removeAttribute("aria-hidden"); setSnap("half"); document.body.classList.add("sheet-open"); }
-function closeSheet(){ sheet.classList.remove("open"); sheet.setAttribute("aria-hidden", "true"); selectedN = null; document.body.classList.remove("sheet-open");
+let releaseSheetTrap = null;
+function openSheet(){ sheet.classList.add("open"); sheet.removeAttribute("aria-hidden"); setSnap("half"); document.body.classList.add("sheet-open"); releaseSheetTrap = trapFocus(sheet, closeSheet); }
+function closeSheet(){ if (releaseSheetTrap){ releaseSheetTrap(); releaseSheetTrap = null; } sheet.classList.remove("open"); sheet.setAttribute("aria-hidden", "true"); selectedN = null; document.body.classList.remove("sheet-open");
   if (location.hash.startsWith("#loc=")) history.replaceState(null,"",location.pathname+location.search);
   if (window.fitKarnataka) setTimeout(()=>window.fitKarnataka(), 350); }
 $("sheetClose").onclick = closeSheet;
@@ -543,8 +567,10 @@ async function openPhotoViewer(n){
     if (Math.abs(dx) > 60) pvShow(pvIdx + (dx < 0 ? 1 : -1));
   }, { passive:true });
   document.addEventListener("keydown", pvKey);
+  pvReleaseTrap = trapFocus(v, closePhotoViewer);
   pvShow(pvIdx);
 }
+let pvReleaseTrap = null;
 function pvKey(e){
   if (!document.getElementById("photoViewer")) return;
   if (e.key === "Escape") closePhotoViewer();
@@ -565,6 +591,7 @@ async function pvShow(i){
   $("pvNext").style.visibility = pvList.length > 1 ? "visible" : "hidden";
 }
 function closePhotoViewer(){
+  if (pvReleaseTrap){ pvReleaseTrap(); pvReleaseTrap = null; }
   const v = document.getElementById("photoViewer");
   if (v) v.remove();
   if (pvUrl){ URL.revokeObjectURL(pvUrl); pvUrl = null; }
@@ -1372,8 +1399,10 @@ $("rivalAddBtn").onclick = async () => {
   if (!error){ $("rivalCodeInput").value = ""; toast("Added " + (f.display_name || "friend") + "!"); renderRivals(); }
   else toast(t("toast.already_added"));
 };
+let rsReleaseTrap = null;
 async function openRivalProfile(uid){
   $("rivalSheet").style.display = "block";
+  rsReleaseTrap = trapFocus($("rivalSheet"), closeRivalSheet);
   const grid = $("rsPhotos");
   grid.textContent = "";
   const loading = document.createElement("div");
@@ -1416,8 +1445,9 @@ async function openRivalProfile(uid){
     grid.appendChild(err);
   }
 }
-$("rsClose").onclick = () => { $("rivalSheet").style.display = "none"; };
-$("rivalSheet").addEventListener("click", e => { if (e.target.id === "rivalSheet") $("rivalSheet").style.display = "none"; });
+function closeRivalSheet(){ if (rsReleaseTrap){ rsReleaseTrap(); rsReleaseTrap = null; } $("rivalSheet").style.display = "none"; }
+$("rsClose").onclick = closeRivalSheet;
+$("rivalSheet").addEventListener("click", e => { if (e.target.id === "rivalSheet") closeRivalSheet(); });
 
 /* ================= deep link / first run / init ================= */
 function handleHash(){

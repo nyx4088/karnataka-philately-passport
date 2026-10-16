@@ -100,7 +100,7 @@ html[data-theme="dark"]{--fog:#2C251F}
 @keyframes fogdrift{to{background-position:420px 210px}}
 @media (prefers-reduced-motion:reduce){.fog-texture{animation:none}}
 .fog-label{background:transparent!important;border:0!important;box-shadow:none!important;
-  color:var(--ink-2)!important;font-family:var(--font-sans)!important;font-size:11px!important;
+  color:var(--ink-2)!important;font-family:var(--font-sans)!important;font-size:12px!important;
   letter-spacing:2.5px!important;text-transform:uppercase;white-space:nowrap}
 .fog-label:before{display:none!important}
 .topbar{position:absolute;z-index:500;top:0;left:0;right:0;padding:calc(8px + env(safe-area-inset-top)) 8px 0;pointer-events:none}
@@ -148,7 +148,7 @@ html[data-theme="dark"] .hcard{background:color-mix(in srgb, var(--header-bg) 92
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   .mapctl.rail{background:var(--surface);border-color:var(--border-subtle)}
 }
-.mapctl.rail button{width:40px;height:40px;min-width:40px;min-height:40px;border:0;background:transparent;color:var(--ink);
+.mapctl.rail button{width:44px;height:44px;min-width:44px;min-height:44px;border:0;background:transparent;color:var(--ink);
   display:flex;align-items:center;justify-content:center;border-radius:10px;cursor:pointer;padding:0}
 .mapctl.rail button svg{width:22px;height:22px}
 .mapctl.rail button:active,.mapctl.rail button.on{background:color-mix(in srgb, var(--brand) 18%, transparent);color:var(--brand)}
@@ -334,7 +334,7 @@ h3.sec{font-size:17px;margin:22px 0 10px;letter-spacing:.5px}
 .tile.visited .check{display:flex}
 .tile.visited .postmark{position:absolute;left:50%;top:50%;transform:translate(-50%,-60%) rotate(-8deg);
   border:2px solid var(--collected);border-radius:50%;width:52px;height:52px;display:flex;align-items:center;justify-content:center;
-  font-family:var(--font-mono);font-size:10px;font-weight:500;color:var(--collected);text-transform:uppercase;
+  font-family:var(--font-mono);font-size:12px;font-weight:500;color:var(--collected);text-transform:uppercase;
   opacity:.4;pointer-events:none;text-align:center;line-height:1.15;padding:6px;overflow:hidden}
 .tile.planned{border:1.5px dashed var(--planned);background:var(--surface)}
 .tile.planned .tno{color:var(--planned)}
@@ -401,7 +401,7 @@ h3.sec{font-size:17px;margin:22px 0 10px;letter-spacing:.5px}
 .tile.hasphoto .check{z-index:3}
 .tile.hasphoto .postmark{display:none}
 /* visited without photo: postmark away from camera */
-.tile.visited:not(.hasphoto) .postmark{top:6px;right:6px;left:auto;transform:rotate(8deg);opacity:.55;font-size:10px}
+.tile.visited:not(.hasphoto) .postmark{top:6px;right:6px;left:auto;transform:rotate(8deg);opacity:.55;font-size:12px}
 .meter{height:8px;border-radius:4px;background:var(--border);overflow:hidden;margin:8px 0 4px}
 .meter i{display:block;height:100%;background:var(--brand);border-radius:4px;transition:width .3s}
 .segrow{display:flex;gap:8px;margin:4px 0 8px}
