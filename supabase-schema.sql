@@ -67,7 +67,7 @@ create policy "users delete own photos" on storage.objects
   );
 
 -- 7. Leaderboard view: ranked by stamps collected
-create or replace view leaderboard as
+create or replace view leaderboard with (security_invoker = true) as
 select
   p.id,
   p.friend_code,
