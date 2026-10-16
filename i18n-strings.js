@@ -83,6 +83,16 @@ en: {
 
 
 
+
+// Tutorial
+"tutorial.s1_title": "Welcome to StampQuest",
+"tutorial.s1_body": "All 100 Karnataka Philately Passport post offices, on one map. Tap a pin for details and directions, mark each stamp as you collect it, and watch your passport fill up.<br><br>The slim rail on the right holds <b>Layers</b> (map style), <b>Near me</b> (closest offices) and <b>Reset</b> (back to Karnataka view), plus zoom.<br><br>Your progress never leaves this device.<br><br>Built solo by a fellow collector, with a little AI help — so if you spot a glitch or a wrong detail, I'd genuinely like to hear about it (see <b>Settings → About this app</b>).",
+"tutorial.s2_title": "Collect with a photo",
+"tutorial.s2_body": "Add a stamp photo to mark an office visited. Tap its tile in Passport, choose a photo — it's marked visited automatically with today's date.<br><br>Photos stay on this device unless you switch on Share stamp photos in Settings.",
+"tutorial.s3_title": "Explore Karnataka",
+"tutorial.s3_body": "Use Circuits for region-wise routes, the Planned filter in Passport for your planned stops, and share your progress as a postcard when the passport fills up.<br><br>Only Karnataka is on the map — that's the whole quest.",
+"tutorial.skip": "Skip", "tutorial.next": "Next",
+
 // About sections
 "settings.about_data_body": "Locations are the 100 post offices from the Karnataka Philately Passport booklet (₹600, issued October 2026 by the Department of Posts, Karnataka Circle). Coordinates were geocoded per post office — 34 hand-verified to the actual office, 3 near-verified, the rest town-level approximations labelled \"Approximate location\" on their cards; the Directions button searches the post office on Google Maps, and \"Directions to map pin\" navigates to the exact pinned point.<br><br>Pictorial-cancellation motifs and introduction dates shown come from India Post's published permanent pictorial cancellation lists. No complete public registry of the passport's 100 motifs exists — the booklet itself is the definitive source. Where no published entry matched, the motif section is omitted — check your booklet on the ground.<br><br>\"Getting there\" names the nearest major transit town as an indicative hint only — use Directions for live routing. Nothing here is live transport data and there are no fares.",
 "settings.privacy_body": "Everything — your visited and planned lists, theme choice, and location (used only when you tap \"Near me\") — stays in this browser's local storage on your device. No analytics. Rivals uses an anonymous account (no sign-up) storing your display name, friend code and visited-office list, publicly readable by other collectors. Photos upload only if \"Share stamp photos\" is switched on. A linked email is used only for sign-in. Clearing browser data erases your local passport unless you exported a backup.",
@@ -207,6 +217,16 @@ kn: {
 
 
 
+
+// Tutorial
+"tutorial.s1_title": "Welcome to StampQuest",
+"tutorial.s1_body": "All 100 Karnataka Philately Passport post offices, on one map. Tap a pin for details and directions, mark each stamp as you collect it, and watch your passport fill up.<br><br>The slim rail on the right holds <b>Layers</b> (map style), <b>Near me</b> (closest offices) and <b>Reset</b> (back to Karnataka view), plus zoom.<br><br>Your progress never leaves this device.<br><br>Built solo by a fellow collector, with a little AI help — so if you spot a glitch or a wrong detail, I'd genuinely like to hear about it (see <b>Settings → About this app</b>).",
+"tutorial.s2_title": "Collect with a photo",
+"tutorial.s2_body": "Add a stamp photo to mark an office visited. Tap its tile in Passport, choose a photo — it's marked visited automatically with today's date.<br><br>Photos stay on this device unless you switch on Share stamp photos in Settings.",
+"tutorial.s3_title": "Explore Karnataka",
+"tutorial.s3_body": "Use Circuits for region-wise routes, the Planned filter in Passport for your planned stops, and share your progress as a postcard when the passport fills up.<br><br>Only Karnataka is on the map — that's the whole quest.",
+"tutorial.skip": "Skip", "tutorial.next": "Next",
+
 // About sections
 "settings.about_data_body": "Locations are the 100 post offices from the Karnataka Philately Passport booklet (₹600, issued October 2026 by the Department of Posts, Karnataka Circle). Coordinates were geocoded per post office — 34 hand-verified to the actual office, 3 near-verified, the rest town-level approximations labelled \"Approximate location\" on their cards; the Directions button searches the post office on Google Maps, and \"Directions to map pin\" navigates to the exact pinned point.<br><br>Pictorial-cancellation motifs and introduction dates shown come from India Post's published permanent pictorial cancellation lists. No complete public registry of the passport's 100 motifs exists — the booklet itself is the definitive source. Where no published entry matched, the motif section is omitted — check your booklet on the ground.<br><br>\"Getting there\" names the nearest major transit town as an indicative hint only — use Directions for live routing. Nothing here is live transport data and there are no fares.",
 "settings.privacy_body": "Everything — your visited and planned lists, theme choice, and location (used only when you tap \"Near me\") — stays in this browser's local storage on your device. No analytics. Rivals uses an anonymous account (no sign-up) storing your display name, friend code and visited-office list, publicly readable by other collectors. Photos upload only if \"Share stamp photos\" is switched on. A linked email is used only for sign-in. Clearing browser data erases your local passport unless you exported a backup.",
@@ -232,11 +252,41 @@ kn: {
 
 
 
+
+// Tutorial
+"tutorial.s1_title": "Welcome to StampQuest",
+"tutorial.s1_body": "All 100 Karnataka Philately Passport post offices, on one map. Tap a pin for details and directions, mark each stamp as you collect it, and watch your passport fill up.<br><br>The slim rail on the right holds <b>Layers</b> (map style), <b>Near me</b> (closest offices) and <b>Reset</b> (back to Karnataka view), plus zoom.<br><br>Your progress never leaves this device.<br><br>Built solo by a fellow collector, with a little AI help — so if you spot a glitch or a wrong detail, I'd genuinely like to hear about it (see <b>Settings → About this app</b>).",
+"tutorial.s2_title": "Collect with a photo",
+"tutorial.s2_body": "Add a stamp photo to mark an office visited. Tap its tile in Passport, choose a photo — it's marked visited automatically with today's date.<br><br>Photos stay on this device unless you switch on Share stamp photos in Settings.",
+"tutorial.s3_title": "Explore Karnataka",
+"tutorial.s3_body": "Use Circuits for region-wise routes, the Planned filter in Passport for your planned stops, and share your progress as a postcard when the passport fills up.<br><br>Only Karnataka is on the map — that's the whole quest.",
+"tutorial.skip": "Skip", "tutorial.next": "Next",
+
 // About sections
 "settings.about_data_body": "Locations are the 100 post offices from the Karnataka Philately Passport booklet (₹600, issued October 2026 by the Department of Posts, Karnataka Circle). Coordinates were geocoded per post office — 34 hand-verified to the actual office, 3 near-verified, the rest town-level approximations labelled \"Approximate location\" on their cards; the Directions button searches the post office on Google Maps, and \"Directions to map pin\" navigates to the exact pinned point.<br><br>Pictorial-cancellation motifs and introduction dates shown come from India Post's published permanent pictorial cancellation lists. No complete public registry of the passport's 100 motifs exists — the booklet itself is the definitive source. Where no published entry matched, the motif section is omitted — check your booklet on the ground.<br><br>\"Getting there\" names the nearest major transit town as an indicative hint only — use Directions for live routing. Nothing here is live transport data and there are no fares.",
 "settings.privacy_body": "Everything — your visited and planned lists, theme choice, and location (used only when you tap \"Near me\") — stays in this browser's local storage on your device. No analytics. Rivals uses an anonymous account (no sign-up) storing your display name, friend code and visited-office list, publicly readable by other collectors. Photos upload only if \"Share stamp photos\" is switched on. A linked email is used only for sign-in. Clearing browser data erases your local passport unless you exported a backup.",
 "settings.about_app_body": "StampQuest was built solo by a fellow passport holder, with a little AI help along the way — so you may run into a glitch or a wrong detail. Spotted something? I'd genuinely like to hear about it. Loving it? Share it with your fellow collectors.",
 
+
+
+// Tutorial
+"tutorial.s1_title": "Welcome to StampQuest",
+"tutorial.s1_body": "All 100 Karnataka Philately Passport post offices, on one map. Tap a pin for details and directions, mark each stamp as you collect it, and watch your passport fill up.<br><br>The slim rail on the right holds <b>Layers</b> (map style), <b>Near me</b> (closest offices) and <b>Reset</b> (back to Karnataka view), plus zoom.<br><br>Your progress never leaves this device.<br><br>Built solo by a fellow collector, with a little AI help — so if you spot a glitch or a wrong detail, I'd genuinely like to hear about it (see <b>Settings → About this app</b>).",
+"tutorial.s2_title": "Collect with a photo",
+"tutorial.s2_body": "Add a stamp photo to mark an office visited. Tap its tile in Passport, choose a photo — it's marked visited automatically with today's date.<br><br>Photos stay on this device unless you switch on Share stamp photos in Settings.",
+"tutorial.s3_title": "Explore Karnataka",
+"tutorial.s3_body": "Use Circuits for region-wise routes, the Planned filter in Passport for your planned stops, and share your progress as a postcard when the passport fills up.<br><br>Only Karnataka is on the map — that's the whole quest.",
+"tutorial.skip": "Skip", "tutorial.next": "Next",
+
+
+// Tutorial
+"tutorial.s1_title": "StampQuest ಗೆ ಸುಸ್ವಾಗತ",
+"tutorial.s1_body": "ಕರ್ನಾಟಕ ಫಿಲಾಟೆಲಿ ಪಾಸ್‌ಪೋರ್ಟ್‌ನ ಎಲ್ಲಾ 100 ಅಂಚೆ ಕಚೇರಿಗಳು, ಒಂದೇ ನಕ್ಷೆಯಲ್ಲಿ. ವಿವರಗಳು ಮತ್ತು ದಿಕ್ಕುಗಳಿಗಾಗಿ ಪಿನ್ ಒತ್ತಿ, ನೀವು ಸಂಗ್ರಹಿಸುವಂತೆ ಪ್ರತಿ ಸ್ಟ್ಯಾಂಪ್ ಗುರುತಿಸಿ, ಮತ್ತು ನಿಮ್ಮ ಪಾಸ್‌ಪೋರ್ಟ್ ತುಂಬುವುದನ್ನು ನೋಡಿ.<br><br>ಬಲಭಾಗದ ತೆಳು ಪಟ್ಟಿಯಲ್ಲಿ <b>Layers</b> (ನಕ್ಷೆ ಶೈಲಿ), <b>Near me</b> (ಹತ್ತಿರದ ಕಚೇರಿಗಳು) ಮತ್ತು <b>Reset</b> (ಕರ್ನಾಟಕ ನೋಟಕ್ಕೆ ಹಿಂತಿರುಗಿ), ಜೊತೆಗೆ ಜೂಮ್ ಇದೆ.<br><br>ನಿಮ್ಮ ಪ್ರಗತಿ ಈ ಸಾಧನವನ್ನು ಎಂದಿಗೂ ಬಿಡುವುದಿಲ್ಲ.<br><br>ಸಹ ಸಂಗ್ರಾಹಕರಿಂದ ಏಕಾಂಗಿಯಾಗಿ ನಿರ್ಮಿಸಲಾಗಿದೆ, ಸ್ವಲ್ಪ AI ಸಹಾಯದೊಂದಿಗೆ — ಆದ್ದರಿಂದ ನೀವು ದೋಷ ಅಥವಾ ತಪ್ಪು ವಿವರವನ್ನು ಕಂಡರೆ, ಅದರ ಬಗ್ಗೆ ಕೇಳಲು ನಾನು ನಿಜವಾಗಿಯೂ ಇಷ್ಟಪಡುತ್ತೇನೆ (<b>Settings → About this app</b> ನೋಡಿ).",
+"tutorial.s2_title": "ಫೋಟೋದೊಂದಿಗೆ ಸಂಗ್ರಹಿಸಿ",
+"tutorial.s2_body": "ಕಚೇರಿಗೆ ಭೇಟಿ ನೀಡಿದ್ದೀರಿ ಎಂದು ಗುರುತಿಸಲು ಸ್ಟ್ಯಾಂಪ್ ಫೋಟೋ ಸೇರಿಸಿ. Passport ನಲ್ಲಿ ಅದರ ಟೈಲ್ ಒತ್ತಿ, ಫೋಟೋ ಆಯ್ಕೆಮಾಡಿ — ಇಂದಿನ ದಿನಾಂಕದೊಂದಿಗೆ ಭೇಟಿ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಗುರುತಾಗುತ್ತದೆ.<br><br>Settings ನಲ್ಲಿ Share stamp photos ಆನ್ ಮಾಡದ ಹೊರತು ಫೋಟೋಗಳು ಈ ಸಾಧನದಲ್ಲೇ ಇರುತ್ತವೆ.",
+"tutorial.s3_title": "ಕರ್ನಾಟಕ ಅನ್ವೇಷಿಸಿ",
+"tutorial.s3_body": "ಪ್ರದೇಶವಾರು ಮಾರ್ಗಗಳಿಗಾಗಿ Circuits ಬಳಸಿ, ನಿಮ್ಮ ಯೋಜಿತ ನಿಲ್ದಾಣಗಳಿಗಾಗಿ Passport ನಲ್ಲಿ Planned ಫಿಲ್ಟರ್, ಮತ್ತು ಪಾಸ್‌ಪೋರ್ಟ್ ತುಂಬಿದಾಗ ನಿಮ್ಮ ಪ್ರಗತಿಯನ್ನು ಪೋಸ್ಟ್‌ಕಾರ್ಡ್ ಆಗಿ ಹಂಚಿಕೊಳ್ಳಿ.<br><br>ನಕ್ಷೆಯಲ್ಲಿ ಕರ್ನಾಟಕ ಮಾತ್ರ ಇದೆ — ಅದೇ ಸಂಪೂರ್ಣ ಅನ್ವೇಷಣೆ.",
+"tutorial.skip": "ಬಿಟ್ಟುಬಿಡಿ", "tutorial.next": "ಮುಂದೆ",
 
 // About sections
 "settings.about_data_body": "ಸ್ಥಳಗಳು ಕರ್ನಾಟಕ ಫಿಲಾಟೆಲಿ ಪಾಸ್‌ಪೋರ್ಟ್ ಪುಸ್ತಕದ 100 ಅಂಚೆ ಕಚೇರಿಗಳು (₹600, ಅಂಚೆ ಇಲಾಖೆ, ಕರ್ನಾಟಕ ವೃತ್ತದಿಂದ ಅಕ್ಟೋಬರ್ 2026 ರಲ್ಲಿ ಬಿಡುಗಡೆ). ಪ್ರತಿ ಅಂಚೆ ಕಚೇರಿಗೆ ನಿರ್ದೇಶಾಂಕಗಳನ್ನು ಜಿಯೋಕೋಡ್ ಮಾಡಲಾಗಿದೆ — 34 ನೈಜ ಕಚೇರಿಗೆ ಹಸ್ತಚಾಲಿತವಾಗಿ ಪರಿಶೀಲಿಸಲಾಗಿದೆ, 3 ಹತ್ತಿರ-ಪರಿಶೀಲಿತ, ಉಳಿದವು ಪಟ್ಟಣ-ಮಟ್ಟದ ಅಂದಾಜುಗಳು ಅವುಗಳ ಕಾರ್ಡ್‌ಗಳಲ್ಲಿ \"Approximate location\" ಎಂದು ಲೇಬಲ್ ಮಾಡಲಾಗಿದೆ; Directions ಬಟನ್ ಅಂಚೆ ಕಚೇರಿಯನ್ನು Google Maps ನಲ್ಲಿ ಹುಡುಕುತ್ತದೆ, ಮತ್ತು \"Directions to map pin\" ನಿಖರ ಪಿನ್ ಬಿಂದುವಿಗೆ ನ್ಯಾವಿಗೇಟ್ ಮಾಡುತ್ತದೆ.<br><br>ತೋರಿಸಲಾದ ಚಿತ್ರಾತ್ಮಕ-ರದ್ದತಿ ಮೋಟಿಫ್‌ಗಳು ಮತ್ತು ಪರಿಚಯ ದಿನಾಂಕಗಳು India Post ನ ಪ್ರಕಟಿತ ಶಾಶ್ವತ ಚಿತ್ರಾತ್ಮಕ ರದ್ದತಿ ಪಟ್ಟಿಗಳಿಂದ ಬಂದಿವೆ. ಪಾಸ್‌ಪೋರ್ಟ್‌ನ 100 ಮೋಟಿಫ್‌ಗಳ ಸಂಪೂರ್ಣ ಸಾರ್ವಜನಿಕ ನೋಂದಣಿ ಅಸ್ತಿತ್ವದಲ್ಲಿಲ್ಲ — ಪುಸ್ತಕವೇ ನಿರ್ಣಾಯಕ ಮೂಲ. ಯಾವುದೇ ಪ್ರಕಟಿತ ನಮೂದು ಹೊಂದಿಕೆಯಾಗದಿದ್ದಲ್ಲಿ, ಮೋಟಿಫ್ ವಿಭಾಗವನ್ನು ಬಿಡಲಾಗಿದೆ — ನೆಲದ ಮೇಲೆ ನಿಮ್ಮ ಪುಸ್ತಕ ಪರಿಶೀಲಿಸಿ.<br><br>\"Getting there\" ಹತ್ತಿರದ ಪ್ರಮುಖ ಸಾರಿಗೆ ಪಟ್ಟಣವನ್ನು ಸೂಚನಾತ್ಮಕ ಸುಳಿವಾಗಿ ಮಾತ್ರ ಹೆಸರಿಸುತ್ತದೆ — ಲೈವ್ ರೂಟಿಂಗ್‌ಗಾಗಿ Directions ಬಳಸಿ. ಇಲ್ಲಿ ಯಾವುದೂ ಲೈವ್ ಸಾರಿಗೆ ಡೇಟಾ ಅಲ್ಲ ಮತ್ತು ಯಾವುದೇ ದರಗಳಿಲ್ಲ.",
