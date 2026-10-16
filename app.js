@@ -1086,7 +1086,10 @@ function applyLang(){
   $("langToggle").checked = kn;
   document.documentElement.lang = kn ? "kn" : "en";
   // static HTML via data-i18n attributes
+  // SAFETY: skip elements containing form controls (input/button/select/textarea)
+  // to avoid wiping toggle switches and buttons
   document.querySelectorAll("[data-i18n]").forEach(el => {
+    if (el.querySelector("input,button,select,textarea")) return;
     el.innerHTML = t(el.getAttribute("data-i18n"));
   });
   document.querySelectorAll("[data-i18n-ph]").forEach(el => {
