@@ -81,6 +81,25 @@ en: {
 // office types
 "officetype.BO": "Branch Office", "officetype.SO": "Sub Office", "officetype.HO": "Head Office", "officetype.BA": "Branch",
 
+
+// FAQ
+"faq.visited.q": "How do I mark a place visited?",
+"faq.visited.a": "Visit a post office, tap its tile in Passport, add a photo of your stamp — <b>it's marked visited automatically</b>, with the visit date saved. You'll see \"Marked visited.\" with an Undo button if you want to revert. Prefer no photo? Use <b>Mark visited without photo</b> on the office card.",
+"faq.photos.q": "Where are my photos stored?",
+"faq.photos.a": "<b>On this device by default.</b> Photos are kept in on-device storage. If you switch on \"Share stamp photos\" in Settings, a ~400px copy of each photo is shown publicly on Rivals. Removing a photo or switching sharing off deletes that public copy. Photos are <b>not included</b> if you export your progress as a JSON backup — the backup carries your visited/planned lists only.",
+"faq.tiles.q": "What do the passport tile colors mean?",
+"faq.tiles.a": "<b>Green with a ✓</b> = visited (stamped). <b>Dashed amber</b> = planned. <b>Plain</b> = not visited yet. The number is the booklet serial; the district postmark shows at a glance where it belongs.",
+"faq.approx.q": "What does \"Approximate location\" mean?",
+"faq.approx.a": "The pin is placed at the town centre, not the exact office building. Use the <b>Directions</b> button (which searches the post office by name and PIN) rather than the pin alone when you're close.",
+"faq.directions.q": "How do I get directions?",
+"faq.directions.a": "Tap any pin or tile, then <b>Directions</b> — it opens Google Maps searching the post office by name and PIN. <b>Directions to map pin</b> navigates to the exact pinned point instead. \"Getting there\" names the nearest major transit town as a hint only; there is no live transport data and no fares.",
+"faq.backup.q": "Is my progress backed up anywhere?",
+"faq.backup.a": "Only if you back it up: use <b>Export backup</b> under Share & backup to save a JSON file, and <b>Import backup</b> to restore it. Photos are not part of the backup. Clearing browser data erases everything unless you exported.",
+"faq.circuits.q": "What are Circuits?",
+"faq.circuits.a": "Suggested region-wise routes (North, Coastal, South, etc.) to plan multi-stop stamp runs. They're neutral suggestions — start wherever you are.",
+"faq.karnataka.q": "Why is only Karnataka on the map?",
+"faq.karnataka.a": "That's the whole quest — the passport covers Karnataka's 100 post offices only. Everything outside the state is hidden by design.",
+
 // toasts
 "toast.beyond": "Beyond Karnataka. Nothing to stamp here.",
 "toast.removed": "Removed from visited.", "toast.already": "Already visited — unmark visited first.",
@@ -179,6 +198,44 @@ kn: {
 "landscape.plains": "ಬಯಲು", "landscape.lake": "ಕೆರೆ",
 // office types
 "officetype.BO": "ಶಾಖಾ ಕಚೇರಿ", "officetype.SO": "ಉಪ ಕಚೇರಿ", "officetype.HO": "ಮುಖ್ಯ ಕಚೇರಿ", "officetype.BA": "ಶಾಖೆ",
+
+
+// FAQ
+"faq.visited.q": "How do I mark a place visited?",
+"faq.visited.a": "Visit a post office, tap its tile in Passport, add a photo of your stamp — <b>it's marked visited automatically</b>, with the visit date saved. You'll see \"Marked visited.\" with an Undo button if you want to revert. Prefer no photo? Use <b>Mark visited without photo</b> on the office card.",
+"faq.photos.q": "Where are my photos stored?",
+"faq.photos.a": "<b>On this device by default.</b> Photos are kept in on-device storage. If you switch on \"Share stamp photos\" in Settings, a ~400px copy of each photo is shown publicly on Rivals. Removing a photo or switching sharing off deletes that public copy. Photos are <b>not included</b> if you export your progress as a JSON backup — the backup carries your visited/planned lists only.",
+"faq.tiles.q": "What do the passport tile colors mean?",
+"faq.tiles.a": "<b>Green with a ✓</b> = visited (stamped). <b>Dashed amber</b> = planned. <b>Plain</b> = not visited yet. The number is the booklet serial; the district postmark shows at a glance where it belongs.",
+"faq.approx.q": "What does \"Approximate location\" mean?",
+"faq.approx.a": "The pin is placed at the town centre, not the exact office building. Use the <b>Directions</b> button (which searches the post office by name and PIN) rather than the pin alone when you're close.",
+"faq.directions.q": "How do I get directions?",
+"faq.directions.a": "Tap any pin or tile, then <b>Directions</b> — it opens Google Maps searching the post office by name and PIN. <b>Directions to map pin</b> navigates to the exact pinned point instead. \"Getting there\" names the nearest major transit town as a hint only; there is no live transport data and no fares.",
+"faq.backup.q": "Is my progress backed up anywhere?",
+"faq.backup.a": "Only if you back it up: use <b>Export backup</b> under Share & backup to save a JSON file, and <b>Import backup</b> to restore it. Photos are not part of the backup. Clearing browser data erases everything unless you exported.",
+"faq.circuits.q": "What are Circuits?",
+"faq.circuits.a": "Suggested region-wise routes (North, Coastal, South, etc.) to plan multi-stop stamp runs. They're neutral suggestions — start wherever you are.",
+"faq.karnataka.q": "Why is only Karnataka on the map?",
+"faq.karnataka.a": "That's the whole quest — the passport covers Karnataka's 100 post offices only. Everything outside the state is hidden by design.",
+
+
+// FAQ
+"faq.visited.q": "ಭೇಟಿ ನೀಡಿದ ಸ್ಥಳವನ್ನು ಹೇಗೆ ಗುರುತಿಸುವುದು?",
+"faq.visited.a": "ಅಂಚೆ ಕಚೇರಿಗೆ ಭೇಟಿ ನೀಡಿ, Passport ನಲ್ಲಿ ಅದರ ಟೈಲ್ ಒತ್ತಿ, ನಿಮ್ಮ ಸ್ಟ್ಯಾಂಪ್ ಫೋಟೋ ಸೇರಿಸಿ — <b>ಭೇಟಿ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಗುರುತಾಗುತ್ತದೆ</b>, ಭೇಟಿ ದಿನಾಂಕದೊಂದಿಗೆ ಉಳಿಯುತ್ತದೆ. ರದ್ದುಮಾಡಲು \"Marked visited.\" ಜೊತೆ Undo ಬಟನ್ ಕಾಣುತ್ತದೆ. ಫೋಟೋ ಬೇಡವೇ? ಕಚೇರಿ ಕಾರ್ಡ್‌ನಲ್ಲಿ <b>Mark visited without photo</b> ಬಳಸಿ.",
+"faq.photos.q": "ನನ್ನ ಫೋಟೋಗಳು ಎಲ್ಲಿ ಸಂಗ್ರಹವಾಗಿವೆ?",
+"faq.photos.a": "<b>ಪೂರ್ವನಿಯೋಜಿತವಾಗಿ ಈ ಸಾಧನದಲ್ಲಿ.</b> ಫೋಟೋಗಳು ಸಾಧನದ ಸಂಗ್ರಹದಲ್ಲಿರುತ್ತವೆ. Settings ನಲ್ಲಿ \"Share stamp photos\" ಆನ್ ಮಾಡಿದರೆ, ಪ್ರತಿ ಫೋಟೋದ ~400px ನಕಲು Rivals ನಲ್ಲಿ ಸಾರ್ವಜನಿಕವಾಗಿ ತೋರಿಸಲಾಗುತ್ತದೆ. ಫೋಟೋ ತೆಗೆದುಹಾಕಿದರೆ ಅಥವಾ ಹಂಚಿಕೆ ಆಫ್ ಮಾಡಿದರೆ ಆ ಸಾರ್ವಜನಿಕ ನಕಲು ಅಳಿಸಲ್ಪಡುತ್ತದೆ. ಪ್ರಗತಿಯನ್ನು JSON ಬ್ಯಾಕಪ್ ಆಗಿ ರಫ್ತು ಮಾಡಿದರೆ ಫೋಟೋಗಳು <b>ಸೇರಿರುವುದಿಲ್ಲ</b> — ಬ್ಯಾಕಪ್‌ನಲ್ಲಿ ಭೇಟಿ/ಯೋಜಿತ ಪಟ್ಟಿಗಳು ಮಾತ್ರ ಇರುತ್ತವೆ.",
+"faq.tiles.q": "ಪಾಸ್‌ಪೋರ್ಟ್ ಟೈಲ್ ಬಣ್ಣಗಳ ಅರ್ಥವೇನು?",
+"faq.tiles.a": "<b>✓ ಜೊತೆ ಹಸಿರು</b> = ಭೇಟಿ ನೀಡಲಾಗಿದೆ (ಸ್ಟ್ಯಾಂಪ್ ಆಗಿದೆ). <b>ಗೆರೆ ಎಳೆದ ಕೇಸರಿ</b> = ಯೋಜಿತ. <b>ಸಾದಾ</b> = ಇನ್ನೂ ಭೇಟಿ ನೀಡಿಲ್ಲ. ಸಂಖ್ಯೆ ಪುಸ್ತಕದ ಕ್ರಮ ಸಂಖ್ಯೆ; ಜಿಲ್ಲಾ ಅಂಚೆಚೀಟಿ ಅದು ಎಲ್ಲಿ ಸೇರುತ್ತದೆ ಎಂದು ತೋರಿಸುತ್ತದೆ.",
+"faq.approx.q": "\"Approximate location\" ಎಂದರೇನು?",
+"faq.approx.a": "ಪಿನ್ ಅನ್ನು ನಿಖರ ಕಚೇರಿ ಕಟ್ಟಡದ ಬದಲು ಪಟ್ಟಣ ಕೇಂದ್ರದಲ್ಲಿ ಇರಿಸಲಾಗಿದೆ. ಹತ್ತಿರವಿದ್ದಾಗ ಪಿನ್ ಮಾತ್ರವಲ್ಲದೆ <b>Directions</b> ಬಟನ್ (ಅಂಚೆ ಕಚೇರಿಯನ್ನು ಹೆಸರು ಮತ್ತು PIN ಮೂಲಕ ಹುಡುಕುತ್ತದೆ) ಬಳಸಿ.",
+"faq.directions.q": "ದಿಕ್ಕುಗಳನ್ನು ಹೇಗೆ ಪಡೆಯುವುದು?",
+"faq.directions.a": "ಯಾವುದೇ ಪಿನ್ ಅಥವಾ ಟೈಲ್ ಒತ್ತಿ, ನಂತರ <b>Directions</b> — ಅದು ಅಂಚೆ ಕಚೇರಿಯನ್ನು ಹೆಸರು ಮತ್ತು PIN ಮೂಲಕ ಹುಡುಕುತ್ತಾ Google Maps ತೆರೆಯುತ್ತದೆ. <b>Directions to map pin</b> ಬದಲಾಗಿ ನಿಖರ ಪಿನ್ ಬಿಂದುವಿಗೆ ನ್ಯಾವಿಗೇಟ್ ಮಾಡುತ್ತದೆ. \"Getting there\" ಹತ್ತಿರದ ಪ್ರಮುಖ ಸಾರಿಗೆ ಪಟ್ಟಣವನ್ನು ಸುಳಿವಾಗಿ ಮಾತ್ರ ಹೆಸರಿಸುತ್ತದೆ; ಯಾವುದೇ ಲೈವ್ ಸಾರಿಗೆ ಡೇಟಾ ಅಥವಾ ದರಗಳಿಲ್ಲ.",
+"faq.backup.q": "ನನ್ನ ಪ್ರಗತಿ ಎಲ್ಲಾದರೂ ಬ್ಯಾಕಪ್ ಆಗಿದೆಯೇ?",
+"faq.backup.a": "ನೀವು ಬ್ಯಾಕಪ್ ಮಾಡಿದರೆ ಮಾತ್ರ: JSON ಫೈಲ್ ಉಳಿಸಲು Share & backup ಅಡಿಯಲ್ಲಿ <b>Export backup</b> ಬಳಸಿ, ಮತ್ತು ಮರುಸ್ಥಾಪಿಸಲು <b>Import backup</b>. ಫೋಟೋಗಳು ಬ್ಯಾಕಪ್‌ನ ಭಾಗವಲ್ಲ. ನೀವು ರಫ್ತು ಮಾಡದಿದ್ದರೆ ಬ್ರೌಸರ್ ಡೇಟಾ ಅಳಿಸುವುದರಿಂದ ಎಲ್ಲವೂ ಅಳಿಸಲ್ಪಡುತ್ತದೆ.",
+"faq.circuits.q": "Circuits ಎಂದರೇನು?",
+"faq.circuits.a": "ಬಹು-ನಿಲ್ದಾಣ ಸ್ಟ್ಯಾಂಪ್ ಓಟಗಳನ್ನು ಯೋಜಿಸಲು ಸೂಚಿತ ಪ್ರದೇಶವಾರು ಮಾರ್ಗಗಳು (ಉತ್ತರ, ಕರಾವಳಿ, ದಕ್ಷಿಣ, ಇತ್ಯಾದಿ). ಅವು ತಟಸ್ಥ ಸಲಹೆಗಳು — ನೀವು ಇರುವಲ್ಲಿಂದ ಪ್ರಾರಂಭಿಸಿ.",
+"faq.karnataka.q": "ನಕ್ಷೆಯಲ್ಲಿ ಕರ್ನಾಟಕ ಮಾತ್ರ ಏಕೆ ಇದೆ?",
+"faq.karnataka.a": "ಅದೇ ಸಂಪೂರ್ಣ ಅನ್ವೇಷಣೆ — ಪಾಸ್‌ಪೋರ್ಟ್ ಕರ್ನಾಟಕದ 100 ಅಂಚೆ ಕಚೇರಿಗಳನ್ನು ಮಾತ್ರ ಒಳಗೊಂಡಿದೆ. ರಾಜ್ಯದ ಹೊರಗಿನ ಎಲ್ಲವನ್ನೂ ವಿನ್ಯಾಸದಿಂದ ಮರೆಮಾಡಲಾಗಿದೆ.",
 
 // toasts
 "toast.beyond": "ಕರ್ನಾಟಕದ ಹೊರಗೆ. ಇಲ್ಲಿ ಸ್ಟ್ಯಾಂಪ್ ಮಾಡಲು ಏನೂ ಇಲ್ಲ.",
