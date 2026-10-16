@@ -227,3 +227,76 @@ test('i18n keys: no duplicates, kn values contain Kannada script', async ({ page
     console.log('Keys without Kannada script:', result.nonKannadaKeys);
   }
 });
+
+test("zero storage requests before opt-in", async ({ page }) => {
+  const storageRequests = [];
+  page.on("request", req => {
+    if (req.url().includes("supabase.co/storage")) {
+      storageRequests.push(req.url());
+    }
+  });
+  await page.goto(BASE);
+  await page.waitForTimeout(3000);
+  // No storage requests should have been made
+  expect(storageRequests.length).toBe(0);
+});
+
+test("CSP meta tag present", async ({ page }) => {
+  await page.goto(BASE);
+  const csp = await page.getAttribute('meta[http-equiv="Content-Security-Policy"]', 'content');
+  expect(csp).toContain("script-src 'self'");
+});
+
+test("share toggle OFF by default", async ({ page }) => {
+  await page.goto(BASE);
+  await page.click('[data-tab="settings"]');
+  const checked = await page.isChecked("#sharePhotosToggle");
+  expect(checked).toBe(false);
+});
+
+// Regression tests for shipped bugs
+
+test("dark theme toggle visible after language switch", async ({ page }) => {
+  await page.goto(BASE);
+  await page.click('[data-tab="settings"]');
+  // Toggle to Kannada and back
+  await page.click("#langToggle");
+  await page.waitForTimeout(500);
+  await page.click("#langToggle");
+  await page.waitForTimeout(500);
+  // Dark theme toggle should still be visible
+  const visible = await page.isVisible("#darkThemeToggle");
+  expect(visible).toBe(true);
+});
+
+test("share toggle visible after language switch", async ({ page }) => {
+  await page.goto(BASE);
+  await page.click('[data-tab="settings"]');
+  await page.click("#langToggle");
+  await page.waitForTimeout(500);
+  const visible = await page.isVisible("#sharePhotosToggle");
+  expect(visible).toBe(true);
+});
+
+test("passport tiles have no nested buttons", async ({ page }) => {
+  await page.goto(BASE);
+  await page.click('[data-tab="passport"]');
+  const nested = await page.$$eval(".tile button", els => els.length);
+  expect(nested).toBe(0);
+});
+
+test("app loads without CSP blocking (no inline script error)", async ({ page }) => {
+  const errors = [];
+  page.on("pageerror", e => errors.push(e.message));
+  page.on("console", msg => {
+    if (msg.type() === "error" && msg.text().includes("Content Security Policy")) {
+      errors.push(msg.text());
+    }
+  });
+  await page.goto(BASE);
+  await page.waitForTimeout(2000);
+  // Map should be visible (proves app.js loaded, not blocked by CSP)
+  const mapVisible = await page.isVisible("#map");
+  expect(mapVisible).toBe(true);
+  expect(errors.filter(e => e.includes("CSP") || e.includes("Content Security")).length).toBe(0);
+});
