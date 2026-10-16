@@ -1,13 +1,11 @@
-const CACHE = "stampquest-v4";
+const CACHE = "stampquest-v5";
 const SHELL = [
   "./",
   "index.html",
   "manifest.json",
-  "vendor/leaflet.css",
+  "vendor/bundle.css",
   "vendor/leaflet.js",
   "vendor/leaflet.markercluster.js",
-  "vendor/MarkerCluster.css",
-  "vendor/MarkerCluster.Default.css",
   "vendor/supabase-js.js",
   "i18n-strings.js",
   "app.js",
