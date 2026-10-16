@@ -533,9 +533,9 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
     <button id="btnZoomOut" data-i18n-aria="map.zoom_out" data-i18n-title="map.zoom_out" aria-label="Zoom out" title="Zoom out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
 </div>
   <div class="layersheet" id="layerSheet" data-i18n="map.layer_streets">
-    <button data-layer="streets" class="on">Streets</button data-i18n="map.layer_satellite">
-    <button data-layer="satellite">Satellite</button data-i18n="map.layer_terrain">
-    <button data-layer="terrain">Terrain</button>
+    <button data-layer="streets" class="on" data-i18n="map.layer_streets">Streets</button>
+    <button data-layer="satellite" data-i18n="map.layer_satellite">Satellite</button>
+    <button data-layer="terrain" data-i18n="map.layer_terrain">Terrain</button>
   </div>
 </section>
 
@@ -567,33 +567,33 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       <div class="explored"><b id="exploredNum">0</b> / 100 explored</div>
       <div class="notchbar" id="notchBar" aria-hidden="true"></div>
       <div class="milestones" id="milestoneBadges"></div>
-      <div class="chips" id="gridFilters" data-i18n="passport.filter_all">
-        <button class="chip on" data-f="all" aria-pressed="true">All</button data-i18n="passport.filter_visited">
-        <button class="chip" data-f="visited" aria-pressed="false">Visited</button data-i18n="passport.filter_planned">
-        <button class="chip" data-f="planned" aria-pressed="false">Planned</button data-i18n="passport.filter_unvisited">
-        <button class="chip" data-f="unvisited" aria-pressed="false">Unvisited</button>
+      <div class="chips" id="gridFilters">
+        <button class="chip on" data-f="all" data-i18n="passport.filter_all" aria-pressed="true">All</button>
+        <button class="chip" data-f="visited" data-i18n="passport.filter_visited" aria-pressed="false">Visited</button>
+        <button class="chip" data-f="planned" data-i18n="passport.filter_planned" aria-pressed="false">Planned</button>
+        <button class="chip" data-f="unvisited" data-i18n="passport.filter_unvisited" aria-pressed="false">Unvisited</button>
       </div>
       <div class="tilegrid" id="tileGrid"></div>
-    </div data-i18n="passport.district_progress">
-    <h3 class="sec">District progress</h3>
+    </div>
+    <h3 class="sec" data-i18n="passport.district_progress">District progress</h3>
     <div class="card" id="districtProg" style="padding:8px 14px"></div>
     <h3 class="sec">Share &amp; backup</h3>
     <div class="card">
       <div class="segrow" id="shareFmt" role="group" aria-label="Share card format" data-i18n="passport.fmt_post">
-        <button class="seg on" data-fmt="post">Post · 4:5</button data-i18n="passport.fmt_story">
-        <button class="seg" data-fmt="story">Story · 9:16</button>
+        <button class="seg on" data-fmt="post" data-i18n="passport.fmt_post">Post · 4:5</button>
+        <button class="seg" data-fmt="story" data-i18n="passport.fmt_story">Story · 9:16</button>
       </div>
       <label class="checkrow"><input type="checkbox" id="sharePhotos" checked data-i18n="passport.include_photos"> <span>Include my stamp photos</span></label>
       <div class="actionrow" style="margin-top:10px" data-i18n="passport.share_journey">
-        <button class="btn accent" id="btnShare">Share my journey</button>
+        <button class="btn accent" id="btnShare" data-i18n="passport.share_journey">Share my journey</button>
       </div>
       <div id="sharePreview" style="display:none;margin-top:12px"></div>
       <div class="actionrow" data-i18n="passport.export">
-        <button class="btn ghost" id="btnExport" style="flex:1">Export backup</button data-i18n="passport.import">
+        <button class="btn ghost" id="btnExport" data-i18n="passport.export" style="flex:1">Export backup</button>
         <label class="btn ghost filebtn" style="flex:1;text-align:center">Import backup<input type="file" id="fileImport" accept="application/json"></label>
       </div>
       <div class="note" style="margin-top:10px">Your progress lives in this browser. Your stamp count also syncs to the Rivals leaderboard, but it cannot restore your passport on a new device — export a backup file before clearing browser data or switching devices. Stamp photos are <b>not</b> included in the JSON backup.</div>
-    </div data-i18n="passport.photos_section">
+    </div>
     <h3 class="sec">Stamp photos</h3>
     <div class="card">
       <div id="photoMeter"></div>
@@ -612,7 +612,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
         <div style="flex:1">
           <div id="rivalName" style="font-weight:800;font-size:17px"></div>
           <div id="rivalCode" style="font-size:13px;color:var(--ink-2)"></div>
-        </div data-i18n="rivals.copy_code">
+        </div>
         <button class="btn ghost" id="rivalCopyCode" style="padding:8px 12px;font-size:13px">Copy code</button>
       </div>
       <div style="margin-top:10px;display:flex;gap:8px">
@@ -626,14 +626,14 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       <div class="note" id="rivalEmailNote" style="margin-top:8px;font-size:12px">Share your code with friends so they can add you. Link your email to keep your progress if you switch devices.</div>
     </div>
     <div class="card" id="rivalAdd" data-i18n="rivals.add_friend">
-      <div style="font-weight:700;margin-bottom:8px">Add a friend</div>
+      <div style="font-weight:700;margin-bottom:8px" data-i18n="rivals.add_friend">Add a friend</div>
       <div style="display:flex;gap:8px">
         <input id="rivalCodeInput" data-i18n-ph="rivals.code_ph" placeholder="Enter friend's code" maxlength="6" autocapitalize="characters" style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:15px;text-transform:uppercase" data-i18n="rivals.add">
         <button class="btn" id="rivalAddBtn" style="padding:10px 14px">Add</button>
       </div>
-    </div data-i18n="rivals.leaderboard">
+    </div>
     <h3 class="sec">Leaderboard</h3>
-    <div id="rivalBoard"><div class="note">Loading…</div></div data-i18n="rivals.my_friends">
+    <div id="rivalBoard"><div class="note">Loading…</div></div>
     <h3 class="sec">My friends</h3>
     <div id="rivalFriends"><div class="note">No friends added yet.</div></div>
     <div class="card note" id="rivalOffline" style="display:none">You're offline — the leaderboard needs an internet connection. Your progress is safe on this device.</div>
@@ -661,7 +661,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
   <div class="pagehead"><h1<h1 data-i18n="settings.title">Settings</h1><p>App preferences and information.</p></div>
   <div class="scroll">
     <div class="card">
-      <div class="togglerow" data-i18n="settings.dark"><span>Dark theme</span>
+      <div class="togglerow"><span data-i18n="settings.dark">Dark theme</span>
         <span class="switch"><input type="checkbox" id="themeToggle" aria-label="Toggle dark theme"><span class="tr"></span><span class="th"></span></span>
       </div>
       <div class="note">Theme preference is saved on this device only.</div>
@@ -673,7 +673,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
         <span class="switch"><input type="checkbox" id="sharePhotosToggle" aria-label="Share stamp photos publicly on Rivals"><span class="tr"></span><span class="th"></span></span>
       </div>
       <div class="note">Off by default. When on, a small copy of each stamp photo is shown publicly on Rivals. Turning it off deletes the shared copies.</div>
-    </div data-i18n="settings.faq">
+    </div>
     <h3 class="sec">FAQ</h3>
     <div class="card faq">
       <details>
@@ -711,9 +711,9 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
     </div>
     <h3 class="sec" data-i18n="settings.tutorial">Tutorial</h3>
     <div class="card" data-i18n="settings.replay">
-      <button class="btn ghost" id="replayTutorial" style="width:100%">Replay tutorial</button>
+      <button class="btn ghost" id="replayTutorial" data-i18n="settings.replay" style="width:100%">Replay tutorial</button>
       <div class="note">The 3-card intro from your first visit.</div>
-    </div data-i18n="settings.about_data">
+    </div>
     <h3 class="sec" data-i18n="settings.about_data">About this data</h3>
     <div class="card note" data-i18n="settings.about_data_body">
       Locations are the 100 post offices from the Karnataka Philately Passport booklet (₹600, issued October 2026 by the Department of Posts, Karnataka Circle). Coordinates were geocoded per post office — 34 hand-verified to the actual office, 3 near-verified, the rest town-level approximations labelled "Approximate location" on their cards; the Directions button searches the post office on Google Maps, and "Directions to map pin" navigates to the exact pinned point.<br><br>
@@ -735,10 +735,10 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       StampQuest was built solo by a fellow passport holder, with a little AI help along the way — so you may run into a glitch or a wrong detail. Spotted something? I'd genuinely like to hear about it. Loving it? Share it with your fellow collectors.
       <br><br>
       <a class="btn" style="width:100%;text-decoration:none;text-align:center;display:block" href="mailto:pannova89@gmail.com?subject=StampQuest%20feedback">Send feedback</a>
-    </div data-i18n="settings.danger">
+    </div>
     <h3 class="sec">Danger zone</h3>
     <div class="card" data-i18n="settings.reset">
-      <button class="btn ghost" id="btnReset" style="width:100%;border-color:var(--brand);color:var(--brand)">Reset all progress</button>
+      <button class="btn ghost" id="btnReset" data-i18n="settings.reset" style="width:100%;border-color:var(--brand);color:var(--brand)">Reset all progress</button>
     </div>
     <div class="note" style="text-align:center;margin-top:18px">StampQuest · v1.0<br>Karnataka Philately Passport</div>
   </div>
