@@ -1911,8 +1911,8 @@ $("btnReset").onclick = async () => {
 
 /* ================= rivals (Supabase leaderboard + friend codes) ================= */
 // Fill these in from your Supabase project dashboard (Settings → API)
-const SB_URL = ""; // e.g. "https://xyzcompany.supabase.co"
-const SB_KEY = ""; // anon/public key
+const SB_URL = "https://cpygucvkxnvghpxyqqjr.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNweWd1Y3ZreG52Z2hweHlxcWpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxMTU4NTQsImV4cCI6MjEwNzY5MTg1NH0.28JaSAVtjzjPwLm93E4ToOzYU75Q1DkG0rkihE3Rm44";
 let sb = null, rivalUser = null, rivalProfile = null;
 
 function sbReady(){ return !!(SB_URL && SB_KEY && window.supabase); }
