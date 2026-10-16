@@ -1433,7 +1433,7 @@ async function openRivalProfile(uid){
       img.src = publicUrl; img.loading = "lazy"; img.alt = "Stamp photo";
       img.style.cssText = "width:100%;height:100%;object-fit:cover";
       const cap = document.createElement("div");
-      cap.style.cssText = "position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:4px 6px";
+      cap.style.cssText = "position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);color:#fff;font-size:12px;padding:4px 6px";
       cap.textContent = (isNaN(n) ? "" : n + ". ") + (loc ? loc.name : "");
       d.appendChild(img); d.appendChild(cap);
       grid.appendChild(d);
