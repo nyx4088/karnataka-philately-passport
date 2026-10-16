@@ -81,12 +81,17 @@ create trigger profiles_lock before update on profiles
   for each row execute function lock_profile_fields();
 
 -- 8. Leaderboard view: ranked by stamps, photo count for transparency
-create or replace view leaderboard with (security_invoker = true) as
+-- Leaderboard: stamps are self-reported; photos column shows opt-in shared photo count
+drop view if exists leaderboard;
+create view leaderboard with (security_invoker = true) as
 select
   p.id,
   p.friend_code,
   p.display_name,
   coalesce(cardinality(pr.visited), 0) as stamps,
+  (select count(*)::int from storage.objects
+   where bucket_id = 'quest-photos'
+   and (storage.foldername(name))[1] = p.id::text) as photos,
   pr.updated_at
 from profiles p
 left join progress pr on pr.user_id = p.id

@@ -1278,7 +1278,7 @@ function buildRivalRow(r, i, avatarBg){
   row.style.cssText = "display:flex;align-items:center;gap:12px;margin-bottom:8px;cursor:pointer;" + (me ? "border:2px solid var(--brand)" : "");
   row.setAttribute("role", "button");
   row.setAttribute("tabindex", "0");
-  row.setAttribute("aria-label", (r.display_name || "Collector") + ", " + r.stamps + " of 100 stamps");
+  row.setAttribute("aria-label", (r.display_name || "Collector") + ", " + r.stamps + " of 100 stamps, self-reported" + ((r.photos > 0) ? ", " + r.photos + " photos shared" : ""));
   row.onclick = () => openRivalProfile(r.id);
   row.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openRivalProfile(r.id); } };
   const medal = document.createElement("div");
@@ -1300,7 +1300,8 @@ function buildRivalRow(r, i, avatarBg){
   }
   const sub = document.createElement("div");
   sub.style.cssText = "font-size:12px;color:var(--ink-2)";
-  sub.textContent = r.stamps + " / 100 stamps";
+  const photoTxt = (r.photos > 0) ? " · 📷 " + r.photos + " shared" : "";
+  sub.textContent = r.stamps + " / 100 stamps (self-reported)" + photoTxt;
   mid.appendChild(nm); mid.appendChild(sub);
   const count = document.createElement("div");
   count.style.cssText = "font-weight:800;font-size:18px;color:var(--brand)";
