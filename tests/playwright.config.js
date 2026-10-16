@@ -24,6 +24,9 @@ module.exports = defineConfig({
         viewport: { width: 390, height: 844 }, // phone-first: Stage 3 QA targets 375px
         hasTouch: true,
         isMobile: true,
+        launchOptions: {
+          executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,
+        },
       },
     },
   ],

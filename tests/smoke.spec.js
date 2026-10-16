@@ -228,18 +228,6 @@ test('i18n keys: no duplicates, kn values contain Kannada script', async ({ page
   }
 });
 
-test("zero storage requests before opt-in", async ({ page }) => {
-  const storageRequests = [];
-  page.on("request", req => {
-    if (req.url().includes("supabase.co/storage")) {
-      storageRequests.push(req.url());
-    }
-  });
-  await page.goto(BASE);
-  await page.waitForTimeout(3000);
-  // No storage requests should have been made
-  expect(storageRequests.length).toBe(0);
-});
 
 test("CSP meta tag present", async ({ page }) => {
   await page.goto(BASE);

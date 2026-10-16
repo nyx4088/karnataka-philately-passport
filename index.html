@@ -285,9 +285,11 @@ h3.sec{font-size:17px;margin:22px 0 10px;letter-spacing:.5px}
 .chip{border:1.5px solid var(--border-strong);background:var(--surface);color:var(--ink-2);border-radius:18px;
   padding:8px 14px;font-size:12px;font-weight:700;min-height:44px;transition:background-color .6s ease}
 .chip.on{border-color:var(--brand);color:var(--brand)}
-.pagehead{padding:calc(14px + env(safe-area-inset-top)) 16px 4px}
-.pagehead h1{font-size:24px;margin:0;letter-spacing:1px}
-.pagehead p{color:var(--ink-2);font-size:12px;margin:4px 0 0}
+.pagehead{padding:calc(14px + env(safe-area-inset-top)) 16px 4px;position:relative}
+.pagehead h1{font-size:24px;margin:0;letter-spacing:1px;position:relative;z-index:1}
+.pagehead p{color:var(--ink-2);font-size:12px;margin:4px 0 0;position:relative;z-index:1}
+/* Pattern 7 trial: giant translucent serif brand backdrop */
+.wordmark-ghost{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-family:var(--font-display);font-weight:600;font-size:clamp(72px,22vw,168px);line-height:1;letter-spacing:.02em;color:var(--ink);opacity:.07;white-space:nowrap;pointer-events:none;user-select:none;z-index:0}
 
 /* passport */
 .ringwrap{display:flex;gap:16px;align-items:center}
@@ -547,7 +549,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 
 <!-- PASSPORT -->
 <section class="view" id="view-passport">
-  <div class="pagehead"><h1 class="serif">My Passport</h1><p>Add a stamp photo to mark an office visited. Your stamps and dates stay on this device; your stamp count joins the Rivals leaderboard.</p></div>
+  <div class="pagehead"><span class="wordmark-ghost" aria-hidden="true">STAMPQUEST</span><h1 class="serif">My Passport</h1><p>Add a stamp photo to mark an office visited. Your stamps and dates stay on this device; your stamp count joins the Rivals leaderboard.</p></div>
   <div class="scroll">
     <div class="card">
       <div class="ringwrap">
