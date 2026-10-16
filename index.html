@@ -1268,6 +1268,8 @@ async function handlePhotoFile(n, file){
     const wasVisited = !!state.visited[n];
     const wasPlanned = !!state.planned[n];
     await photoPut({ n, full, thumb, addedAt: Date.now() });
+    // clear shared flag so a replaced photo re-uploads on next sync
+    try { const sh = JSON.parse(localStorage.getItem("sq_shared_photos") || "{}"); delete sh[n]; localStorage.setItem("sq_shared_photos", JSON.stringify(sh)); } catch(e){}
     // auto-mark visited with date; planned -> visited
     const today = new Date().toISOString().slice(0, 10);
     state.visited[n] = today;
