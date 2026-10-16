@@ -1293,7 +1293,7 @@ async function handlePhotoFile(n, file){
 }
 
 async function removePhoto(n){
-  if (!confirm("Remove this stamp photo? Your visited mark stays.")) return;
+  if (!confirm(t("confirm.remove_photo"))) return;
   await photoDel(n);
   if (typeof rivalRemovePhotos === "function") rivalRemovePhotos([n]);
   save(); renderSheetBody(byN[n]); renderGrid(); renderPhotoMeter();
@@ -1851,7 +1851,7 @@ $("fileImport").addEventListener("change", e => {
       if (!checkObj(s.visited) || !checkObj(s.planned)){ toast(bad); return; }
       const curV = Object.keys(state.visited).length;
       const newV = Object.keys(s.visited).length;
-      if (!confirm("Replace your current progress ("+curV+" visited) with this backup ("+newV+" visited)?")) return;
+      if (!confirm(t("confirm.import", {a:curV, b:newV}))) return;
       // keep previous state for Undo
       const prev = JSON.parse(JSON.stringify({ visited:state.visited, planned:state.planned, theme:state.theme, milestones:state.milestones }));
       state.visited = s.visited || {}; state.planned = s.planned || {};
@@ -1915,8 +1915,8 @@ function dispName(l){ return (state.lang === "kn" && l.kn_name) ? l.kn_name : l.
 $("btnReset").onclick = async () => {
   const vCount = Object.keys(state.visited).length;
   const photoCount = await photoCountAll().catch(()=>0);
-  const photoMsg = photoCount > 0 ? " Your "+photoCount+" stamp photo"+(photoCount>1?"s":"")+" will be kept." : "";
-  if (!confirm("Reset all progress ("+vCount+" visited)? This clears your visited and planned lists on this device."+photoMsg)) return;
+  const photoMsg = photoCount > 0 ? " "+t("confirm.kept_photos", {n:photoCount}) : "";
+  if (!confirm(t("confirm.reset", {n:vCount})+photoMsg)) return;
   let delPhotos = false;
   if (photoCount > 0){
     delPhotos = confirm("Also delete your "+photoCount+" stamp photo"+(photoCount>1?"s":"")+"? (Cancel keeps them.)");

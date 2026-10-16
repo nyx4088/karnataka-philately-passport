@@ -84,6 +84,14 @@ en: {
 
 
 
+
+// Confirms
+"confirm.remove_photo": "Remove this stamp photo? Your visited mark stays.",
+"confirm.import": "Replace your current progress ({a} visited) with this backup ({b} visited)?",
+"confirm.reset": "Reset all progress ({n} visited)? This clears your visited and planned lists on this device.",
+"confirm.kept_photos": "Your {n} stamp photo(s) will be kept.",
+"confirm.delete_photos": "Also delete your {n} stamp photo(s)? (Cancel keeps them.)",
+
 // Tutorial
 "tutorial.s1_title": "Welcome to StampQuest",
 "tutorial.s1_body": "All 100 Karnataka Philately Passport post offices, on one map. Tap a pin for details and directions, mark each stamp as you collect it, and watch your passport fill up.<br><br>The slim rail on the right holds <b>Layers</b> (map style), <b>Near me</b> (closest offices) and <b>Reset</b> (back to Karnataka view), plus zoom.<br><br>Your progress never leaves this device.<br><br>Built solo by a fellow collector, with a little AI help — so if you spot a glitch or a wrong detail, I'd genuinely like to hear about it (see <b>Settings → About this app</b>).",
@@ -218,6 +226,14 @@ kn: {
 
 
 
+
+// Confirms
+"confirm.remove_photo": "Remove this stamp photo? Your visited mark stays.",
+"confirm.import": "Replace your current progress ({a} visited) with this backup ({b} visited)?",
+"confirm.reset": "Reset all progress ({n} visited)? This clears your visited and planned lists on this device.",
+"confirm.kept_photos": "Your {n} stamp photo(s) will be kept.",
+"confirm.delete_photos": "Also delete your {n} stamp photo(s)? (Cancel keeps them.)",
+
 // Tutorial
 "tutorial.s1_title": "Welcome to StampQuest",
 "tutorial.s1_body": "All 100 Karnataka Philately Passport post offices, on one map. Tap a pin for details and directions, mark each stamp as you collect it, and watch your passport fill up.<br><br>The slim rail on the right holds <b>Layers</b> (map style), <b>Near me</b> (closest offices) and <b>Reset</b> (back to Karnataka view), plus zoom.<br><br>Your progress never leaves this device.<br><br>Built solo by a fellow collector, with a little AI help — so if you spot a glitch or a wrong detail, I'd genuinely like to hear about it (see <b>Settings → About this app</b>).",
@@ -253,6 +269,14 @@ kn: {
 
 
 
+
+// Confirms
+"confirm.remove_photo": "Remove this stamp photo? Your visited mark stays.",
+"confirm.import": "Replace your current progress ({a} visited) with this backup ({b} visited)?",
+"confirm.reset": "Reset all progress ({n} visited)? This clears your visited and planned lists on this device.",
+"confirm.kept_photos": "Your {n} stamp photo(s) will be kept.",
+"confirm.delete_photos": "Also delete your {n} stamp photo(s)? (Cancel keeps them.)",
+
 // Tutorial
 "tutorial.s1_title": "Welcome to StampQuest",
 "tutorial.s1_body": "All 100 Karnataka Philately Passport post offices, on one map. Tap a pin for details and directions, mark each stamp as you collect it, and watch your passport fill up.<br><br>The slim rail on the right holds <b>Layers</b> (map style), <b>Near me</b> (closest offices) and <b>Reset</b> (back to Karnataka view), plus zoom.<br><br>Your progress never leaves this device.<br><br>Built solo by a fellow collector, with a little AI help — so if you spot a glitch or a wrong detail, I'd genuinely like to hear about it (see <b>Settings → About this app</b>).",
@@ -269,6 +293,14 @@ kn: {
 
 
 
+
+// Confirms
+"confirm.remove_photo": "Remove this stamp photo? Your visited mark stays.",
+"confirm.import": "Replace your current progress ({a} visited) with this backup ({b} visited)?",
+"confirm.reset": "Reset all progress ({n} visited)? This clears your visited and planned lists on this device.",
+"confirm.kept_photos": "Your {n} stamp photo(s) will be kept.",
+"confirm.delete_photos": "Also delete your {n} stamp photo(s)? (Cancel keeps them.)",
+
 // Tutorial
 "tutorial.s1_title": "Welcome to StampQuest",
 "tutorial.s1_body": "All 100 Karnataka Philately Passport post offices, on one map. Tap a pin for details and directions, mark each stamp as you collect it, and watch your passport fill up.<br><br>The slim rail on the right holds <b>Layers</b> (map style), <b>Near me</b> (closest offices) and <b>Reset</b> (back to Karnataka view), plus zoom.<br><br>Your progress never leaves this device.<br><br>Built solo by a fellow collector, with a little AI help — so if you spot a glitch or a wrong detail, I'd genuinely like to hear about it (see <b>Settings → About this app</b>).",
@@ -278,6 +310,22 @@ kn: {
 "tutorial.s3_body": "Use Circuits for region-wise routes, the Planned filter in Passport for your planned stops, and share your progress as a postcard when the passport fills up.<br><br>Only Karnataka is on the map — that's the whole quest.",
 "tutorial.skip": "Skip", "tutorial.next": "Next",
 
+
+
+// Confirms
+"confirm.remove_photo": "Remove this stamp photo? Your visited mark stays.",
+"confirm.import": "Replace your current progress ({a} visited) with this backup ({b} visited)?",
+"confirm.reset": "Reset all progress ({n} visited)? This clears your visited and planned lists on this device.",
+"confirm.kept_photos": "Your {n} stamp photo(s) will be kept.",
+"confirm.delete_photos": "Also delete your {n} stamp photo(s)? (Cancel keeps them.)",
+
+
+// Confirms
+"confirm.remove_photo": "ಈ ಸ್ಟ್ಯಾಂಪ್ ಫೋಟೋ ತೆಗೆದುಹಾಕುವುದೇ? ನಿಮ್ಮ ಭೇಟಿ ಗುರುತು ಉಳಿಯುತ್ತದೆ.",
+"confirm.import": "ನಿಮ್ಮ ಪ್ರಸ್ತುತ ಪ್ರಗತಿಯನ್ನು ({a} ಭೇಟಿ) ಈ ಬ್ಯಾಕಪ್‌ನೊಂದಿಗೆ ({b} ಭೇಟಿ) ಬದಲಾಯಿಸುವುದೇ?",
+"confirm.reset": "ಎಲ್ಲಾ ಪ್ರಗತಿಯನ್ನು ಮರುಹೊಂದಿಸುವುದೇ ({n} ಭೇಟಿ)? ಇದು ಈ ಸಾಧನದಲ್ಲಿ ನಿಮ್ಮ ಭೇಟಿ ಮತ್ತು ಯೋಜಿತ ಪಟ್ಟಿಗಳನ್ನು ತೆರವುಗೊಳಿಸುತ್ತದೆ.",
+"confirm.kept_photos": "ನಿಮ್ಮ {n} ಸ್ಟ್ಯಾಂಪ್ ಫೋಟೋ(ಗಳು) ಉಳಿಯುತ್ತವೆ.",
+"confirm.delete_photos": "ನಿಮ್ಮ {n} ಸ್ಟ್ಯಾಂಪ್ ಫೋಟೋ(ಗಳನ್ನು) ಸಹ ಅಳಿಸುವುದೇ? (ರದ್ದುಮಾಡಿದರೆ ಉಳಿಯುತ್ತವೆ.)",
 
 // Tutorial
 "tutorial.s1_title": "StampQuest ಗೆ ಸುಸ್ವಾಗತ",
