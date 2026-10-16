@@ -597,11 +597,6 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 </section>
 
 <!-- SAVED -->
-<section class="view" id="view-saved">
-  <div class="pagehead"><h1>Your Postbox</h1><p>Post offices you plan to visit. Stored only on this device.</p></div>
-  <div class="scroll" id="savedList"></div>
-</section>
-
 <!-- RIVALS -->
 <section class="view" id="view-rivals">
   <div class="pagehead"><h1>Rivals</h1><p>Compete with fellow collectors. Tap anyone to see their stamps.</p></div>
@@ -678,7 +673,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       </details>
       <details>
         <summary>What do the passport tile colors mean?</summary>
-        <div class="a"><b>Green with a ✓</b> = visited (stamped). <b>Dashed amber</b> = planned (in your Postbox). <b>Plain</b> = not visited yet. The number is the booklet serial; the district postmark shows at a glance where it belongs.</div>
+        <div class="a"><b>Green with a ✓</b> = visited (stamped). <b>Dashed amber</b> = planned. <b>Plain</b> = not visited yet. The number is the booklet serial; the district postmark shows at a glance where it belongs.</div>
       </details>
       <details>
         <summary>What does "Approximate location" mean?</summary>
@@ -740,7 +735,6 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
   <button data-tab="explore" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-5.6-7-11a7 7 0 1 1 14 0c0 5.4-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>Explore</button>
   <button data-tab="circuits"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="18" r="2.4"/><circle cx="18" cy="6" r="2.4"/><path d="M8.4 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.4" stroke-dasharray="3 2.4"/></svg>Circuits</button>
   <button data-tab="passport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3.5" width="12" height="17" rx="1.5"/><path d="M9 8.5h6M9 12h6M9 15.5h4"/></svg>Passport</button>
-  <button data-tab="saved"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11V8.5A4.5 4.5 0 0 1 8.5 4h7A4.5 4.5 0 0 1 20 8.5V11"/><rect x="4" y="11" width="16" height="9" rx="1.5"/><path d="M4 14.5h16"/></svg>Postbox</button>
   <button data-tab="rivals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21v-2a4 4 0 0 1 4-4h0a4 4 0 0 1 4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M17 11l2 2 4-4"/></svg>Rivals</button>
   <button data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h9M17.5 8H20M4 16h3.5M12 16h8"/><circle cx="15" cy="8" r="2.2"/><circle cx="9.5" cy="16" r="2.2"/></svg>Settings</button>
 </nav>
@@ -778,7 +772,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       </div>
       <div class="tslide">
         <div class="serif" style="font-size:20px;margin-bottom:8px">Explore Karnataka</div>
-        <div class="note" style="font-size:13px;color:var(--ink)">Use Circuits for region-wise routes, Postbox for your planned stops, and share your progress as a postcard when the passport fills up.<br><br>Only Karnataka is on the map — that's the whole quest.</div>
+        <div class="note" style="font-size:13px;color:var(--ink)">Use Circuits for region-wise routes, the Planned filter in Passport for your planned stops, and share your progress as a postcard when the passport fills up.<br><br>Only Karnataka is on the map — that's the whole quest.</div>
       </div>
     </div>
     <div class="tdots" id="tDots"><span class="on"></span><span></span><span></span></div>
@@ -1047,7 +1041,7 @@ function toggleVisited(n){
   const was = !!state.visited[n];
   if (was) delete state.visited[n];
   else { state.visited[n] = new Date().toISOString().slice(0, 10); delete state.planned[n]; }
-  save(); refreshMarker(n); renderSheetBody(byN[n]); renderProgress(); renderGrid(); renderDistricts(); renderSaved();
+  save(); refreshMarker(n); renderSheetBody(byN[n]); renderProgress(); renderGrid(); renderDistricts();
   if (typeof rivalSync === "function") rivalSync();
   if (!was){ stampPop(); checkMilestones(); toast("Stamped! " + visitedCount() + " of 100 collected."); }
   else toast("Removed from visited.");
@@ -1055,7 +1049,7 @@ function toggleVisited(n){
 function togglePlanned(n){
   if (state.visited[n]){ toast("Already visited — unmark visited first."); return; }
   if (state.planned[n]) delete state.planned[n]; else state.planned[n] = true;
-  save(); refreshMarker(n); renderSheetBody(byN[n]); renderGrid(); renderSaved();
+  save(); refreshMarker(n); renderSheetBody(byN[n]); renderGrid();
   toast(state.planned[n] ? "Added to your postbox." : "Removed from postbox.");
 }
 function checkMilestones(){
@@ -1266,14 +1260,14 @@ async function handlePhotoFile(n, file){
     state.visited[n] = today;
     delete state.planned[n];
     save();
-    refreshMarker(n); renderSheetBody(byN[n]); renderProgress(); renderGrid(); renderDistricts(); renderSaved();
+    refreshMarker(n); renderSheetBody(byN[n]); renderProgress(); renderGrid(); renderDistricts();
     if (!wasVisited){ stampPop(); checkMilestones(); }
     toastAction("Marked visited.", "Undo", async () => {
       if (old) await photoPut(old); else await photoDel(n);
       if (!wasVisited) delete state.visited[n];
       if (wasPlanned) state.planned[n] = true;
       save();
-      refreshMarker(n); renderSheetBody(byN[n]); renderProgress(); renderGrid(); renderDistricts(); renderSaved();
+      refreshMarker(n); renderSheetBody(byN[n]); renderProgress(); renderGrid(); renderDistricts();
       toast(old ? "Previous photo restored." : "Photo removed, visit undone.");
     });
   } catch(err){
@@ -1460,8 +1454,8 @@ function switchTab(name){
   }
   if (name === "explore"){ setTimeout(()=>map.invalidateSize(), 60); }
   if (name === "passport"){ renderProgress(); renderGrid(); renderDistricts(); }
-  if (name === "saved") renderSaved();
   if (name === "circuits") renderCircuits();
+  if (name === "rivals") renderRivals();
   if (name === "rivals") renderRivals();
   if (name === "settings") renderPhotoMeter();
 }
@@ -1845,12 +1839,12 @@ $("fileImport").addEventListener("change", e => {
       state.visited = s.visited || {}; state.planned = s.planned || {};
       if (s.theme) state.theme = s.theme; state.milestones = s.milestones || [];
       save(); applyTheme(); LOCATIONS.forEach(l => refreshMarker(l.n));
-      renderProgress(); renderGrid(); renderDistricts(); renderSaved();
+      renderProgress(); renderGrid(); renderDistricts();
       toast("Backup imported. Undo", () => {
         state.visited = prev.visited; state.planned = prev.planned;
         state.theme = prev.theme; state.milestones = prev.milestones;
         save(); applyTheme(); LOCATIONS.forEach(l => refreshMarker(l.n));
-        renderProgress(); renderGrid(); renderDistricts(); renderSaved();
+        renderProgress(); renderGrid(); renderDistricts();
       });
     }catch(err){ toast("Couldn't read that file."); } e.target.value = ""; };
   r.readAsText(f);
@@ -1858,18 +1852,6 @@ $("fileImport").addEventListener("change", e => {
 
 /* ================= saved ================= */
 const POSTBOX = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" style="stroke:var(--brand)" stroke-width="1.8" aria-hidden="true"><rect x="4" y="8" width="16" height="11" rx="2"/><path d="M4 8a8 5 0 0 1 16 0"/><rect x="10" y="3.5" width="4" height="3" rx="1"/><path d="M9 19v2M15 19v2"/></svg>';
-function renderSaved(){
-  const list = LOCATIONS.filter(l => state.planned[l.n]);
-  $("savedList").innerHTML = list.length ? list.map(l =>
-    '<button class="rowbtn" data-n="'+l.n+'">'+POSTBOX+
-    '<span class="grow"><span class="t">'+l.n+'. '+esc(l.name)+'</span><span class="s" style="display:block">'+esc(l.district)+' · '+l.pin+'</span></span>'+
-    '<span style="color:var(--ink-2)">›</span></button>').join("")
-    : '<div class="card" style="text-align:center;padding:34px 18px"><div style="display:flex;justify-content:center;margin-bottom:10px">'+POSTBOX.replace('width="26" height="26"','width="44" height="44"')+'</div>'+
-      '<div class="serif" style="font-size:16px;margin-bottom:6px">Your postbox is empty.</div>'+
-      '<div class="note">Tap "Plan to visit" on any post office to park it here for later.</div></div>';
-  $("savedList").querySelectorAll(".rowbtn").forEach(b => b.onclick = () => { switchTab("explore"); openLocation(+b.dataset.n); });
-}
-
 /* ================= settings ================= */
 $("themeToggle").addEventListener("change", e => { state.theme = e.target.checked ? "dark" : "light"; save(); applyTheme(); });
 $("langToggle").addEventListener("change", e => {
@@ -1882,9 +1864,8 @@ function applyLang(){
   // re-render dynamic content
   if (typeof renderGrid === "function") renderGrid();
   if (typeof renderDistricts === "function") renderDistricts();
-  if (typeof renderSaved === "function") renderSaved();
   // update nav labels
-  const navLabels = { en: ["Explore","Circuits","Passport","Postbox","Settings"], kn: ["ಅನ್ವೇಷಣೆ","ಸರ್ಕ್ಯೂಟ್‌ಗಳು","ಪಾಸ್‌ಪೋರ್ಟ್","ಅಂಚೆಪೆಟ್ಟಿಗೆ","ಸೆಟ್ಟಿಂಗ್‌ಗಳು"] };
+  const navLabels = { en: ["Explore","Circuits","Passport","Rivals","Settings"], kn: ["ಅನ್ವೇಷಣೆ","ಸರ್ಕ್ಯೂಟ್‌ಗಳು","ಪಾಸ್‌ಪೋರ್ಟ್","ಪೈಪೋಟಿ","ಸೆಟ್ಟಿಂಗ್‌ಗಳು"] };
   document.querySelectorAll("#nav button").forEach((b, i) => {
     const svg = b.querySelector("svg");
     b.innerHTML = "";
@@ -1905,7 +1886,7 @@ $("btnReset").onclick = async () => {
   state.visited = {}; state.planned = {}; state.milestones = []; save();
   if (delPhotos) await photoClearAll().catch(()=>{});
   LOCATIONS.forEach(l => refreshMarker(l.n));
-  renderProgress(); renderGrid(); renderDistricts(); renderSaved(); renderPhotoMeter();
+  renderProgress(); renderGrid(); renderDistricts(); renderPhotoMeter();
   toast(delPhotos ? "Progress and photos reset." : "Progress reset. Photos kept.");
 };
 
@@ -2130,7 +2111,7 @@ $("replayTutorial").onclick = () => { tShow(0); $("firstrun").classList.add("sho
 
 applyTheme();
 applyLang();
-renderProgress(); renderCircuits(); renderGrid(); renderDistricts(); renderSaved();
+renderProgress(); renderCircuits(); renderGrid(); renderDistricts();
 if (typeof rivalInit === "function") setTimeout(rivalInit, 2000);
 if (!state.firstRun) $("firstrun").classList.add("show");
 setTimeout(handleHash, 400);
