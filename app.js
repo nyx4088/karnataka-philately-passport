@@ -171,8 +171,8 @@ $("layerSheet").querySelectorAll("button").forEach(b => b.onclick = () => {
 let selectedN = null;
 const sheet = $("sheet");
 function setSnap(s){ sheet.dataset.snap = s; }
-function openSheet(){ sheet.classList.add("open"); setSnap("half"); document.body.classList.add("sheet-open"); }
-function closeSheet(){ sheet.classList.remove("open"); selectedN = null; document.body.classList.remove("sheet-open");
+function openSheet(){ sheet.classList.add("open"); sheet.removeAttribute("aria-hidden"); setSnap("half"); document.body.classList.add("sheet-open"); }
+function closeSheet(){ sheet.classList.remove("open"); sheet.setAttribute("aria-hidden", "true"); selectedN = null; document.body.classList.remove("sheet-open");
   if (location.hash.startsWith("#loc=")) history.replaceState(null,"",location.pathname+location.search);
   if (window.fitKarnataka) setTimeout(()=>window.fitKarnataka(), 350); }
 $("sheetClose").onclick = closeSheet;
@@ -748,9 +748,12 @@ function renderGrid(){
     const st = statusOf(l.n);
     const pm = st === "visited" ? '<span class="postmark">'+esc(l.district)+'</span>' : "";
     const ck = st === "visited" ? '<span class="check" aria-hidden="true">✓</span>' : "";
-    return '<button class="tile '+st+'" data-n="'+l.n+'" aria-label="'+l.n+". "+esc(l.name)+", "+st+'"><span class="tno">'+l.n+'</span><span class="nm">'+esc(dispName(l))+'</span><span class="pcam" data-n="'+l.n+'" role="button" aria-label="Add stamp photo" title="Add stamp photo"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>'+ck+pm+'<span class="tphoto" aria-hidden="true"></span></button>';
+    return '<div class="tile '+st+'" data-n="'+l.n+'" role="button" tabindex="0" aria-label="'+l.n+". "+esc(l.name)+", "+st+'"><span class="tno">'+l.n+'</span><span class="nm">'+esc(dispName(l))+'</span><span class="pcam" data-n="'+l.n+'" role="button" aria-label="Add stamp photo" title="Add stamp photo"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>'+ck+pm+'<span class="tphoto" aria-hidden="true"></span></div>';
   }).join("");
-  g.querySelectorAll(".tile").forEach(t => t.onclick = () => { switchTab("explore"); openLocation(+t.dataset.n); });
+  g.querySelectorAll(".tile").forEach(t => {
+    t.onclick = () => { switchTab("explore"); openLocation(+t.dataset.n); };
+    t.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); switchTab("explore"); openLocation(+t.dataset.n); } };
+  });
   g.querySelectorAll(".pcam").forEach(b => b.onclick = e => { e.stopPropagation(); openPhotoPicker(+b.dataset.n); });
   // long-press on photo tile: quick actions (Remove / Change)
   function attachLongPress(t){
