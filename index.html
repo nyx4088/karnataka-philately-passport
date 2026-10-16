@@ -614,7 +614,11 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
         <input id="rivalNameInput" placeholder="Your display name" maxlength="24" style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:15px">
         <button class="btn" id="rivalSaveName" style="padding:10px 14px">Save</button>
       </div>
-      <div class="note" style="margin-top:8px;font-size:12px">Share your code with friends so they can add you. No account needed.</div>
+      <div id="rivalEmailRow" style="margin-top:10px;display:flex;gap:8px">
+        <input id="rivalEmailInput" type="email" placeholder="Email to save progress across devices" style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:15px">
+        <button class="btn" id="rivalLinkEmail" style="padding:10px 14px">Link</button>
+      </div>
+      <div class="note" id="rivalEmailNote" style="margin-top:8px;font-size:12px">Share your code with friends so they can add you. Link your email to keep your progress if you switch devices.</div>
     </div>
     <div class="card" id="rivalAdd">
       <div style="font-weight:700;margin-bottom:8px">Add a friend</div>
@@ -1949,6 +1953,7 @@ function renderRivalProfile(){
   $("rivalName").textContent = rivalProfile.display_name || "Collector";
   $("rivalCode").textContent = "Your code: " + rivalProfile.friend_code;
   $("rivalNameInput").value = rivalProfile.display_name || "";
+  if (typeof renderRivalEmailState === "function") renderRivalEmailState();
 }
 $("rivalCopyCode").onclick = () => {
   if (!rivalProfile) return;
@@ -1959,6 +1964,25 @@ $("rivalSaveName").onclick = async () => {
   const { error } = await sb.from("profiles").update({ display_name: name }).eq("id", rivalUser.id);
   if (!error){ rivalProfile.display_name = name; renderRivalProfile(); toast("Name saved."); }
 };
+// link email to anonymous account (converts to permanent, keeps friend code + progress)
+$("rivalLinkEmail").onclick = async () => {
+  const email = $("rivalEmailInput").value.trim();
+  if (!email || !email.includes("@")){ toast("Enter a valid email."); return; }
+  const { error } = await sb.auth.updateUser({ email }, { emailRedirectTo: location.origin + location.pathname });
+  if (error){ toast("Could not send link: " + error.message); return; }
+  toast("Check your inbox — tap the confirmation link to finish linking.");
+};
+function renderRivalEmailState(){
+  const row = $("rivalEmailRow"), note = $("rivalEmailNote");
+  if (!row) return;
+  const email = rivalUser && rivalUser.email;
+  if (email){
+    row.style.display = "none";
+    note.textContent = "Signed in as " + email + ". Your progress is safe across devices.";
+  } else {
+    row.style.display = "flex";
+  }
+}
 // sync visited array + new photos to Supabase (debounced)
 let syncT = 0;
 function rivalSync(){
