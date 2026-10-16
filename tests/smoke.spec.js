@@ -253,7 +253,7 @@ test("dark theme toggle visible after language switch", async ({ page }) => {
   await page.click("#langToggle");
   await page.waitForTimeout(500);
   // Dark theme toggle should still be visible
-  const visible = await page.isVisible("#darkThemeToggle");
+  const visible = await page.isVisible("#themeToggle");
   expect(visible).toBe(true);
 });
 
