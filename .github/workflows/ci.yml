@@ -12,7 +12,8 @@ jobs:
       - run: npx playwright install --with-deps chromium
         working-directory: tests
       - run: |
-          python3 -m http.server 8080 &
+          # Serve the site root (repo root), NOT tests/ — the app under test is index.html.
+          python3 -m http.server 8080 --directory "$GITHUB_WORKSPACE" &
           curl --retry 15 --retry-connrefused -s -o /dev/null http://localhost:8080/
           BASE_URL=http://localhost:8080 npx playwright test
         working-directory: tests
