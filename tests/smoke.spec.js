@@ -230,13 +230,13 @@ test('i18n keys: no duplicates, kn values contain Kannada script', async ({ page
 
 
 test("CSP meta tag present", async ({ page }) => {
-  await page.goto(BASE);
+  await page.goto('/');
   const csp = await page.getAttribute('meta[http-equiv="Content-Security-Policy"]', 'content');
   expect(csp).toContain("script-src 'self'");
 });
 
 test("share toggle OFF by default", async ({ page }) => {
-  await page.goto(BASE);
+  await page.goto('/');
   await page.click('[data-tab="settings"]');
   const checked = await page.isChecked("#sharePhotosToggle");
   expect(checked).toBe(false);
@@ -245,7 +245,7 @@ test("share toggle OFF by default", async ({ page }) => {
 // Regression tests for shipped bugs
 
 test("dark theme toggle visible after language switch", async ({ page }) => {
-  await page.goto(BASE);
+  await page.goto('/');
   await page.click('[data-tab="settings"]');
   // Toggle to Kannada and back
   await page.click("#langToggle");
@@ -258,7 +258,7 @@ test("dark theme toggle visible after language switch", async ({ page }) => {
 });
 
 test("share toggle visible after language switch", async ({ page }) => {
-  await page.goto(BASE);
+  await page.goto('/');
   await page.click('[data-tab="settings"]');
   await page.click("#langToggle");
   await page.waitForTimeout(500);
@@ -267,7 +267,7 @@ test("share toggle visible after language switch", async ({ page }) => {
 });
 
 test("passport tiles have no nested buttons", async ({ page }) => {
-  await page.goto(BASE);
+  await page.goto('/');
   await page.click('[data-tab="passport"]');
   const nested = await page.$$eval(".tile button", els => els.length);
   expect(nested).toBe(0);
@@ -281,7 +281,7 @@ test("app loads without CSP blocking (no inline script error)", async ({ page })
       errors.push(msg.text());
     }
   });
-  await page.goto(BASE);
+  await page.goto('/');
   await page.waitForTimeout(2000);
   // Map should be visible (proves app.js loaded, not blocked by CSP)
   const mapVisible = await page.isVisible("#map");
