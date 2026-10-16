@@ -1,4 +1,4 @@
-const CACHE = "stampquest-v3";
+const CACHE = "stampquest-v4";
 const SHELL = [
   "./",
   "index.html",
@@ -10,6 +10,7 @@ const SHELL = [
   "vendor/MarkerCluster.Default.css",
   "vendor/supabase-js.js",
   "i18n-strings.js",
+  "app.js",
   "karnataka.geojson",
   "icons/icon-192.png",
   "icons/icon-512.png",
