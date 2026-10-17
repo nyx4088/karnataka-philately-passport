@@ -274,13 +274,49 @@ function stampPop(){
   const d = document.createElement("div"); d.className = "stamp-pop"; d.textContent = "VISITED";
   c.appendChild(d); setTimeout(()=>d.remove(), 1400);
 }
+
+/* ================= Delight pass: confetti + animated counters + typewriter + smooth scroll ================= */
+const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let confettiFx = null;
+function stampBurst(big, extra){
+  if (typeof confetti === "undefined" || typeof confetti.create !== "function") return;
+  try {
+    /* dedicated instance without the OffscreenCanvas worker path (CSP: script-src 'self' forbids blob workers) */
+    if (!confettiFx) confettiFx = confetti.create(null, { resize: true });
+    confettiFx(Object.assign({ particleCount: big ? 150 : 45, spread: big ? 110 : 70, origin: { y: 0.6 },
+      disableForReducedMotion: true,
+      colors: ["#A91F26", "#2B6A46", "#C9A227", "#F3EBD8"] }, extra || {}));
+  } catch(e){}
+}
+let lastRingCount = -1;
+function renderRingCount(c){
+  const set = n => { $("ringNum").textContent = n; $("progChipTxt").textContent = n + "/100"; $("exploredNum").textContent = n; };
+  if (REDUCED || typeof gsap === "undefined" || lastRingCount < 0){ set(c); }
+  else if (lastRingCount !== c){
+    const o = { v: lastRingCount };
+    gsap.to(o, { v: c, duration: 0.6, ease: "power2.out", overwrite: "auto",
+      onUpdate(){ set(Math.round(o.v)); } });
+  }
+  lastRingCount = c;
+}
+let heroTyper = null;
+function startHeroType(){
+  const el = $("heroType");
+  if (!el || typeof Typed === "undefined" || REDUCED) return;
+  try {
+    if (heroTyper) heroTyper.destroy();
+    heroTyper = new Typed(el, { strings: ["100 post offices. One passport.", "Collect them all, one stamp at a time.", "Your Karnataka quest starts here."],
+      typeSpeed: 36, backSpeed: 20, backDelay: 1700, loop: true, showCursor: true, cursorChar: "|" });
+  } catch(e){}
+}
+function stopHeroType(){ if (heroTyper){ try { heroTyper.destroy(); } catch(e){} heroTyper = null; } }
 function toggleVisited(n){
   const was = !!state.visited[n];
   if (was) delete state.visited[n];
   else { state.visited[n] = new Date().toISOString().slice(0, 10); delete state.planned[n]; }
   save(); refreshMarker(n); renderSheetBody(byN[n]); renderProgress(); renderGrid(); renderDistricts();
   if (typeof rivalSync === "function") rivalSync();
-  if (!was){ stampPop(); checkMilestones(); toast("Stamped! " + visitedCount() + " of 100 collected."); }
+  if (!was){ stampPop(); stampBurst(false); checkMilestones(); toast("Stamped! " + visitedCount() + " of 100 collected."); }
   else toast(t("toast.removed"));
 }
 function togglePlanned(n){
@@ -293,6 +329,12 @@ function checkMilestones(){
   const c = visitedCount();
   [25,50,75,100].forEach(m => {
     if (c >= m && !state.milestones.includes(m)){ state.milestones.push(m); save();
+      if (m === 100){
+        stampBurst(true);
+        setTimeout(() => stampBurst(true), 400);
+        setTimeout(() => stampBurst(true, { particleCount: 90, angle: 60, spread: 60, origin: { x: 0, y: 0.7 } }), 800);
+        setTimeout(() => stampBurst(true, { particleCount: 90, angle: 120, spread: 60, origin: { x: 1, y: 0.7 } }), 1200);
+      } else stampBurst(true);
       toast(m === 100 ? "INCREDIBLE — all 100 stamps collected!" : m + " stamps! Milestone reached."); }
   });
 }
@@ -747,13 +789,11 @@ function renderCircuits(){
 let gridFilter = "all";
 function renderProgress(){
   const c = visitedCount();
-  $("progChipTxt").textContent = c + "/100";
-  $("ringNum").textContent = c;
+  renderRingCount(c);
   $("ringFg").style.strokeDashoffset = (326.7 * (1 - c/100)).toFixed(1);
   const msgs = [[0,"Your passport is waiting for its first stamp."],[1,"Off to a great start — keep going."],[25,"A quarter century of stamps!"],[50,"Halfway there. The map is filling up."],[75,"The final stretch — almost legendary."],[100,"All 100 collected. Legendary."]];
   let m = msgs[0][1]; msgs.forEach(([t,x]) => { if (c >= t) m = x; });
   $("ringMsg").textContent = m;
-  $("exploredNum").textContent = c;
   $("notchBar").innerHTML = LOCATIONS.map(l => '<i class="'+(state.visited[l.n]?"hit":"")+'"></i>').join("");
   $("milestoneBadges").innerHTML = [25,50,75,100].map(mn =>
     '<span class="mstone'+(c>=mn?" hit":"")+'">'+mn+' stamps</span>').join("");
@@ -1471,10 +1511,10 @@ function tSyncUI(){
   document.querySelectorAll("#tDots span").forEach((d, k) => d.classList.toggle("on", k === tIdx));
   $("btnTNext").textContent = tIdx === 2 ? "Start exploring" : "Next";
 }
-function tClose(){ state.firstRun = true; save(); $("firstrun").classList.remove("show"); }
+function tClose(){ stopHeroType(); state.firstRun = true; save(); $("firstrun").classList.remove("show"); }
 $("btnTNext").onclick = () => { if (tIdx === 2) tClose(); else tShow(tIdx + 1); };
 $("btnTSkip").onclick = tClose;
-$("replayTutorial").onclick = () => { tShow(0); $("firstrun").classList.add("show"); };
+$("replayTutorial").onclick = () => { tShow(0); $("firstrun").classList.add("show"); startHeroType(); };
 // sync dots when user swipes natively (scroll-snap)
 (function(){
   const tr = $("tTrack");
@@ -1492,8 +1532,15 @@ applyTheme();
 applyLang();
 renderProgress(); renderCircuits(); renderGrid(); renderDistricts();
 if (typeof rivalInit === "function") setTimeout(rivalInit, 2000);
-if (!state.firstRun) $("firstrun").classList.add("show");
+if (!state.firstRun){ $("firstrun").classList.add("show"); startHeroType(); }
 setTimeout(handleHash, 400);
+/* Lenis smooth scroll — desktop fine-pointer only; phones keep native touch scrolling */
+if (typeof Lenis === "function" && !REDUCED && window.matchMedia("(pointer: fine)").matches){
+  try {
+    const lenis = new Lenis({ duration: 1.15 });
+    (function raf(t){ lenis.raf(t); requestAnimationFrame(raf); })(performance.now());
+  } catch(e){}
+}
 if ("serviceWorker" in navigator){
   window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
 }
