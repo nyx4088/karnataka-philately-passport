@@ -500,9 +500,61 @@ html[data-theme="dark"] [data-region="North Karnataka"] .chead .serif,html[data-
 html[data-theme="dark"] #map .leaflet-control-attribution{background:rgba(22,18,15,.9);color:#E8DFCF}
 html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 
+/* ============ functional splash (brand moment during real init only) ============ */
+#splash{position:fixed;inset:0;z-index:3000;background:#6B2236;display:flex;align-items:center;justify-content:center}
+.sp-inner{display:flex;flex-direction:column;align-items:center;gap:14px;padding:24px;text-align:center}
+.sp-mark{width:96px;height:96px;transform:rotate(-8deg)}
+.sp-draw{fill:none;stroke:#E3A512;stroke-dasharray:100;stroke-dashoffset:100;animation:spDraw 1s ease-out forwards}
+.sp-draw.d1{stroke-width:3.4;animation-delay:.05s}
+.sp-draw.d2{stroke-width:1.5;animation-delay:.25s}
+@keyframes spDraw{to{stroke-dashoffset:0}}
+.sp-num{font-family:Fraunces,Georgia,serif;font-size:15px;font-weight:600;fill:#E3A512;opacity:0;animation:spFade .5s ease-out .7s forwards}
+.sp-word{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:24px;letter-spacing:4px;color:#F3EBD8;opacity:0;animation:spFade .5s ease-out .45s forwards}
+.sp-word b{color:#E3A512;font-weight:600}
+.sp-sub{font-size:11px;letter-spacing:2.5px;color:rgba(243,235,216,.72);text-transform:uppercase;opacity:0;animation:spFade .5s ease-out .6s forwards}
+@keyframes spFade{to{opacity:1}}
+.sp-ring{width:40px;height:40px;transform:rotate(-90deg);margin-top:6px}
+.sp-track{fill:none;stroke:rgba(243,235,216,.22);stroke-width:4}
+.sp-fill{fill:none;stroke:#E3A512;stroke-width:4;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset .3s ease}
+@media (prefers-reduced-motion:reduce){
+  .sp-draw,.sp-num,.sp-word,.sp-sub{animation:none;opacity:1}
+  .sp-draw{stroke-dashoffset:0}
+}
+/* ============ passport tile FLIP expand ============ */
+.tile.expanded{grid-column:1/-1;aspect-ratio:auto;min-height:230px;cursor:default;align-items:stretch;
+  text-align:left;padding:0;overflow:hidden;z-index:6}
+.tile.expanded>:not(.tdetail):not(.tphoto){display:none}
+.tile .tdetail{display:none}
+.tile.expanded .tdetail{display:flex;flex-direction:column;gap:10px;padding:14px;position:relative;z-index:1}
+.td-head{display:flex;align-items:center;gap:10px}
+.td-no{font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--brand);flex:none}
+.td-titles{flex:1;min-width:0}
+.td-titles b{display:block;font-size:16px;line-height:1.3}
+.td-titles span{font-size:12px;color:var(--ink-2)}
+.td-photo{height:118px;border-radius:10px;background-color:var(--locked-fill);background-size:cover;background-position:center;display:none;flex:none}
+.td-photo.has{display:block}
+.td-fact{font-size:13px;color:var(--ink-2);margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.td-actions{margin-top:auto}
 </style>
 </head>
 <body>
+
+<!-- functional splash: visible during real init only, removed by app.js -->
+<div id="splash" aria-hidden="true">
+  <div class="sp-inner">
+    <svg class="sp-mark" viewBox="0 0 54 54" aria-hidden="true">
+      <circle class="sp-draw d1" cx="27" cy="27" r="24" pathLength="100"/>
+      <circle class="sp-draw d2" cx="27" cy="27" r="17" pathLength="100"/>
+      <text class="sp-num" x="27" y="32.5" text-anchor="middle">100</text>
+    </svg>
+    <div class="sp-word">STAMP<b>QUEST</b></div>
+    <div class="sp-sub">Karnataka Philately Passport</div>
+    <svg class="sp-ring" viewBox="0 0 44 44" aria-hidden="true">
+      <circle class="sp-track" cx="22" cy="22" r="18" pathLength="100"/>
+      <circle class="sp-fill" cx="22" cy="22" r="18" pathLength="100"/>
+    </svg>
+  </div>
+</div>
 
 <!-- EXPLORE -->
 <section class="view active" id="view-explore">
@@ -813,6 +865,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 <!-- supabase-js loads lazily (rivalInit) so the critical path stays light; still cached offline by the SW -->
 <script src="vendor/confetti.min.js"></script>
 <script src="vendor/gsap.min.js"></script>
+<script src="vendor/Flip.min.js"></script>
 <script src="vendor/typed.min.js"></script>
 <script src="vendor/lenis.min.js"></script>
 <script src="i18n-strings.js"></script>

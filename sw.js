@@ -1,4 +1,4 @@
-const CACHE = "stampquest-v8";
+const CACHE = "stampquest-v9";
 const SHELL = [
   "./",
   "index.html",
@@ -9,6 +9,7 @@ const SHELL = [
   "vendor/supabase-js.js",
   "vendor/confetti.min.js",
   "vendor/gsap.min.js",
+  "vendor/Flip.min.js",
   "vendor/typed.min.js",
   "vendor/lenis.min.js",
   "i18n-strings.js",
