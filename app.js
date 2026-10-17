@@ -1448,10 +1448,43 @@ function compressForShare(blob){
     img.src = URL.createObjectURL(blob);
   });
 }
-async function rivalInit(){
-  if (!(await loadSupabase())) return;
-  if (!initSupabase()) return;
+/* Rivals is FULLY opt-in: nothing (no account, no profile, no sync) happens until
+   the user taps "Join". They appear on the leaderboard only after they ALSO tap
+   "Upload my progress" (rivalUpload), which creates their progress row. */
+function rivalsJoined(){ try { return localStorage.getItem("sq_rivals_joined") === "1"; } catch(e){ return false; } }
+function rivalsUploaded(){ try { return localStorage.getItem("sq_rivals_uploaded") === "1"; } catch(e){ return false; } }
+/* load the supabase-js library only (no auth, no user data) so the public
+   leaderboard stays viewable without joining */
+async function rivalEnsureLib(){
+  if (!(await loadSupabase())) return false;
+  return initSupabase();
+}
+/* silent restore of a previous explicit join: reads session + profile only,
+   never creates anything and never syncs */
+async function rivalRestore(){
+  if (!rivalsJoined() || rivalUser) return;
   try {
+    if (!(await rivalEnsureLib())) return;
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) throw new Error("no session");
+    const { data: prof } = await sb.from("profiles").select("*").eq("id", session.user.id).maybeSingle();
+    if (!prof) throw new Error("no profile");
+    rivalUser = session.user;
+    rivalProfile = prof;
+    renderRivalProfile();
+  } catch(e){
+    console.warn("rivals restore:", e.message);
+    try { localStorage.removeItem("sq_rivals_joined"); localStorage.removeItem("sq_rivals_uploaded"); } catch(_){}
+    rivalUser = null; rivalProfile = null;
+  }
+}
+/* explicit opt-in: create (or adopt) the anonymous identity + profile.
+   No progress sync here — the user is NOT on the leaderboard yet. */
+async function rivalJoin(){
+  const btn = $("rivalJoinBtn");
+  if (btn) btn.disabled = true;
+  try {
+    if (!(await rivalEnsureLib())){ toast(t("rivals.join_failed")); return; }
     const { data: { session } } = await sb.auth.getSession();
     if (session) rivalUser = session.user;
     else {
@@ -1459,7 +1492,7 @@ async function rivalInit(){
       if (error) throw error;
       rivalUser = data.user;
     }
-    // load or create profile
+    // load or create profile (adopts a pre-existing one from the old auto behavior)
     let { data: prof } = await sb.from("profiles").select("*").eq("id", rivalUser.id).maybeSingle();
     if (!prof){
       const code = await sb.rpc("gen_friend_code").then(r => r.data).catch(() => Math.random().toString(36).slice(2,8).toUpperCase());
@@ -1468,8 +1501,9 @@ async function rivalInit(){
       prof = np;
     }
     rivalProfile = prof;
+    try { localStorage.setItem("sq_rivals_joined", "1"); } catch(e){}
     renderRivalProfile();
-    rivalSync(); // push current progress
+    renderRivalJoinState();
     // one-time cleanup: photos uploaded before sharing became opt-in
     try {
       if (!state.sharePhotos && !localStorage.getItem("sq_photo_cleanup")){
@@ -1477,18 +1511,52 @@ async function rivalInit(){
         localStorage.setItem("sq_photo_cleanup", "1");
       }
     } catch(e){}
-  } catch(e){ console.warn("rivals init:", e.message); }
+    toast(t("rivals.joined_toast"));
+  } catch(e){ console.warn("rivals join:", e.message); toast(t("rivals.join_failed")); }
+  finally { if (btn) btn.disabled = false; }
+}
+/* explicit upload: push the stamp count (and any pending shared photos) so the
+   user appears on the leaderboard. Background sync stays off until this runs. */
+async function rivalUpload(){
+  const btn = $("rivalUploadBtn");
+  if (btn) btn.disabled = true;
+  try {
+    if (!rivalUser || !sb){ toast(t("rivals.upload_failed")); return; }
+    const ok = await doRivalSync();
+    if (ok){
+      try { localStorage.setItem("sq_rivals_uploaded", "1"); } catch(e){}
+      renderRivalJoinState();
+      toast(t("rivals.uploaded_toast"));
+      renderRivals();
+    } else {
+      toast(t("rivals.upload_failed"));
+    }
+  } finally { if (btn) btn.disabled = false; }
+}
+/* single owner of join/upload/profile visibility in the Rivals tab */
+function renderRivalJoinState(){
+  const joined = !!(rivalUser && rivalProfile);
+  const uploaded = joined && rivalsUploaded();
+  $("rivalJoinPanel").style.display = joined ? "none" : "block";
+  $("rivalProfile").style.display = joined ? "block" : "none";
+  $("rivalAdd").style.display = joined ? "block" : "none";
+  $("rivalFriendsHead").style.display = joined ? "block" : "none";
+  $("rivalFriends").style.display = joined ? "block" : "none";
+  $("rivalUploadPanel").style.display = (joined && !uploaded) ? "block" : "none";
+  $("rivalLiveNote").style.display = (joined && uploaded) ? "block" : "none";
 }
 function renderRivalProfile(){
+  /* visibility is owned by renderRivalJoinState(); this only fills content */
+  if (!rivalProfile) return;
   const card = $("rivalProfile");
-  if (!rivalProfile){ card.style.display = "none"; return; }
-  card.style.display = "block";
   $("rivalAvatar").textContent = (rivalProfile.display_name || t("rivals.collector")).slice(0,1).toUpperCase();
   $("rivalName").textContent = rivalProfile.display_name || t("rivals.collector");
   $("rivalCode").textContent = t("rivals.your_code", { code: rivalProfile.friend_code });
   $("rivalNameInput").value = rivalProfile.display_name || "";
   if (typeof renderRivalEmailState === "function") renderRivalEmailState();
 }
+$("rivalJoinBtn").onclick = () => rivalJoin();
+$("rivalUploadBtn").onclick = () => rivalUpload();
 $("rivalCopyCode").onclick = () => {
   if (!rivalProfile) return;
   navigator.clipboard.writeText(rivalProfile.friend_code).then(() => toast(t("toast.copied")));
@@ -1520,7 +1588,8 @@ function renderRivalEmailState(){
 // sync visited array + new photos to Supabase (debounced)
 let syncT = 0;
 function rivalSync(){
-  if (!sbReady() || !rivalUser) return;
+  /* background count sync runs ONLY for users who joined AND uploaded */
+  if (!sbReady() || !rivalUser || !rivalsJoined() || !rivalsUploaded()) return;
   clearTimeout(syncT);
   syncT = setTimeout(doRivalSync, 1500);
 }
@@ -1528,7 +1597,7 @@ async function doRivalSync(){
   try {
     const visited = Object.keys(state.visited).map(Number);
     await sb.from("progress").upsert({ user_id: rivalUser.id, visited, updated_at: new Date().toISOString() });
-    if (!state.sharePhotos) return; // photo sharing is opt-in; count sync still runs above
+    if (!state.sharePhotos) return true; // photo sharing is opt-in; count sync still runs above
     // upload photos not yet shared (tracked in localStorage)
     let shared = {};
     try { shared = JSON.parse(localStorage.getItem("sq_shared_photos") || "{}"); } catch(e){}
@@ -1542,7 +1611,8 @@ async function doRivalSync(){
       if (!error) shared[p.n] = 1;
     }
     localStorage.setItem("sq_shared_photos", JSON.stringify(shared));
-  } catch(e){ console.warn("rival sync:", e.message); }
+    return true;
+  } catch(e){ console.warn("rival sync:", e.message); return false; }
 }
 // delete shared photo copies from Supabase storage; ns omitted = all
 async function rivalRemovePhotos(ns){
@@ -1605,12 +1675,17 @@ function buildRivalRow(r, i, avatarBg){
   return row;
 }
 async function renderRivals(){
+  /* the leaderboard is public: load the library only (no auth, no user data)
+     so anyone can view it without joining */
+  if (!navigator.onLine){ $("rivalOffline").style.display = "block"; return; }
+  $("rivalOffline").style.display = "none";
+  await rivalEnsureLib();
+  renderRivalJoinState();
+  if (rivalsJoined() && !rivalUser){ await rivalRestore(); renderRivalJoinState(); }
   if (!sbReady()){
     $("rivalBoard").innerHTML = '<div class="note">'+t("rivals.not_connected")+'</div>';
     return;
   }
-  if (!navigator.onLine){ $("rivalOffline").style.display = "block"; return; }
-  $("rivalOffline").style.display = "none";
   try {
     const { data: board } = await sb.from("leaderboard").select("*").limit(50);
     const el = $("rivalBoard");
@@ -1753,8 +1828,8 @@ $("replayTutorial").onclick = () => { tShow(0); $("firstrun").classList.add("sho
 applyTheme();
 applyLang();
 renderProgress(); renderCircuits(); renderGrid(); renderDistricts();
-/* rivals auth is network-bound: don't even try when the browser reports offline */
-if (typeof rivalInit === "function" && navigator.onLine !== false) setTimeout(rivalInit, 2000);
+/* Rivals is fully opt-in: no auto-init. Nothing (account, profile, sync) happens
+   until the user taps "Join" in the Rivals tab. See rivalJoin()/rivalUpload(). */
 splashSet(0.5);
 initSplash(); /* splash gates the first-run tutorial + deep link until it exits */
 /* Lenis smooth scroll — desktop fine-pointer only; phones keep native touch scrolling */

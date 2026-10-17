@@ -82,6 +82,11 @@ create trigger profiles_lock before update on profiles
 
 -- 8. Leaderboard view: ranked by stamps, photo count for transparency
 -- Leaderboard: stamps are self-reported; photos column shows opt-in shared photo count
+-- FULLY OPT-IN (2026-10-17): only collectors who JOINED and UPLOADED appear.
+-- A profile with no progress row (joined but never uploaded, or never joined)
+-- is excluded via the inner join below.
+-- >>> AFTER EDITING: re-run this section (8) in the Supabase SQL editor so the
+-- >>> live view picks it up. Do NOT run blindly — snapshot/back up first.
 drop view if exists leaderboard;
 create view leaderboard with (security_invoker = true) as
 select
@@ -94,7 +99,7 @@ select
    and (storage.foldername(name))[1] = p.id::text) as photos,
   pr.updated_at
 from profiles p
-left join progress pr on pr.user_id = p.id
+join progress pr on pr.user_id = p.id
 order by stamps desc, pr.updated_at asc;
 
 -- 9. Helper: generate a short unique friend code

@@ -683,7 +683,18 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       </div>
       <div class="note" id="rivalEmailNote" style="margin-top:8px;font-size:12px" data-i18n="rivals.email_note">Share your code with friends so they can add you. Link your email to keep your progress if you switch devices.</div>
     </div>
-    <div class="card" id="rivalAdd">
+    <div class="card" id="rivalJoinPanel">
+      <div style="font-weight:800;font-size:16px;margin-bottom:8px" data-i18n="rivals.join_title">Join the leaderboard</div>
+      <div class="note" style="margin-bottom:12px" data-i18n="rivals.join_body">Rivals is fully opt-in. Nothing leaves this device until you join.</div>
+      <button class="btn primary" id="rivalJoinBtn" data-i18n="rivals.join_btn" style="width:100%;padding:12px;min-height:48px">Join Rivals</button>
+    </div>
+    <div class="card" id="rivalUploadPanel" style="display:none">
+      <div style="font-weight:800;font-size:16px;margin-bottom:8px" data-i18n="rivals.upload_title">One more step</div>
+      <div class="note" style="margin-bottom:12px" data-i18n="rivals.upload_body">Upload your stamp count to appear on the leaderboard.</div>
+      <button class="btn primary" id="rivalUploadBtn" data-i18n="rivals.upload_btn" style="width:100%;padding:12px;min-height:48px">Upload my progress</button>
+    </div>
+    <div class="note" id="rivalLiveNote" style="display:none" data-i18n="rivals.live_note">You're on the leaderboard.</div>
+    <div class="card" id="rivalAdd" style="display:none">
       <div style="font-weight:700;margin-bottom:8px" data-i18n="rivals.add_friend">Add a friend</div>
       <div style="display:flex;gap:8px">
         <input id="rivalCodeInput" data-i18n-ph="rivals.code_ph" placeholder="Enter friend's code" maxlength="6" autocapitalize="characters" style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:15px;text-transform:uppercase">
@@ -692,8 +703,8 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
     </div>
     <h3 class="sec" data-i18n="rivals.leaderboard">Leaderboard</h3>
     <div id="rivalBoard"><div class="note">Loading…</div></div>
-    <h3 class="sec" data-i18n="rivals.my_friends">My friends</h3>
-    <div id="rivalFriends"><div class="note">No friends added yet.</div></div>
+    <h3 class="sec" id="rivalFriendsHead" data-i18n="rivals.my_friends" style="display:none">My friends</h3>
+    <div id="rivalFriends" style="display:none"><div class="note">No friends added yet.</div></div>
     <div class="card note" id="rivalOffline" style="display:none" data-i18n="rivals.offline">You're offline — the leaderboard needs an internet connection. Your progress is safe on this device.</div>
   </div>
 </section>
