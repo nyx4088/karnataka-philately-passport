@@ -729,19 +729,94 @@ async function openPhotoViewer(n){
   $("pvClose").onclick = closePhotoViewer;
   $("pvPrev").onclick = (e) => { e.stopPropagation(); pvShow(pvIdx - 1); };
   $("pvNext").onclick = (e) => { e.stopPropagation(); pvShow(pvIdx + 1); };
-  v.onclick = (e) => { if (e.target === v || e.target.id === "pvImg") closePhotoViewer(); };
-  // swipe
-  let sx = 0;
-  v.addEventListener("touchstart", e => { sx = e.touches[0].clientX; }, { passive:true });
-  v.addEventListener("touchend", e => {
-    const dx = e.changedTouches[0].clientX - sx;
-    if (Math.abs(dx) > 60) pvShow(pvIdx + (dx < 0 ? 1 : -1));
-  }, { passive:true });
+  v.onclick = (e) => { if (e.target === v) closePhotoViewer(); };
+  initPinchZoom($("pvImg"));
   document.addEventListener("keydown", pvKey);
   pvReleaseTrap = trapFocus(v, closePhotoViewer);
   pvShow(pvIdx);
 }
 let pvReleaseTrap = null;
+let pvResetZoom = null;
+/* pinch-zoom + pan for the fullscreen photo viewer.
+   Navigation is via the ‹ › buttons only (no swipe) so pinch gestures never flip photos. */
+function initPinchZoom(img){
+  let zScale = 1, zX = 0, zY = 0;
+  const track = new Map();
+  let pinchD0 = 0, pinchScale0 = 1, pinchCx0 = 0, pinchCy0 = 0;
+  let downT = 0, downX = 0, downY = 0, lastX = 0, lastY = 0, moved = false;
+  let lastTapT = 0, tapTimer = 0;
+  const applyZ = () => { img.style.transform = "translate(" + zX + "px," + zY + "px) scale(" + zScale + ")"; };
+  const resetZ = () => { zScale = 1; zX = 0; zY = 0; applyZ(); };
+  pvResetZoom = resetZ;
+  const clampPan = () => {
+    const ox = Math.max(0, (img.offsetWidth * zScale - img.offsetWidth) / 2);
+    const oy = Math.max(0, (img.offsetHeight * zScale - img.offsetHeight) / 2);
+    zX = Math.min(ox, Math.max(-ox, zX));
+    zY = Math.min(oy, Math.max(-oy, zY));
+  };
+  const doTap = () => {
+    const now = Date.now();
+    if (now - lastTapT < 300){
+      if (tapTimer){ clearTimeout(tapTimer); tapTimer = 0; }
+      lastTapT = 0;
+      if (zScale > 1.2) resetZ();
+      else { zScale = 2.5; zX = 0; zY = 0; applyZ(); }
+    } else {
+      lastTapT = now;
+      tapTimer = setTimeout(() => { tapTimer = 0; closePhotoViewer(); }, 300);
+    }
+  };
+  img.addEventListener("touchstart", e => {
+    e.preventDefault();
+    for (const t of e.changedTouches) track.set(t.identifier, { x: t.clientX, y: t.clientY });
+    if (track.size === 1){
+      const t = e.touches[0];
+      downT = Date.now(); downX = lastX = t.clientX; downY = lastY = t.clientY; moved = false;
+    } else if (track.size === 2){
+      const p = [...track.values()];
+      pinchD0 = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
+      pinchScale0 = zScale;
+      pinchCx0 = (p[0].x + p[1].x) / 2; pinchCy0 = (p[0].y + p[1].y) / 2;
+      moved = true;
+    }
+  }, { passive:false });
+  img.addEventListener("touchmove", e => {
+    e.preventDefault();
+    for (const t of e.changedTouches) if (track.has(t.identifier)) track.set(t.identifier, { x: t.clientX, y: t.clientY });
+    if (track.size === 2){
+      const p = [...track.values()];
+      const d = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
+      if (pinchD0 > 0 && d > 0){
+        zScale = Math.min(4, Math.max(1, pinchScale0 * d / pinchD0));
+        const cx = (p[0].x + p[1].x) / 2, cy = (p[0].y + p[1].y) / 2;
+        zX += cx - pinchCx0; zY += cy - pinchCy0;
+        pinchCx0 = cx; pinchCy0 = cy;
+        clampPan(); applyZ();
+      }
+    } else if (track.size === 1 && zScale > 1){
+      const t = e.touches[0];
+      zX += t.clientX - lastX; zY += t.clientY - lastY;
+      lastX = t.clientX; lastY = t.clientY;
+      if (Math.hypot(t.clientX - downX, t.clientY - downY) > 10) moved = true;
+      clampPan(); applyZ();
+    }
+  }, { passive:false });
+  const endTouch = e => {
+    for (const t of e.changedTouches) track.delete(t.identifier);
+    if (track.size < 2) pinchD0 = 0;
+    if (track.size === 0){
+      const c = e.changedTouches[0];
+      const dist = Math.hypot(c.clientX - downX, c.clientY - downY);
+      if (!moved && Date.now() - downT < 400 && dist < 10) doTap();
+      moved = false;
+    } else if (track.size === 1){
+      const p = [...track.values()][0];
+      lastX = p.x; lastY = p.y;
+    }
+  };
+  img.addEventListener("touchend", endTouch);
+  img.addEventListener("touchcancel", endTouch);
+}
 function pvKey(e){
   if (!document.getElementById("photoViewer")) return;
   if (e.key === "Escape") closePhotoViewer();
@@ -751,6 +826,7 @@ function pvKey(e){
 async function pvShow(i){
   if (!pvList.length) return;
   pvIdx = (i + pvList.length) % pvList.length;
+  if (pvResetZoom) pvResetZoom();
   const n = pvList[pvIdx], l = byN[n];
   const rec = await photoGet(n);
   if (!rec) return;
@@ -763,6 +839,7 @@ async function pvShow(i){
 }
 function closePhotoViewer(){
   if (pvReleaseTrap){ pvReleaseTrap(); pvReleaseTrap = null; }
+  pvResetZoom = null;
   const v = document.getElementById("photoViewer");
   if (v) v.remove();
   if (pvUrl){ URL.revokeObjectURL(pvUrl); pvUrl = null; }

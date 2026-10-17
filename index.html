@@ -161,7 +161,7 @@ html[data-theme="dark"] .hcard{background:color-mix(in srgb, var(--header-bg) 92
 /* fullscreen photo viewer */
 #photoViewer{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
 #photoViewer.open{opacity:1}
-#photoViewer #pvImg{max-width:94vw;max-height:82vh;object-fit:contain;border-radius:8px}
+#photoViewer #pvImg{max-width:94vw;max-height:82vh;object-fit:contain;border-radius:8px;touch-action:none;user-select:none;-webkit-user-select:none}
 #photoViewer .pv-top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;color:#fff;font-size:15px}
 #photoViewer #pvClose{background:rgba(255,255,255,.15);border:0;color:#fff;font-size:18px;width:44px;height:44px;border-radius:50%;cursor:pointer}
 #photoViewer .pv-nav{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);display:flex;justify-content:space-between;padding:0 8px;pointer-events:none}
