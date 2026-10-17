@@ -313,9 +313,9 @@ function renderSheetBody(l){
       '<div class="kv"><span class="k">REGION</span><span class="v">'+esc(l.region)+'</span></div>'+
       '<div class="kv"><span class="k">SETTING</span><span class="v">'+esc(t('landscape.'+l.landscape) !== 'landscape.'+l.landscape ? t('landscape.'+l.landscape) : (l.landscape||''))+'</span></div>'+
       ppc +
-      (l.fact ? '<div class="kv"><span class="k">DID YOU KNOW</span><span class="v" style="font-weight:400">'+esc(l.fact)+'</span></div>' : '')+
+      (l.fact ? '<div class="factblock"><span class="factk">DID YOU KNOW</span><span class="factv">'+esc(l.fact)+'</span></div>' : '')+
       (l.nearby && l.nearby.length ? '<div class="kv"><span class="k">NEARBY</span><span class="v" style="font-weight:400">'+l.nearby.map(esc).join(' · ')+'</span></div>' : '')+
-      '<div class="kv"><span class="k">GETTING THERE</span><span class="v">'+t("sheet.getting_there", { town: esc(l.transit_town) })+'<span class="sub">'+t("sheet.getting_there_sub")+'</span></span></div>'+
+      
       vline +
       '<div class="photosec" id="photoSec"></div>'+
       '<div class="actionrow">'+
