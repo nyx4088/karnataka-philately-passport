@@ -50,7 +50,7 @@
 
 :root{
   --paper:#F3EBD8; --surface:#FBF6E9; --ink:#1F1B16; --ink-2:#54493C;
-  --border-strong:#6E6254; --border-subtle:#D9CFB4;
+  --border:#D9CFB4; --border-strong:#6E6254; --border-subtle:#D9CFB4;
   --brand:#A91F26; --brand-hover:#8F1822; --on-brand:#FFFFFF; --focus:#1D3557;
   --collected:#2B6A46; --planned:#7A5600; --error:#8E1B1B;
   --header-bg:#6B2236; --header-paper:#F3EBD8; --header-gold:#E3A512;
@@ -64,7 +64,7 @@
 }
 html[data-theme="dark"]{
   --paper:#16120F; --surface:#221C17; --ink:#F3EDE0; --ink-2:#B9AF9F;
-  --border-strong:#8C8272; --border-subtle:#3A322A;
+  --border:#3A322A; --border-strong:#8C8272; --border-subtle:#3A322A;
   --brand:#F0707A; --brand-hover:#F58D95; --on-brand:#16120F; --focus:#F3EDE0;
   --collected:#6FCB9A; --planned:#E8B84A; --error:#F0707A;
   --locked-fill:#3E3226;
@@ -182,13 +182,13 @@ body.sheet-open .mapctl{display:none}
 .layersheet button{display:block;width:100%;text-align:left;background:none;border:0;padding:11px 14px;font-size:13px;color:var(--ink)}
 .layersheet button.on{color:var(--brand);font-weight:700}
 
-/* postmark markers — states differ by shape, not only colour */
-.mk{width:32px;height:32px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;}
-.mk::after{content:"";position:absolute;top:-6px;left:-6px;right:-6px;bottom:-6px;}
+/* postmark markers — states differ by shape, not only colour; single pins are white with a ring */
+.mk{width:32px;height:32px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;
   font-family:var(--font-mono);font-weight:500;font-size:13px;line-height:1;
   box-shadow:0 0 0 2px var(--paper),0 2px 6px rgba(0,0,0,.35)}
-.mk.unvisited{background:var(--paper);border:2px solid var(--ink);color:var(--ink)}
-.mk.planned{background:var(--surface);border:2px dashed var(--planned);color:var(--ink)}
+.mk::after{content:"";position:absolute;top:-6px;left:-6px;right:-6px;bottom:-6px;}
+.mk.unvisited{background:#FFFFFF;border:2px solid var(--ink);color:var(--ink)}
+.mk.planned{background:#FFFFFF;border:2px dashed var(--planned);color:var(--ink)}
 .mk.planned .mk-star{position:absolute;top:-8px;right:-5px;font-size:13px;color:var(--planned);line-height:1;
   text-shadow:0 0 2px var(--surface),0 0 2px var(--surface)}
 .mk.visited{background:var(--collected);border:2px solid var(--collected);color:var(--paper);
@@ -207,7 +207,13 @@ body.sheet-open .mapctl{display:none}
 #sheet[data-snap="peek"] .sheet-body{display:none}
 #sheet[data-snap="half"]{max-height:52vh}
 #sheet[data-snap="full"]{max-height:88vh}
-.handle{padding:10px 0 4px;cursor:grab;touch-action:none;flex:none}
+.handle{padding:12px 0 8px;cursor:grab;touch-action:none;flex:none}
+/* update available bar */
+#updateBar{position:fixed;z-index:850;left:50%;transform:translateX(-50%);bottom:calc(80px + env(safe-area-inset-bottom));
+  display:none;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--brand);border-radius:14px;
+  box-shadow:var(--shadow);padding:10px 12px 10px 16px;font-size:13px;font-weight:600;color:var(--ink);max-width:92vw}
+#updateBar button{background:var(--brand);color:var(--on-brand);border:0;border-radius:10px;font-weight:700;font-size:13px;
+  padding:10px 16px;min-height:44px;cursor:pointer;flex:none}
 .handle::before{content:"";display:block;width:44px;height:5px;border-radius:3px;background:var(--border-subtle);margin:0 auto}
 .sheet-head{display:flex;gap:12px;align-items:flex-start;padding:6px 18px 10px;flex:none}
 .sheet-head .info{flex:1;min-width:0;padding-right:36px}
@@ -245,7 +251,7 @@ body.sheet-open .mapctl{display:none}
 .btn.planned-on{border-color:var(--planned);color:var(--planned)}
 .btn.done-on{background:var(--collected);color:#fff;border-color:var(--collected)}
 .sheetclose{position:absolute;top:10px;right:12px;border:1px solid var(--border-subtle);background:var(--surface);color:var(--ink);
-  width:36px;height:36px;border-radius:50%;font-size:14px;box-shadow:var(--shadow);z-index:2;
+  width:44px;height:44px;border-radius:50%;font-size:14px;box-shadow:var(--shadow);z-index:2;
   display:flex;align-items:center;justify-content:center;transition:background-color .6s ease}
 
 /* stamp pop animation */
@@ -320,10 +326,9 @@ h3.sec{font-size:17px;margin:22px 0 10px;letter-spacing:.5px}
 .tile .tno{font-family:var(--font-mono);font-weight:500;font-size:20px;line-height:1.2;color:var(--ink-2);text-align:center;flex:none}
 .tile .nm{font-size:12px;line-height:1.3;color:var(--ink-2);text-align:center;margin:auto 4px 6px;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:100%;min-height:2.6em}
-.tile .pcam{position:relative;display:flex;align-items:center;justify-content:center;width:32px;height:32px;flex:none;}
-.tile .pcam::after{content:"";position:absolute;top:-6px;left:-6px;right:-6px;bottom:-6px;}
+.tile .pcam{position:relative;display:flex;align-items:center;justify-content:center;width:32px;height:32px;flex:none;
   color:var(--ink-2);border-radius:8px;margin-bottom:auto}
-.tile .pcam::after{content:"";position:absolute;inset:-6px}
+.tile .pcam::after{content:"";position:absolute;top:-6px;left:-6px;right:-6px;bottom:-6px;}
 .tile .pcam svg{display:block}
 .tile.visited .pcam{color:var(--brand)}
 .tile.visited{background:var(--surface);background:color-mix(in srgb,var(--collected) 22%,var(--surface));
@@ -513,12 +518,12 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
           </svg>
           <span class="wm">STAMP<b>QUEST</b></span>
         </div>
-        <button class="progchip" id="progChip" aria-label="Open passport progress"><span class="dot"></span><span id="progChipTxt">0/100</span></button>
+        <button class="progchip" id="progChip" data-i18n-aria="passport.progress_aria" aria-label="Open passport progress"><span class="dot"></span><span id="progChipTxt">0/100</span></button>
       </div>
       <div class="searchbox">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
         <input id="searchInput" type="search" data-i18n-ph="search.placeholder" placeholder="Search 100 post offices" autocomplete="off" data-i18n-aria="search.aria" aria-label="Search post offices">
-        <button class="sclear" id="searchClear" aria-label="Clear search">✕</button>
+        <button class="sclear" id="searchClear" data-i18n-aria="search.clear" aria-label="Clear search">✕</button>
       </div>
       <div id="searchResults" role="listbox"></div>
     </div>
@@ -541,13 +546,13 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 
 <!-- CIRCUITS -->
 <section class="view" id="view-circuits">
-  <div class="pagehead"><h1<h1 data-i18n="circuits.title">Circuits</h1><p>Suggested region-wise routes. Neutral for everyone — start wherever you are.</p></div>
+  <div class="pagehead"><h1 data-i18n="circuits.title">Circuits</h1><p data-i18n="circuits.subtitle">Suggested region-wise routes. Neutral for everyone — start wherever you are.</p></div>
   <div class="scroll" id="circuitList"></div>
 </section>
 
 <!-- PASSPORT -->
 <section class="view" id="view-passport">
-  <div class="pagehead"><h1 class="serif">My Passport</h1><p>Add a stamp photo to mark an office visited. Your stamps and dates stay on this device; your stamp count joins the Rivals leaderboard.</p></div>
+  <div class="pagehead"><h1 class="serif" data-i18n="passport.title">My Passport</h1><p data-i18n="passport.subtitle">Add a stamp photo to mark an office visited. Your stamps and dates stay on this device; your stamp count joins the Rivals leaderboard.</p></div>
   <div class="scroll">
     <div class="card">
       <div class="ringwrap">
@@ -561,10 +566,10 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
         </div>
         <div>
           <div class="serif" style="font-size:17px" id="ringMsg">Your passport is waiting for its first stamp.</div>
-          <div class="note" style="margin-top:6px">Mark a post office visited from its map card to grow your collection.</div>
+          <div class="note" style="margin-top:6px" data-i18n="passport.mark_hint">Mark a post office visited from its map card to grow your collection.</div>
         </div>
       </div>
-      <div class="explored"><b id="exploredNum">0</b> / 100 explored</div>
+      <div class="explored"><b id="exploredNum">0</b><span data-i18n="passport.explored"> / 100 explored</span></div>
       <div class="notchbar" id="notchBar" aria-hidden="true"></div>
       <div class="milestones" id="milestoneBadges"></div>
       <div class="chips" id="gridFilters">
@@ -574,27 +579,28 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
         <button class="chip" data-f="unvisited" data-i18n="passport.filter_unvisited" aria-pressed="false">Unvisited</button>
       </div>
       <div class="tilegrid" id="tileGrid"></div>
+      <div class="note" id="gridEmpty" style="display:none;text-align:center;padding:18px 8px" data-i18n="passport.empty_filter">Nothing here yet — tap a pin on the map to start collecting.</div>
     </div>
     <h3 class="sec" data-i18n="passport.district_progress">District progress</h3>
     <div class="card" id="districtProg" style="padding:8px 14px"></div>
-    <h3 class="sec">Share &amp; backup</h3>
+    <h3 class="sec" data-i18n="passport.share_backup">Share &amp; backup</h3>
     <div class="card">
-      <div class="segrow" id="shareFmt" role="group" aria-label="Share card format" data-i18n="passport.fmt_post">
+      <div class="segrow" id="shareFmt" role="group" data-i18n-aria="passport.share_format" aria-label="Share card format">
         <button class="seg on" data-fmt="post" data-i18n="passport.fmt_post">Post · 4:5</button>
         <button class="seg" data-fmt="story" data-i18n="passport.fmt_story">Story · 9:16</button>
       </div>
       <label class="checkrow"><input type="checkbox" id="sharePhotos" checked data-i18n="passport.include_photos"> <span>Include my stamp photos</span></label>
-      <div class="actionrow" style="margin-top:10px" data-i18n="passport.share_journey">
+      <div class="actionrow" style="margin-top:10px">
         <button class="btn accent" id="btnShare" data-i18n="passport.share_journey">Share my journey</button>
       </div>
       <div id="sharePreview" style="display:none;margin-top:12px"></div>
-      <div class="actionrow" data-i18n="passport.export">
+      <div class="actionrow">
         <button class="btn ghost" id="btnExport" data-i18n="passport.export" style="flex:1">Export backup</button>
         <label class="btn ghost filebtn" style="flex:1;text-align:center">Import backup<input type="file" id="fileImport" accept="application/json"></label>
       </div>
-      <div class="note" style="margin-top:10px">Your progress lives in this browser. Your stamp count also syncs to the Rivals leaderboard, but it cannot restore your passport on a new device — export a backup file before clearing browser data or switching devices. Stamp photos are <b>not</b> included in the JSON backup.</div>
+      <div class="note" style="margin-top:10px" data-i18n="passport.backup_note">Your progress lives in this browser. Your stamp count also syncs to the Rivals leaderboard, but it cannot restore your passport on a new device — export a backup file before clearing browser data or switching devices. Stamp photos are <b>not</b> included in the JSON backup.</div>
     </div>
-    <h3 class="sec">Stamp photos</h3>
+    <h3 class="sec" data-i18n="passport.photos_section">Stamp photos</h3>
     <div class="card">
       <div id="photoMeter"></div>
     </div>
@@ -604,7 +610,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 <!-- SAVED -->
 <!-- RIVALS -->
 <section class="view" id="view-rivals">
-  <div class="pagehead"><h1<h1 data-i18n="rivals.title">Rivals</h1><p>Compete with fellow collectors. Tap anyone to see their stamps.</p></div>
+  <div class="pagehead"><h1 data-i18n="rivals.title">Rivals</h1><p data-i18n="rivals.subtitle">Compete with fellow collectors. Tap anyone to see their stamps.</p></div>
   <div class="scroll" id="rivalsScroll">
     <div class="card" id="rivalProfile" style="display:none">
       <div style="display:flex;align-items:center;gap:12px">
@@ -613,35 +619,35 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
           <div id="rivalName" style="font-weight:800;font-size:17px"></div>
           <div id="rivalCode" style="font-size:13px;color:var(--ink-2)"></div>
         </div>
-        <button class="btn ghost" id="rivalCopyCode" style="padding:8px 12px;font-size:13px">Copy code</button>
+        <button class="btn ghost" id="rivalCopyCode" data-i18n="rivals.copy_code" style="padding:8px 12px;font-size:13px">Copy code</button>
       </div>
       <div style="margin-top:10px;display:flex;gap:8px">
-        <input id="rivalNameInput" data-i18n-ph="rivals.name_ph" placeholder="Your display name" maxlength="24" style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:15px" data-i18n="rivals.save">
-        <button class="btn" id="rivalSaveName" style="padding:10px 14px">Save</button>
+        <input id="rivalNameInput" data-i18n-ph="rivals.name_ph" placeholder="Your display name" maxlength="24" style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:15px">
+        <button class="btn" id="rivalSaveName" data-i18n="rivals.save" style="padding:10px 14px">Save</button>
       </div>
       <div id="rivalEmailRow" style="margin-top:10px;display:flex;gap:8px">
-        <input id="rivalEmailInput" type="email" data-i18n-ph="rivals.email_ph" placeholder="Email to save progress across devices" style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:15px" data-i18n="rivals.link">
-        <button class="btn" id="rivalLinkEmail" style="padding:10px 14px">Link</button>
+        <input id="rivalEmailInput" type="email" data-i18n-ph="rivals.email_ph" placeholder="Email to save progress across devices" style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:15px">
+        <button class="btn" id="rivalLinkEmail" data-i18n="rivals.link" style="padding:10px 14px">Link</button>
       </div>
-      <div class="note" id="rivalEmailNote" style="margin-top:8px;font-size:12px">Share your code with friends so they can add you. Link your email to keep your progress if you switch devices.</div>
+      <div class="note" id="rivalEmailNote" style="margin-top:8px;font-size:12px" data-i18n="rivals.email_note">Share your code with friends so they can add you. Link your email to keep your progress if you switch devices.</div>
     </div>
-    <div class="card" id="rivalAdd" data-i18n="rivals.add_friend">
+    <div class="card" id="rivalAdd">
       <div style="font-weight:700;margin-bottom:8px" data-i18n="rivals.add_friend">Add a friend</div>
       <div style="display:flex;gap:8px">
-        <input id="rivalCodeInput" data-i18n-ph="rivals.code_ph" placeholder="Enter friend's code" maxlength="6" autocapitalize="characters" style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:15px;text-transform:uppercase" data-i18n="rivals.add">
-        <button class="btn" id="rivalAddBtn" style="padding:10px 14px">Add</button>
+        <input id="rivalCodeInput" data-i18n-ph="rivals.code_ph" placeholder="Enter friend's code" maxlength="6" autocapitalize="characters" style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--ink);font-size:15px;text-transform:uppercase">
+        <button class="btn" id="rivalAddBtn" data-i18n="rivals.add" style="padding:10px 14px">Add</button>
       </div>
     </div>
-    <h3 class="sec">Leaderboard</h3>
+    <h3 class="sec" data-i18n="rivals.leaderboard">Leaderboard</h3>
     <div id="rivalBoard"><div class="note">Loading…</div></div>
-    <h3 class="sec">My friends</h3>
+    <h3 class="sec" data-i18n="rivals.my_friends">My friends</h3>
     <div id="rivalFriends"><div class="note">No friends added yet.</div></div>
-    <div class="card note" id="rivalOffline" style="display:none">You're offline — the leaderboard needs an internet connection. Your progress is safe on this device.</div>
+    <div class="card note" id="rivalOffline" style="display:none" data-i18n="rivals.offline">You're offline — the leaderboard needs an internet connection. Your progress is safe on this device.</div>
   </div>
 </section>
 
 <!-- RIVAL PROFILE SHEET -->
-<div id="rivalSheet" style="display:none;position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.5)" role="dialog" aria-label="Collector profile">
+<div id="rivalSheet" style="display:none;position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.5)" role="dialog" data-i18n-aria="rivalsheet.aria" aria-label="Collector profile">
   <div style="position:absolute;left:0;right:0;bottom:0;max-height:82vh;background:var(--surface);border-radius:18px 18px 0 0;overflow-y:auto;padding:18px">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
       <div id="rsAvatar" style="width:52px;height:52px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px"></div>
@@ -651,30 +657,30 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       </div>
       <button class="btn ghost" id="rsClose" style="padding:8px 12px">✕</button>
     </div>
-    <div class="note" style="font-size:12px;margin-bottom:10px">Photos below were shared by this collector.</div>
+    <div class="note" style="font-size:12px;margin-bottom:10px" data-i18n="rivalsheet.photos_note">Photos below were shared by this collector.</div>
     <div id="rsPhotos" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"></div>
   </div>
 </div>
 
 <!-- SETTINGS -->
 <section class="view" id="view-settings">
-  <div class="pagehead"><h1<h1 data-i18n="settings.title">Settings</h1><p>App preferences and information.</p></div>
+  <div class="pagehead"><h1 data-i18n="settings.title">Settings</h1><p data-i18n="settings.subtitle">App preferences and information.</p></div>
   <div class="scroll">
     <div class="card">
       <div class="togglerow"><span data-i18n="settings.dark">Dark theme</span>
         <span class="switch"><input type="checkbox" id="themeToggle" aria-label="Toggle dark theme"><span class="tr"></span><span class="th"></span></span>
       </div>
-      <div class="note">Theme preference is saved on this device only.</div>
+      <div class="note" data-i18n="settings.dark_note">Theme preference is saved on this device only.</div>
       <div class="togglerow" style="margin-top:12px"><span>ಕನ್ನಡ / Kannada</span>
         <span class="switch"><input type="checkbox" id="langToggle" aria-label="Toggle Kannada language"><span class="tr"></span><span class="th"></span></span>
       </div>
-      <div class="note">Show office names and navigation in Kannada. Other text is still English.</div>
+      <div class="note" data-i18n="settings.kannada_note">Show office names and navigation in Kannada. Other text is still English.</div>
       <div class="togglerow" style="margin-top:12px"><span data-i18n="settings.share">Share stamp photos</span>
         <span class="switch"><input type="checkbox" id="sharePhotosToggle" aria-label="Share stamp photos publicly on Rivals"><span class="tr"></span><span class="th"></span></span>
       </div>
-      <div class="note">Off by default. When on, a small copy of each stamp photo is shown publicly on Rivals. Turning it off deletes the shared copies.</div>
+      <div class="note" data-i18n="settings.share_note">Off by default. When on, a small copy of each stamp photo is shown publicly on Rivals. Turning it off deletes the shared copies.</div>
     </div>
-    <h3 class="sec">FAQ</h3>
+    <h3 class="sec" data-i18n="settings.faq">FAQ</h3>
     <div class="card faq">
       <details>
         <summary data-i18n="faq.visited.q">How do I mark a place visited?</summary>
@@ -710,9 +716,9 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       </details>
     </div>
     <h3 class="sec" data-i18n="settings.tutorial">Tutorial</h3>
-    <div class="card" data-i18n="settings.replay">
+    <div class="card">
       <button class="btn ghost" id="replayTutorial" data-i18n="settings.replay" style="width:100%">Replay tutorial</button>
-      <div class="note">The 3-card intro from your first visit.</div>
+      <div class="note" data-i18n="settings.tutorial_note">The 3-card intro from your first visit.</div>
     </div>
     <h3 class="sec" data-i18n="settings.about_data">About this data</h3>
     <div class="card note" data-i18n="settings.about_data_body">
@@ -731,20 +737,20 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       <b>Terrain:</b> © OpenStreetMap contributors, SRTM | style: © OpenTopoMap (CC-BY-SA)
     </div>
     <h3 class="sec" data-i18n="settings.about_app">About this app</h3>
-    <div class="card note" data-i18n="settings.about_app_body">
-      StampQuest was built solo by a fellow passport holder, with a little AI help along the way — so you may run into a glitch or a wrong detail. Spotted something? I'd genuinely like to hear about it. Loving it? Share it with your fellow collectors.
+    <div class="card note">
+      <span data-i18n="settings.about_app_body">StampQuest was built solo by a fellow passport holder, with a little AI help along the way — so you may run into a glitch or a wrong detail. Spotted something? I'd genuinely like to hear about it. Loving it? Share it with your fellow collectors.</span>
       <br><br>
-      <a class="btn" style="width:100%;text-decoration:none;text-align:center;display:block" href="mailto:pannova89@gmail.com?subject=StampQuest%20feedback">Send feedback</a>
+      <a class="btn" style="width:100%;text-decoration:none;text-align:center;display:block" data-i18n="settings.feedback" href="mailto:pannova89@gmail.com?subject=StampQuest%20feedback">Send feedback</a>
     </div>
-    <h3 class="sec">Danger zone</h3>
-    <div class="card" data-i18n="settings.reset">
+    <h3 class="sec" data-i18n="settings.danger">Danger zone</h3>
+    <div class="card">
       <button class="btn ghost" id="btnReset" data-i18n="settings.reset" style="width:100%;border-color:var(--brand);color:var(--brand)">Reset all progress</button>
     </div>
-    <div class="note" style="text-align:center;margin-top:18px">StampQuest · v1.0<br>Karnataka Philately Passport</div>
+    <div class="note" style="text-align:center;margin-top:18px" data-i18n="settings.version">StampQuest · v1.0<br>Karnataka Philately Passport</div>
   </div>
 </section>
 
-<nav id="nav" aria-label="Main navigation">
+<nav id="nav" data-i18n-aria="nav.aria" aria-label="Main navigation">
   <button data-tab="explore" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-5.6-7-11a7 7 0 1 1 14 0c0 5.4-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>Explore</button>
   <button data-tab="circuits"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="18" r="2.4"/><circle cx="18" cy="6" r="2.4"/><path d="M8.4 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.4" stroke-dasharray="3 2.4"/></svg>Circuits</button>
   <button data-tab="passport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3.5" width="12" height="17" rx="1.5"/><path d="M9 8.5h6M9 12h6M9 15.5h4"/></svg>Passport</button>
@@ -753,9 +759,9 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 </nav>
 
 <!-- bottom sheet -->
-<div id="sheet" data-snap="peek" role="dialog" aria-label="Location details">
-  <button class="sheetclose" id="sheetClose" aria-label="Close details">✕</button>
-  <div class="handle" id="sheetHandle"></div>
+<div id="sheet" data-snap="peek" role="dialog" data-i18n-aria="sheet.aria" aria-label="Location details" aria-hidden="true">
+  <button class="sheetclose" id="sheetClose" data-i18n-aria="sheet.close" aria-label="Close details">✕</button>
+  <div class="handle" id="sheetHandle" role="button" tabindex="0" data-i18n-aria="handle.aria" aria-label="Drag to resize details panel"></div>
   <div class="sheet-head">
     <div class="info">
       <div class="no" id="shNo">No. —</div>
@@ -770,6 +776,11 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 
 <div id="toast" role="status"></div>
 
+<div id="updateBar" role="status" data-i18n-aria="update.aria" aria-label="Update available">
+  <span data-i18n="update.available">A new version of StampQuest is ready.</span>
+  <button id="updateRefresh" data-i18n="update.refresh">Refresh</button>
+</div>
+
 <input type="file" id="photoCam" accept="image/*" capture="environment" style="display:none" aria-hidden="true">
 <input type="file" id="photoGal" accept="image/*" style="display:none" aria-hidden="true">
 <div id="firstrun">
@@ -778,7 +789,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       <div class="tslide">
         <div class="serif" style="font-size:20px;margin-bottom:8px" data-i18n="tutorial.s1_title">Welcome to StampQuest</div>
         <div id="heroType" aria-hidden="true" style="font-size:13px;color:var(--brand);min-height:20px;margin-bottom:10px;font-style:italic"></div>
-        <div class="note" style="font-size:13px;color:var(--ink)" data-i18n="tutorial.s1_body">All 100 Karnataka Philately Passport post offices, on one map. Tap a pin for details and directions, mark each stamp as you collect it, and watch your passport fill up.<br><br>The slim rail on the right holds <b>Layers</b> (map style), <b>Near me</b> (closest offices) and <b>Reset</b> (back to Karnataka view), plus zoom.<br><br>Your progress never leaves this device.<br><br>Built solo by a fellow collector, with a little AI help — so if you spot a glitch or a wrong detail, I'd genuinely like to hear about it (see <b>Settings → About this app</b>).</div>
+        <div class="note" style="font-size:13px;color:var(--ink)" data-i18n="tutorial.s1_body">All 100 Karnataka Philately Passport post offices, on one map. Tap a pin for details and directions, mark each stamp as you collect it, and watch your passport fill up.<br><br>The slim rail on the right holds <b>Layers</b> (map style), <b>Near me</b> (closest offices) and <b>Reset</b> (back to Karnataka view), plus zoom.<br><br>Your stamps and photos stay on this device — only your stamp count appears on the Rivals leaderboard.<br><br>Built solo by a fellow collector, with a little AI help — so if you spot a glitch or a wrong detail, I'd genuinely like to hear about it (see <b>Settings → About this app</b>).</div>
       </div>
       <div class="tslide">
         <div class="serif" style="font-size:20px;margin-bottom:8px" data-i18n="tutorial.s2_title">Collect with a photo</div>
@@ -799,7 +810,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 
 <script src="vendor/leaflet.js"></script>
 <script src="vendor/leaflet.markercluster.js"></script>
-<script src="vendor/supabase-js.js"></script>
+<!-- supabase-js loads lazily (rivalInit) so the critical path stays light; still cached offline by the SW -->
 <script src="vendor/confetti.min.js"></script>
 <script src="vendor/gsap.min.js"></script>
 <script src="vendor/typed.min.js"></script>

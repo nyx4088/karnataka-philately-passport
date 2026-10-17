@@ -1,4 +1,4 @@
-const CACHE = "stampquest-v7";
+const CACHE = "stampquest-v8";
 const SHELL = [
   "./",
   "index.html",
@@ -28,6 +28,10 @@ const SHELL = [
 ];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+});
+/* let the page force-activate a waiting worker from the update prompt */
+self.addEventListener("message", e => {
+  if (e.data && e.data.type === "SKIP_WAITING") self.skipWaiting();
 });
 self.addEventListener("activate", e => {
   e.waitUntil(

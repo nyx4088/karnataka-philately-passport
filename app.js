@@ -201,14 +201,16 @@ function closeSheet(){ if (releaseSheetTrap){ releaseSheetTrap(); releaseSheetTr
   if (window.fitKarnataka) setTimeout(()=>window.fitKarnataka(), 350); }
 $("sheetClose").onclick = closeSheet;
 
-/* drag handle */
-(()=>{ const h = $("sheetHandle"); let y0=null, snap0=null;
+/* drag handle: drag between snap points; tap (or Enter/Space) cycles them */
+(()=>{ const h = $("sheetHandle"); let y0=null, snap0=null, dragged=false;
   const snaps=["peek","half","full"];
-  h.addEventListener("pointerdown", e=>{ y0=e.clientY; snap0=sheet.dataset.snap; h.setPointerCapture(e.pointerId); });
+  h.addEventListener("pointerdown", e=>{ y0=e.clientY; snap0=sheet.dataset.snap; dragged=false; try{ h.setPointerCapture(e.pointerId); }catch(err){} });
   h.addEventListener("pointermove", e=>{ if(y0===null) return; const dy=e.clientY-y0;
-    if (Math.abs(dy)>40){ const i=snaps.indexOf(snap0); setSnap(snaps[Math.min(2,Math.max(0,i+(dy<0?1:-1)))]); y0=e.clientY; snap0=sheet.dataset.snap; } });
+    if (Math.abs(dy)>40){ dragged=true; const i=snaps.indexOf(snap0); setSnap(snaps[Math.min(2,Math.max(0,i+(dy<0?1:-1)))]); y0=e.clientY; snap0=sheet.dataset.snap; } });
   h.addEventListener("pointerup", ()=>{ y0=null; });
-  h.addEventListener("click", ()=>{ const i=snaps.indexOf(sheet.dataset.snap); setSnap(snaps[(i+1)%3]); });
+  h.addEventListener("pointercancel", ()=>{ y0=null; });
+  h.addEventListener("click", ()=>{ if (dragged){ dragged=false; return; } const i=snaps.indexOf(sheet.dataset.snap); setSnap(snaps[(i+1)%3]); });
+  h.addEventListener("keydown", e=>{ if (e.key==="Enter"||e.key===" "){ e.preventDefault(); const i=snaps.indexOf(sheet.dataset.snap); setSnap(snaps[(i+1)%3]); } });
 })();
 
 function openLocation(n, opts){
@@ -217,7 +219,7 @@ function openLocation(n, opts){
   if (selectedN && markers[selectedN]) refreshMarker(selectedN);
   selectedN = n;
   refreshMarker(n);
-  $("shNo").textContent = "No. " + l.n;
+  $("shNo").textContent = t("sheet.no", { n: l.n });
   $("shName").textContent = fullName(l);
   $("shMeta").textContent = (l.pin + " · " + l.district).toUpperCase() + (l.kn_name ? " · " + l.kn_name : "");
   renderSheetBody(l);
@@ -225,46 +227,45 @@ function openLocation(n, opts){
   if (opts.pan !== false) map.flyTo([l.lat, l.lng], Math.max(map.getZoom(), 12), { duration:.6 });
   if (location.hash !== "#loc="+n) history.replaceState(null,"","#loc="+n);
 }
-const LANDSCAPE_LABEL = { forest:"Forest", coastal:"Coastal", heritage:"Heritage", urban:"Urban",
-  hills:"Hills", riverside:"Riverside", plains:"Plains", lake:"Lake" };
 function renderSheetBody(l){
   const st = statusOf(l.n);
   const badge = $("shBadge");
   badge.className = "badge " + st;
-  badge.textContent = st === "visited" ? "VISITED ✓" : st.toUpperCase();
+  badge.textContent = st === "visited" ? t("sheet.status_visited") : t("sheet.status_" + st);
   const old = sheet.querySelector(".stamp-pop"); if (old) old.remove();
   let ppc = "";
   if (l.ppc) ppc = '<div class="kv"><span class="k">CANCELLATION</span><span class="v">'+esc(l.ppc.motif)+'<span class="sub">Introduced '+esc(l.ppc.introduced)+'</span></span></div>';
-  const office = l.office_type_full ? esc(l.office_type_full) : "Office type unknown";
+  const office = (l.office_type && t("officetype." + l.office_type) !== "officetype." + l.office_type)
+    ? t("officetype." + l.office_type) : (l.office_type_full ? esc(l.office_type_full) : t("sheet.office_unknown"));
   const vline = l.verified === "approx"
-    ? '<div class="hintline">Approximate location — pinned to the town centre.</div>'
-    : '<div class="hintline ok">Location confirmed.</div>';
+    ? '<div class="hintline">'+t("sheet.approx")+'</div>'
+    : '<div class="hintline ok">'+t("sheet.confirmed")+'</div>';
   $("sheetBody").innerHTML =
     '<div class="stampcard" id="stampCard">'+
       '<div class="kv"><span class="k">OFFICE</span><span class="v">'+office+'</span></div>'+
       '<div class="kv"><span class="k">DISTRICT</span><span class="v">'+esc(l.district)+'</span></div>'+
       '<div class="kv"><span class="k">REGION</span><span class="v">'+esc(l.region)+'</span></div>'+
-      '<div class="kv"><span class="k">SETTING</span><span class="v">'+esc(LANDSCAPE_LABEL[l.landscape] || l.landscape)+'</span></div>'+
+      '<div class="kv"><span class="k">SETTING</span><span class="v">'+esc(t('landscape.'+l.landscape) !== 'landscape.'+l.landscape ? t('landscape.'+l.landscape) : (l.landscape||''))+'</span></div>'+
       ppc +
       (l.fact ? '<div class="kv"><span class="k">DID YOU KNOW</span><span class="v" style="font-weight:400">'+esc(l.fact)+'</span></div>' : '')+
       (l.nearby && l.nearby.length ? '<div class="kv"><span class="k">NEARBY</span><span class="v" style="font-weight:400">'+l.nearby.map(esc).join(' · ')+'</span></div>' : '')+
-      '<div class="kv"><span class="k">GETTING THERE</span><span class="v">Via '+esc(l.transit_town)+'<span class="sub">Nearest transit town — indicative only</span></span></div>'+
+      '<div class="kv"><span class="k">GETTING THERE</span><span class="v">'+t("sheet.getting_there", { town: esc(l.transit_town) })+'<span class="sub">'+t("sheet.getting_there_sub")+'</span></span></div>'+
       vline +
       '<div class="photosec" id="photoSec"></div>'+
       '<div class="actionrow">'+
-        '<a class="btn ghost" style="flex:1;text-decoration:none;text-align:center" target="_blank" rel="noopener" href="'+gmapsPhotos(l)+'">Photos</a>'+
-        '<button class="btn ghost" id="btnPlanned" style="flex:1">'+(st==="planned"?"★ Planned":"Plan to visit")+'</button>'+
+        '<a class="btn ghost" style="flex:1;text-decoration:none;text-align:center" target="_blank" rel="noopener" href="'+gmapsPhotos(l)+'">'+t("sheet.photos_btn")+'</a>'+
+        '<button class="btn ghost" id="btnPlanned" style="flex:1">'+(st==="planned"?t("sheet.planned"):t("sheet.plan"))+'</button>'+
       '</div>'+
       '<div class="linkrow">'+
-        '<a target="_blank" rel="noopener" href="'+gmapsDir(l.lat,l.lng)+'">Directions to map pin</a>'+
-        '<a href="'+reportLink(l)+'">Report a wrong location</a>'+
+        '<a target="_blank" rel="noopener" href="'+gmapsDir(l.lat,l.lng)+'">'+t("sheet.directions_pin")+'</a>'+
+        '<a href="'+reportLink(l)+'">'+t("sheet.report")+'</a>'+
       '</div>'+
     '</div>';
   $("sheetFoot").innerHTML =
-    '<a class="btn primary" style="text-decoration:none;text-align:center" target="_blank" rel="noopener" href="'+gmapsSearch(l)+'">Directions</a>'+
+    '<a class="btn primary" style="text-decoration:none;text-align:center" target="_blank" rel="noopener" href="'+gmapsSearch(l)+'">'+t("sheet.directions")+'</a>'+
     (st === "visited"
-      ? '<button class="btn ghost" id="btnVisited">Unmark visited</button>'
-      : '<button class="btn ghost" id="btnVisited">Mark visited without photo</button>');
+      ? '<button class="btn ghost" id="btnVisited">'+t("sheet.unmark_visited")+'</button>'
+      : '<button class="btn ghost" id="btnVisited">'+t("sheet.mark_visited")+'</button>');
   $("btnVisited").onclick = () => toggleVisited(l.n);
   $("btnPlanned").onclick = () => togglePlanned(l.n);
   renderPhotoSection(l);
@@ -316,14 +317,14 @@ function toggleVisited(n){
   else { state.visited[n] = new Date().toISOString().slice(0, 10); delete state.planned[n]; }
   save(); refreshMarker(n); renderSheetBody(byN[n]); renderProgress(); renderGrid(); renderDistricts();
   if (typeof rivalSync === "function") rivalSync();
-  if (!was){ stampPop(); stampBurst(false); checkMilestones(); toast("Stamped! " + visitedCount() + " of 100 collected."); }
+  if (!was){ stampPop(); stampBurst(false); checkMilestones(); toast(t("toast.stamped", { n: visitedCount() })); }
   else toast(t("toast.removed"));
 }
 function togglePlanned(n){
   if (state.visited[n]){ toast(t("toast.already")); return; }
   if (state.planned[n]) delete state.planned[n]; else state.planned[n] = true;
   save(); refreshMarker(n); renderSheetBody(byN[n]); renderGrid();
-  toast(state.planned[n] ? "Added to your postbox." : "Removed from postbox.");
+  toast(state.planned[n] ? t("toast.postbox_add") : t("toast.postbox_remove"));
 }
 function checkMilestones(){
   const c = visitedCount();
@@ -335,7 +336,7 @@ function checkMilestones(){
         setTimeout(() => stampBurst(true, { particleCount: 90, angle: 60, spread: 60, origin: { x: 0, y: 0.7 } }), 800);
         setTimeout(() => stampBurst(true, { particleCount: 90, angle: 120, spread: 60, origin: { x: 1, y: 0.7 } }), 1200);
       } else stampBurst(true);
-      toast(m === 100 ? "INCREDIBLE — all 100 stamps collected!" : m + " stamps! Milestone reached."); }
+      toast(m === 100 ? t("toast.milestone_100") : t("toast.milestone", { m })); }
   });
 }
 
@@ -465,7 +466,7 @@ function closePhotoPicker(){
 function pushPhotoSheet(){
   if (photoSheetPushed) return;
   photoSheetPushed = true;
-  pushPhotoSheet();
+  try { history.pushState({ photosheet: 1 }, "", location.href); } catch(e){}
 }
 /* tile photo long-press actions */
 function openTilePhotoActions(n){
@@ -476,10 +477,10 @@ function openTilePhotoActions(n){
   b.onclick = closePhotoPicker;
   document.body.appendChild(b);
   const d = document.createElement("div");
-  d.id = "photoChoice"; d.className = "photosheet"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", "Photo options");
+  d.id = "photoChoice"; d.className = "photosheet"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", t("sheet.photo_options"));
   const l = byN[n];
-  d.innerHTML = '<div style="text-align:center;padding:8px 0 4px;font-weight:600;color:var(--ink)">'+n+'. '+esc(l?l.name:"")+'</div>'+
-    '<button id="tpChange">Change photo</button><button id="tpRemove" style="color:var(--error)">Remove photo</button><button id="tpCancel" class="cancel">Cancel</button>';
+  d.innerHTML = '<div style="text-align:center;padding:8px 0 4px;font-weight:600;color:var(--ink)">'+(l ? l.n + '. ' + esc(l.name) : '')+'</div>'+
+    '<button id="tpChange">'+t("sheet.change_photo")+'</button><button id="tpRemove" style="color:var(--error)">'+t("sheet.remove_photo")+'</button><button id="tpCancel" class="cancel">'+t("sheet.cancel")+'</button>';
   document.body.appendChild(d);
   requestAnimationFrame(() => d.classList.add("open"));
   $("tpChange").onclick = () => { closePhotoPicker(); openPhotoPicker(n); };
@@ -498,8 +499,8 @@ function openPhotoPicker(n){
   b.onclick = closePhotoPicker;
   document.body.appendChild(b);
   const d = document.createElement("div");
-  d.id = "photoChoice"; d.className = "photosheet"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", "Add stamp photo");
-  d.innerHTML = '<button id="pcCam">Take photo</button><button id="pcGal">Choose from gallery</button><button id="pcCancel" class="cancel">Cancel</button>';
+  d.id = "photoChoice"; d.className = "photosheet"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", t("sheet.add_photo"));
+  d.innerHTML = '<button id="pcCam">'+t("sheet.take_photo")+'</button><button id="pcGal">'+t("sheet.choose_gallery")+'</button><button id="pcCancel" class="cancel">'+t("sheet.cancel")+'</button>';
   document.body.appendChild(d);
   requestAnimationFrame(() => d.classList.add("open"));
   $("pcCam").onclick = () => { closePhotoPicker(); $("photoCam").click(); };
@@ -543,13 +544,13 @@ async function handlePhotoFile(n, file){
     save();
     refreshMarker(n); renderSheetBody(byN[n]); renderProgress(); renderGrid(); renderDistricts();
     if (!wasVisited){ stampPop(); checkMilestones(); }
-    toastAction("Marked visited.", "Undo", async () => {
+    toastAction(t("toast.marked"), t("action.undo"), async () => {
       if (old) await photoPut(old); else { await photoDel(n); if (typeof rivalRemovePhotos === "function") rivalRemovePhotos([n]); }
       if (!wasVisited) delete state.visited[n];
       if (wasPlanned) state.planned[n] = true;
       save();
       refreshMarker(n); renderSheetBody(byN[n]); renderProgress(); renderGrid(); renderDistricts();
-      toast(old ? "Previous photo restored." : "Photo removed, visit undone.");
+      toast(old ? t("toast.restored") : t("toast.removed_undone"));
     });
   } catch(err){
     toast(t("toast.unreadable"));
@@ -570,15 +571,15 @@ async function renderPhotoSection(l){
   const rec = await photoGet(l.n);
   if (rec){
     const url = URL.createObjectURL(rec.thumb);
-    el.innerHTML = '<img class="thumb" alt="Your stamp photo" style="cursor:zoom-in">'+
-      '<div class="prow"><button class="btn ghost" id="btnPhotoRm">Remove photo</button></div>';
+    el.innerHTML = '<img class="thumb" alt="'+esc(t("rivalsheet.photo_alt"))+'" style="cursor:zoom-in">'+
+      '<div class="prow"><button class="btn ghost" id="btnPhotoRm">'+t("sheet.remove_photo")+'</button></div>';
     const img = el.querySelector(".thumb");
     img.src = url;
     img.onclick = () => openPhotoViewer(l.n);
     $("btnPhotoRm").onclick = () => removePhoto(l.n);
   } else {
-    el.innerHTML = '<button class="btn primary" id="btnPhotoAdd" style="width:100%">Add stamp photo</button>'+
-      '<div class="note" style="margin-top:6px">Take or pick a photo — the office is marked visited automatically.</div>';
+    el.innerHTML = '<button class="btn primary" id="btnPhotoAdd" style="width:100%">'+t("sheet.add_photo")+'</button>'+
+      '<div class="note" style="margin-top:6px">'+t("sheet.photo_note")+'</div>';
     $("btnPhotoAdd").onclick = () => openPhotoPicker(l.n);
   }
 }
@@ -648,9 +649,9 @@ async function renderPhotoMeter(){
     const used = await photoTotalBytes();
     const pct = Math.min(100, used / PHOTO_CAP * 100);
     el.innerHTML = '<div class="meter"><i style="width:'+pct.toFixed(1)+'%"></i></div>'+
-      '<div class="note">'+(used/1048576).toFixed(1)+' MB of 25 MB used · kept on this device, not included in JSON backups</div>';
+      '<div class="note">'+t("passport.photo_meter", { x: (used/1048576).toFixed(1) })+'</div>';
   } catch(e){
-    el.innerHTML = '<div class="note">Photo storage unavailable on this browser.</div>';
+    el.innerHTML = '<div class="note">'+t("passport.photo_meter_error")+'</div>';
   }
 }
 
@@ -666,9 +667,9 @@ sInput.addEventListener("input", () => {
   const hits = LOCATIONS.filter(l =>
     l.name.toLowerCase().includes(q) || l.district.toLowerCase().includes(q) ||
     l.pin.includes(q) || String(l.n) === q).slice(0,8);
-  if (!hits.length){ sBox.innerHTML = '<div style="padding:12px;font-size:13px;color:var(--ink-2)">No matches.</div>'; }
+  if (!hits.length){ sBox.innerHTML = '<div style="padding:12px;font-size:13px;color:var(--ink-2)">'+t("search.no_matches")+'</div>'; }
   else sBox.innerHTML = hits.map(l =>
-    '<button data-n="'+l.n+'"><span class="n">'+l.n+'</span><span><b>'+esc(fullName(l))+'</b><br><span style="color:var(--ink-2);font-size:12px">'+esc(l.district)+' · '+l.pin+'</span></span></button>').join("");
+    '<button data-n="'+l.n+'"><span class="n">'+l.n+'</span><span><b>'+esc(fullName(l))+'</b><br><span style="color:var(--ink-2);font-size:12px">'+esc(tDistrict(l.district))+' · '+l.pin+'</span></span></button>').join("");
   sBox.style.display = "block";
   sBox.querySelectorAll("button").forEach(b => b.onclick = () => {
     sBox.style.display = "none"; sInput.value = ""; sClear.style.display = "none"; sInput.blur();
@@ -692,14 +693,14 @@ $("btnLocate").onclick = () => {
 };
 function nearbyManual(msg){
   selectedN = null;
-  $("shNo").textContent = "NEARBY"; $("shName").textContent = "Nearest post offices";
-  $("shMeta").textContent = "FIND CLOSEST STAMPS";
-  const b = $("shBadge"); b.className = "badge unvisited"; b.textContent = "NEARBY";
+  $("shNo").textContent = t("sheet.nearby_no"); $("shName").textContent = t("sheet.nearby_title");
+  $("shMeta").textContent = t("sheet.nearby_meta");
+  const b = $("shBadge"); b.className = "badge unvisited"; b.textContent = t("sheet.nearby_no");
   $("sheetBody").innerHTML = '<div class="stampcard"><div class="note" style="font-size:13px;color:var(--ink)">'+esc(msg||"")+
-    ' Enter a location manually to sort by distance.</div><div class="manrow">'+
+    ' '+t("sheet.manual_note")+'</div><div class="manrow">'+
     '<input id="manLat" inputmode="decimal" placeholder="Latitude e.g. 12.87">'+
     '<input id="manLng" inputmode="decimal" placeholder="Longitude e.g. 74.84"></div>'+
-    '<div class="actionrow"><button class="btn accent" id="manGo" style="flex:1">Use this location</button></div></div>';
+    '<div class="actionrow"><button class="btn accent" id="manGo" style="flex:1">'+t("sheet.use_location")+'</button></div></div>';
   $("sheetFoot").innerHTML = "";
   openSheet();
   $("manGo").onclick = () => {
@@ -713,12 +714,12 @@ function showNearby(){
   const sorted = LOCATIONS.map(l => ({ l, d: havKm(myPos.lat, myPos.lng, l.lat, l.lng) }))
     .sort((a,b) => a.d - b.d).slice(0, 12);
   selectedN = null;
-  $("shNo").textContent = "NEARBY"; $("shName").textContent = "Nearest post offices";
-  $("shMeta").textContent = "SORTED BY DISTANCE";
-  const b = $("shBadge"); b.className = "badge unvisited"; b.textContent = "NEARBY";
+  $("shNo").textContent = t("sheet.nearby_no"); $("shName").textContent = t("sheet.nearby_title");
+  $("shMeta").textContent = t("sheet.nearby_sorted");
+  const b = $("shBadge"); b.className = "badge unvisited"; b.textContent = t("sheet.nearby_no");
   $("sheetBody").innerHTML = '<div class="stampcard">' + sorted.map(({l,d}) =>
     '<button class="nearby-row" data-n="'+l.n+'">'+
-    '<span><b>'+l.n+'. '+esc(l.name)+'</b><br><span style="color:var(--ink-2);font-size:12px">'+esc(l.district)+' · '+(statusOf(l.n)==="visited"?"✓ visited":statusOf(l.n))+'</span></span>'+
+    '<span><b>'+l.n+'. '+esc(l.name)+'</b><br><span style="color:var(--ink-2);font-size:12px">'+esc(tDistrict(l.district))+' · '+(statusOf(l.n)==="visited"?t("sheet.visited_suffix"):t("sheet.status_"+statusOf(l.n)))+'</span></span>'+
     '<span class="d">'+d.toFixed(1)+' km</span></button>').join("") + "</div>";
   $("sheetFoot").innerHTML = "";
   openSheet();
@@ -741,7 +742,6 @@ function switchTab(name){
   if (name === "passport"){ renderProgress(); renderGrid(); renderDistricts(); }
   if (name === "circuits") renderCircuits();
   if (name === "rivals") renderRivals();
-  if (name === "rivals") renderRivals();
   if (name === "settings") renderPhotoMeter();
 }
 document.querySelectorAll("#nav button").forEach(b => b.onclick = () => switchTab(b.dataset.tab));
@@ -762,15 +762,15 @@ function renderCircuits(){
     const open = !!circuitOpen[rg];
     const cid = "cr-" + ri;
     return '<div class="card" data-region="'+esc(rg)+'"><button class="chead" aria-expanded="'+open+'" aria-controls="'+cid+'" id="ch-'+ri+'">'+
-      '<span class="serif" style="font-size:17px">'+esc(rg)+'</span>'+
-      '<span class="cmeta"><span class="note">'+done+'/'+stops.length+' collected</span><span class="chev'+(open?" open":"")+'">›</span></span></button>'+
+      '<span class="serif" style="font-size:17px">'+esc(t('region.'+rg) !== 'region.'+rg ? t('region.'+rg) : rg)+'</span>'+
+      '<span class="cmeta"><span class="note">'+t("circuits.collected", { done: done, total: stops.length })+'</span><span class="chev'+(open?" open":"")+'">›</span></span></button>'+
       '<div class="cbody'+(open?" open":"")+'" id="'+cid+'" role="region" aria-labelledby="ch-'+ri+'">'+
       '<div class="dbar"><i style="width:'+(stops.length?done/stops.length*100:0)+'%"></i></div>'+
       '<div style="margin-top:10px">'+stops.map(l =>
         '<button class="rowbtn" data-n="'+l.n+'">'+
         '<span class="grow"><span class="t">'+l.n+'. '+esc(l.name)+'</span><span class="s" style="display:block">'+esc(l.district)+' · '+l.pin+'</span></span>'+
         '<span style="color:var(--ink-2)">›</span></button>').join("")+'</div>'+
-      '<button class="btn ghost" data-fit="'+esc(rg)+'" style="width:100%;margin-top:4px">Show on map</button></div></div>';
+      '<button class="btn ghost" data-fit="'+esc(rg)+'" style="width:100%;margin-top:4px">'+t("circuits.show_on_map")+'</button></div></div>';
   }).join("");
   $("circuitList").querySelectorAll(".chead").forEach(h => h.onclick = () => {
     const rg = REGION_ORDER[+h.id.split("-")[1]];
@@ -791,8 +791,8 @@ function renderProgress(){
   const c = visitedCount();
   renderRingCount(c);
   $("ringFg").style.strokeDashoffset = (326.7 * (1 - c/100)).toFixed(1);
-  const msgs = [[0,"Your passport is waiting for its first stamp."],[1,"Off to a great start — keep going."],[25,"A quarter century of stamps!"],[50,"Halfway there. The map is filling up."],[75,"The final stretch — almost legendary."],[100,"All 100 collected. Legendary."]];
-  let m = msgs[0][1]; msgs.forEach(([t,x]) => { if (c >= t) m = x; });
+  const msgs = [[0,"passport.ring_empty"],[1,"passport.msg_start"],[25,"passport.msg_quarter"],[50,"passport.msg_half"],[75,"passport.msg_final"],[100,"passport.msg_done"]];
+  let m = t(msgs[0][1]); msgs.forEach(([th,key]) => { if (c >= th) m = t(key); });
   $("ringMsg").textContent = m;
   $("notchBar").innerHTML = LOCATIONS.map(l => '<i class="'+(state.visited[l.n]?"hit":"")+'"></i>').join("");
   $("milestoneBadges").innerHTML = [25,50,75,100].map(mn =>
@@ -815,7 +815,7 @@ function renderGrid(){
     const st = statusOf(l.n);
     const pm = st === "visited" ? '<span class="postmark">'+esc(l.district)+'</span>' : "";
     const ck = st === "visited" ? '<span class="check" aria-hidden="true">✓</span>' : "";
-    return '<div class="tile '+st+'" data-n="'+l.n+'" role="button" tabindex="0" aria-label="'+l.n+". "+esc(l.name)+", "+st+'"><span class="tno">'+l.n+'</span><span class="nm">'+esc(dispName(l))+'</span><span class="pcam" data-n="'+l.n+'" role="button" aria-label="Add stamp photo" title="Add stamp photo"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>'+ck+pm+'<span class="tphoto" aria-hidden="true"></span></div>';
+    return '<div class="tile '+st+'" data-n="'+l.n+'" role="button" tabindex="0" aria-label="'+l.n+". "+esc(l.name)+", "+st+'"><span class="tno">'+l.n+'</span><span class="nm">'+esc(dispName(l))+'</span><span class="pcam" data-n="'+l.n+'" role="button" aria-label="'+t("sheet.add_photo")+'" title="'+t("sheet.add_photo")+'"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>'+ck+pm+'<span class="tphoto" aria-hidden="true"></span></div>';
   }).join("");
   g.querySelectorAll(".tile").forEach(t => {
     t.onclick = () => { switchTab("explore"); openLocation(+t.dataset.n); };
@@ -866,17 +866,19 @@ function renderGrid(){
       const ph = tile.querySelector(".tphoto");
       if (ph) ph.style.backgroundImage = 'url("'+url+'")';
       const pcam = tile.querySelector(".pcam");
-      if (pcam){ pcam.classList.add("has"); pcam.setAttribute("aria-label", "Change photo"); pcam.setAttribute("title", "Change photo"); }
+      if (pcam){ pcam.classList.add("has"); pcam.setAttribute("aria-label", t("sheet.change_photo")); pcam.setAttribute("title", t("sheet.change_photo")); }
       attachLongPress(tile);
     });
   }, { rootMargin: "100px" });
   g.querySelectorAll(".tile").forEach(t => io.observe(t));
+  const empty = $("gridEmpty");
+  if (empty) empty.style.display = g.children.length ? "none" : "block";
 }
 function renderDistricts(){
   const seen = []; LOCATIONS.forEach(l => { if (!seen.includes(l.district)) seen.push(l.district); });
   $("districtProg").innerHTML = seen.map(d => {
     const ds = LOCATIONS.filter(l => l.district === d), done = ds.filter(l => state.visited[l.n]).length;
-    return '<div style="padding:6px 0"><div class="drow"><span>'+esc(d)+'</span><b>'+done+'/'+ds.length+'</b></div>'+
+    return '<div style="padding:6px 0"><div class="drow"><span>'+esc(tDistrict(d))+'</span><b>'+done+'/'+ds.length+'</b></div>'+
       '<div class="dbar"><i style="width:'+(done/ds.length*100)+'%"></i></div></div>';
   }).join("");
 }
@@ -1108,7 +1110,7 @@ $("fileImport").addEventListener("change", e => {
   r.onload = () => { try{
       const j = JSON.parse(r.result); const s = j.state || j;
       // validate: visited/planned must be plain objects with keys 1-100 and date-string values
-      const bad = "That doesn't look like a StampQuest backup.";
+      const bad = t("toast.invalid");
       if (!s || typeof s !== "object" || Array.isArray(s)){ toast(bad); return; }
       const checkObj = (o) => {
         if (!o || typeof o !== "object" || Array.isArray(o)) return false;
@@ -1126,7 +1128,7 @@ $("fileImport").addEventListener("change", e => {
       if (s.theme) state.theme = s.theme; state.milestones = s.milestones || [];
       save(); applyTheme(); LOCATIONS.forEach(l => refreshMarker(l.n));
       renderProgress(); renderGrid(); renderDistricts();
-      toast("Backup imported. Undo", () => {
+      toast(t("toast.imported"), () => {
         state.visited = prev.visited; state.planned = prev.planned;
         state.theme = prev.theme; state.milestones = prev.milestones;
         save(); applyTheme(); LOCATIONS.forEach(l => refreshMarker(l.n));
@@ -1190,13 +1192,13 @@ $("btnReset").onclick = async () => {
   if (!confirm(t("confirm.reset", {n:vCount})+photoMsg)) return;
   let delPhotos = false;
   if (photoCount > 0){
-    delPhotos = confirm("Also delete your "+photoCount+" stamp photo"+(photoCount>1?"s":"")+"? (Cancel keeps them.)");
+    delPhotos = confirm(t("confirm.delete_photos", { n: photoCount }));
   }
   state.visited = {}; state.planned = {}; state.milestones = []; save();
   if (delPhotos){ await photoClearAll().catch(()=>{}); if (typeof rivalRemovePhotos === "function") await rivalRemovePhotos().catch(()=>{}); }
   LOCATIONS.forEach(l => refreshMarker(l.n));
   renderProgress(); renderGrid(); renderDistricts(); renderPhotoMeter();
-  toast(delPhotos ? "Progress and photos reset." : "Progress reset. Photos kept.");
+  toast(delPhotos ? t("toast.reset_photos") : t("toast.reset_kept"));
 };
 
 /* ================= rivals (Supabase leaderboard + friend codes) ================= */
@@ -1206,6 +1208,17 @@ const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 let sb = null, rivalUser = null, rivalProfile = null;
 
 function sbReady(){ return !!(SB_URL && SB_KEY && window.supabase); }
+/* supabase-js loads lazily so the critical path stays light (~108KB off first view) */
+function loadSupabase(){
+  return new Promise(res => {
+    if (window.supabase){ res(true); return; }
+    const sc = document.createElement("script");
+    sc.src = "vendor/supabase-js.js";
+    sc.onload = () => res(!!window.supabase);
+    sc.onerror = () => res(false);
+    document.head.appendChild(sc);
+  });
+}
 function initSupabase(){
   if (!sbReady()) return false;
   if (!sb) sb = window.supabase.createClient(SB_URL, SB_KEY);
@@ -1228,6 +1241,7 @@ function compressForShare(blob){
   });
 }
 async function rivalInit(){
+  if (!(await loadSupabase())) return;
   if (!initSupabase()) return;
   try {
     const { data: { session } } = await sb.auth.getSession();
@@ -1238,7 +1252,7 @@ async function rivalInit(){
       rivalUser = data.user;
     }
     // load or create profile
-    let { data: prof } = await sb.from("profiles").select("*").eq("id", rivalUser.id).single();
+    let { data: prof } = await sb.from("profiles").select("*").eq("id", rivalUser.id).maybeSingle();
     if (!prof){
       const code = await sb.rpc("gen_friend_code").then(r => r.data).catch(() => Math.random().toString(36).slice(2,8).toUpperCase());
       const { data: np, error } = await sb.from("profiles").insert({ id: rivalUser.id, friend_code: code }).select().single();
@@ -1261,9 +1275,9 @@ function renderRivalProfile(){
   const card = $("rivalProfile");
   if (!rivalProfile){ card.style.display = "none"; return; }
   card.style.display = "block";
-  $("rivalAvatar").textContent = (rivalProfile.display_name || "C").slice(0,1).toUpperCase();
-  $("rivalName").textContent = rivalProfile.display_name || "Collector";
-  $("rivalCode").textContent = "Your code: " + rivalProfile.friend_code;
+  $("rivalAvatar").textContent = (rivalProfile.display_name || t("rivals.collector")).slice(0,1).toUpperCase();
+  $("rivalName").textContent = rivalProfile.display_name || t("rivals.collector");
+  $("rivalCode").textContent = t("rivals.your_code", { code: rivalProfile.friend_code });
   $("rivalNameInput").value = rivalProfile.display_name || "";
   if (typeof renderRivalEmailState === "function") renderRivalEmailState();
 }
@@ -1272,7 +1286,7 @@ $("rivalCopyCode").onclick = () => {
   navigator.clipboard.writeText(rivalProfile.friend_code).then(() => toast(t("toast.copied")));
 };
 $("rivalSaveName").onclick = async () => {
-  const name = $("rivalNameInput").value.trim().slice(0, 24) || "Collector";
+  const name = $("rivalNameInput").value.trim().slice(0, 24) || t("rivals.collector");
   const { error } = await sb.from("profiles").update({ display_name: name }).eq("id", rivalUser.id);
   if (!error){ rivalProfile.display_name = name; renderRivalProfile(); toast(t("toast.saved")); }
 };
@@ -1290,7 +1304,7 @@ function renderRivalEmailState(){
   const email = rivalUser && rivalUser.email;
   if (email){
     row.style.display = "none";
-    note.textContent = "Signed in as " + email + ". Keeps your friend code and leaderboard spot. Restoring your passport on a new device is not available yet — use Export backup.";
+    note.textContent = t("rivals.signed_in", { email: email });
   } else {
     row.style.display = "flex";
   }
@@ -1351,7 +1365,7 @@ function buildRivalRow(r, i, avatarBg){
   row.style.cssText = "display:flex;align-items:center;gap:12px;margin-bottom:8px;cursor:pointer;" + (me ? "border:2px solid var(--brand)" : "");
   row.setAttribute("role", "button");
   row.setAttribute("tabindex", "0");
-  row.setAttribute("aria-label", (r.display_name || "Collector") + ", " + r.stamps + " of 100 stamps, self-reported" + ((r.photos > 0) ? ", " + r.photos + " photos shared" : ""));
+  row.setAttribute("aria-label", t("rivals.row_aria", { name: (r.display_name || t("rivals.collector")), n: r.stamps, photos: r.photos > 0 ? t("rivals.row_photos", { p: r.photos }) : "" }));
   row.onclick = () => openRivalProfile(r.id);
   row.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openRivalProfile(r.id); } };
   const medal = document.createElement("div");
@@ -1364,7 +1378,7 @@ function buildRivalRow(r, i, avatarBg){
   mid.style.flex = "1";
   const nm = document.createElement("div");
   nm.style.fontWeight = "700";
-  nm.textContent = r.display_name || "Collector";
+  nm.textContent = r.display_name || t("rivals.collector");
   if (me){
     const you = document.createElement("span");
     you.style.cssText = "font-size:12px;color:var(--brand)";
@@ -1373,8 +1387,8 @@ function buildRivalRow(r, i, avatarBg){
   }
   const sub = document.createElement("div");
   sub.style.cssText = "font-size:12px;color:var(--ink-2)";
-  const photoTxt = (r.photos > 0) ? " · 📷 " + r.photos + " shared" : "";
-  sub.textContent = r.stamps + " / 100 stamps (self-reported)" + photoTxt;
+  const photoTxt = (r.photos > 0) ? " 📷" + t("rivals.row_photos", { p: r.photos }) : "";
+  sub.textContent = t("rivals.stamps", { n: r.stamps }) + " " + t("rivals.self_reported") + photoTxt;
   mid.appendChild(nm); mid.appendChild(sub);
   const count = document.createElement("div");
   count.style.cssText = "font-weight:800;font-size:18px;color:var(--brand)";
@@ -1384,7 +1398,7 @@ function buildRivalRow(r, i, avatarBg){
 }
 async function renderRivals(){
   if (!sbReady()){
-    $("rivalBoard").innerHTML = '<div class="note">Leaderboard not connected yet.</div>';
+    $("rivalBoard").innerHTML = '<div class="note">'+t("rivals.not_connected")+'</div>';
     return;
   }
   if (!navigator.onLine){ $("rivalOffline").style.display = "block"; return; }
@@ -1395,7 +1409,7 @@ async function renderRivals(){
     el.textContent = "";
     if (!board || !board.length){
       const empty = document.createElement("div");
-      empty.className = "note"; empty.textContent = "No collectors yet — be the first!";
+      empty.className = "note"; empty.textContent = t("rivals.no_collectors");
       el.appendChild(empty);
     } else {
       board.forEach((r, i) => el.appendChild(buildRivalRow(r, i, "var(--brand)")));
@@ -1408,7 +1422,7 @@ async function renderRivals(){
       fel.textContent = "";
       if (!fids.length){
         const empty = document.createElement("div");
-        empty.className = "note"; empty.textContent = "No friends added yet.";
+        empty.className = "note"; empty.textContent = t("rivals.no_friends");
         fel.appendChild(empty);
       } else {
         const { data: fps } = await sb.from("profiles").select("id,display_name,friend_code").in("id", fids);
@@ -1424,7 +1438,7 @@ async function renderRivals(){
     const el = $("rivalBoard");
     el.textContent = "";
     const err = document.createElement("div");
-    err.className = "note"; err.textContent = "Could not load leaderboard.";
+    err.className = "note"; err.textContent = t("rivals.load_error");
     el.appendChild(err);
   }
 }
@@ -1433,10 +1447,10 @@ $("rivalAddBtn").onclick = async () => {
   const code = $("rivalCodeInput").value.trim().toUpperCase();
   if (!code || !rivalUser) return;
   if (rivalProfile && code === rivalProfile.friend_code){ toast(t("toast.own_code")); return; }
-  const { data: f } = await sb.from("profiles").select("id,display_name").eq("friend_code", code).single();
+  const { data: f } = await sb.from("profiles").select("id,display_name").eq("friend_code", code).maybeSingle();
   if (!f){ toast(t("toast.not_found")); return; }
   const { error } = await sb.from("friend_links").upsert({ user_id: rivalUser.id, friend_id: f.id });
-  if (!error){ $("rivalCodeInput").value = ""; toast("Added " + (f.display_name || "friend") + "!"); renderRivals(); }
+  if (!error){ $("rivalCodeInput").value = ""; toast(t("rivals.added", { name: f.display_name || t("rivals.collector") })); renderRivals(); }
   else toast(t("toast.already_added"));
 };
 let rsReleaseTrap = null;
@@ -1446,21 +1460,21 @@ async function openRivalProfile(uid){
   const grid = $("rsPhotos");
   grid.textContent = "";
   const loading = document.createElement("div");
-  loading.className = "note"; loading.textContent = "Loading…";
+  loading.className = "note"; loading.textContent = t("rivals.loading");
   grid.appendChild(loading);
   try {
-    const { data: prof } = await sb.from("profiles").select("display_name,friend_code").eq("id", uid).single();
-    const { data: prog } = await sb.from("progress").select("visited").eq("user_id", uid).single();
+    const { data: prof } = await sb.from("profiles").select("display_name,friend_code").eq("id", uid).maybeSingle();
+    const { data: prog } = await sb.from("progress").select("visited").eq("user_id", uid).maybeSingle();
     const visited = (prog && prog.visited) || [];
-    $("rsAvatar").textContent = String(prof.display_name||"C").slice(0,1).toUpperCase();
-    $("rsName").textContent = prof.display_name || "Collector";
-    $("rsStats").textContent = visited.length + " / 100 stamps";
+    $("rsAvatar").textContent = String(prof.display_name || t("rivals.collector")).slice(0,1).toUpperCase();
+    $("rsName").textContent = prof.display_name || t("rivals.collector");
+    $("rsStats").textContent = t("rivals.stamps", { n: visited.length });
     // list their photos from storage
     const { data: files } = await sb.storage.from("quest-photos").list(uid, { limit: 100 });
     grid.textContent = "";
     if (!files || !files.length){
       const empty = document.createElement("div");
-      empty.className = "note"; empty.textContent = "No photos shared yet.";
+      empty.className = "note"; empty.textContent = t("rivalsheet.no_photos");
       grid.appendChild(empty); return;
     }
     for (const f of files){
@@ -1470,7 +1484,7 @@ async function openRivalProfile(uid){
       const d = document.createElement("div");
       d.style.cssText = "position:relative;border-radius:10px;overflow:hidden;aspect-ratio:1;background:var(--surface-2)";
       const img = document.createElement("img");
-      img.src = publicUrl; img.loading = "lazy"; img.alt = "Stamp photo";
+      img.src = publicUrl; img.loading = "lazy"; img.alt = t("rivalsheet.photo_alt");
       img.style.cssText = "width:100%;height:100%;object-fit:cover";
       const cap = document.createElement("div");
       cap.style.cssText = "position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);color:#fff;font-size:12px;padding:4px 6px";
@@ -1481,7 +1495,7 @@ async function openRivalProfile(uid){
   } catch(e){
     grid.textContent = "";
     const err = document.createElement("div");
-    err.className = "note"; err.textContent = "Could not load profile.";
+    err.className = "note"; err.textContent = t("rivalsheet.load_error");
     grid.appendChild(err);
   }
 }
@@ -1531,7 +1545,8 @@ $("replayTutorial").onclick = () => { tShow(0); $("firstrun").classList.add("sho
 applyTheme();
 applyLang();
 renderProgress(); renderCircuits(); renderGrid(); renderDistricts();
-if (typeof rivalInit === "function") setTimeout(rivalInit, 2000);
+/* rivals auth is network-bound: don't even try when the browser reports offline */
+if (typeof rivalInit === "function" && navigator.onLine !== false) setTimeout(rivalInit, 2000);
 if (!state.firstRun){ $("firstrun").classList.add("show"); startHeroType(); }
 setTimeout(handleHash, 400);
 /* Lenis smooth scroll — desktop fine-pointer only; phones keep native touch scrolling */
@@ -1541,6 +1556,39 @@ if (typeof Lenis === "function" && !REDUCED && window.matchMedia("(pointer: fine
     (function raf(t){ lenis.raf(t); requestAnimationFrame(raf); })(performance.now());
   } catch(e){}
 }
-if ("serviceWorker" in navigator){
-  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+/* ===== aggressive self-updates: prompt when a new SW is waiting, re-check often ===== */
+let swReg = null, swUpdateShown = false, swReloading = false;
+function showUpdateBar(){
+  if (swUpdateShown) return; swUpdateShown = true;
+  const b = $("updateBar"); if (!b) return;
+  b.style.display = "flex";
 }
+function applyUpdate(){
+  if (swReg && swReg.waiting) swReg.waiting.postMessage({ type: "SKIP_WAITING" });
+  else location.reload();
+}
+function trackSW(reg){
+  swReg = reg;
+  const onWaiting = () => showUpdateBar();
+  if (reg.waiting) onWaiting();
+  reg.addEventListener("updatefound", () => {
+    const nw = reg.installing; if (!nw) return;
+    nw.addEventListener("statechange", () => {
+      // only prompt when an older worker is already controlling the page
+      if (nw.state === "installed" && navigator.serviceWorker.controller) onWaiting();
+    });
+  });
+}
+if ("serviceWorker" in navigator){
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").then(trackSW).catch(()=>{});
+  });
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (swReloading) return; swReloading = true; location.reload();
+  });
+  const upd = () => { if (swReg) swReg.update().catch(()=>{}); };
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) upd(); });
+  window.addEventListener("focus", upd);
+  setInterval(upd, 30 * 60 * 1000);
+}
+$("updateRefresh").onclick = applyUpdate;
