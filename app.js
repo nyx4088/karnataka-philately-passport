@@ -203,16 +203,80 @@ function closeSheet(){ if (releaseSheetTrap){ releaseSheetTrap(); releaseSheetTr
   if (window.fitKarnataka) setTimeout(()=>window.fitKarnataka(), 350); }
 $("sheetClose").onclick = closeSheet;
 
-/* drag handle: drag between snap points; tap (or Enter/Space) cycles them */
-(()=>{ const h = $("sheetHandle"); let y0=null, snap0=null, dragged=false;
-  const snaps=["peek","half","full"];
-  h.addEventListener("pointerdown", e=>{ y0=e.clientY; snap0=sheet.dataset.snap; dragged=false; try{ h.setPointerCapture(e.pointerId); }catch(err){} });
-  h.addEventListener("pointermove", e=>{ if(y0===null) return; const dy=e.clientY-y0;
-    if (Math.abs(dy)>40){ dragged=true; const i=snaps.indexOf(snap0); setSnap(snaps[Math.min(2,Math.max(0,i+(dy<0?1:-1)))]); y0=e.clientY; snap0=sheet.dataset.snap; } });
-  h.addEventListener("pointerup", ()=>{ y0=null; });
-  h.addEventListener("pointercancel", ()=>{ y0=null; });
-  h.addEventListener("click", ()=>{ if (dragged){ dragged=false; return; } const i=snaps.indexOf(sheet.dataset.snap); setSnap(snaps[(i+1)%3]); });
-  h.addEventListener("keydown", e=>{ if (e.key==="Enter"||e.key===" "){ e.preventDefault(); const i=snaps.indexOf(sheet.dataset.snap); setSnap(snaps[(i+1)%3]); } });
+/* drag handle: the sheet follows the finger 1:1 while dragging, then glides
+   to the nearest snap point on release; tap (or Enter/Space) cycles snaps */
+(()=>{ const h = $("sheetHandle"), body = $("sheetBody");
+  const snaps = ["peek","half","full"];
+  let y0=null, h0=0, dragged=false, peekH=0, maxH=0, vel=0, lastY=0, lastT=0, animating=false;
+  const vhPx = f => Math.round(window.innerHeight*f);
+  function measureFull(){
+    const ps = sheet.dataset.snap, pb = body.style.display, pm = sheet.style.maxHeight, ph = sheet.style.height;
+    sheet.dataset.snap = "full"; body.style.display = ""; sheet.style.maxHeight = "none"; sheet.style.height = "auto";
+    const full = Math.min(sheet.offsetHeight, vhPx(.88));
+    sheet.style.height = ph; sheet.style.maxHeight = pm; body.style.display = pb; sheet.dataset.snap = ps;
+    return full;
+  }
+  function chromeH(){
+    if (sheet.dataset.snap === "peek") return sheet.offsetHeight;
+    return sheet.offsetHeight - body.offsetHeight;
+  }
+  function nearest(hh, v){
+    const pts = [["peek",peekH],["half",vhPx(.52)],["full",maxH]];
+    if (v < -0.4){ const i = pts.findIndex(p => hh <= p[1]+24); return pts[Math.min(2,(i<0?2:i)+1)][0]; }
+    if (v >  0.4){ const i = pts.findIndex(p => hh <= p[1]+24); return pts[Math.max(0,(i<0?0:i)-1)][0]; }
+    let best = pts[0][0], bd = 1e9;
+    for (const [n,px] of pts){ const d = Math.abs(hh-px); if (d<bd){ bd=d; best=n; } }
+    return best;
+  }
+  function finishDrag(target){
+    const fromH = sheet.offsetHeight;
+    sheet.dataset.snap = target;
+    body.style.display = "";
+    const toH = sheet.offsetHeight;
+    if (REDUCED || Math.abs(toH-fromH) < 2){
+      sheet.style.height = ""; sheet.style.transition = ""; setSnap(target); animating = false; return;
+    }
+    sheet.style.height = fromH+"px";
+    void sheet.offsetHeight;
+    animating = true;
+    sheet.style.transition = "height .28s cubic-bezier(.32,.72,.35,1)";
+    sheet.style.height = toH+"px";
+    const done = e =>{ if(e && e.propertyName && e.propertyName!=="height") return;
+      if(!animating) return; animating=false;
+      sheet.style.height=""; sheet.style.transition=""; setSnap(target); };
+    sheet.addEventListener("transitionend", done, { once:true });
+    setTimeout(()=>done(null), 350);
+  }
+  h.addEventListener("pointerdown", e=>{
+    if (!sheet.classList.contains("open")) return;
+    y0 = e.clientY; lastY = e.clientY; lastT = performance.now();
+    h0 = sheet.offsetHeight; dragged = false; vel = 0;
+    animating = false; sheet.style.transition = "";
+    peekH = chromeH(); maxH = measureFull();
+    sheet.style.transition = "none"; sheet.style.height = h0+"px";
+    try{ h.setPointerCapture(e.pointerId); }catch(err){}
+  });
+  h.addEventListener("pointermove", e=>{
+    if (y0===null || !sheet.classList.contains("open")) return;
+    const dy = e.clientY - y0;
+    if (Math.abs(dy) > 6) dragged = true;
+    const now = performance.now(), dt = Math.max(1, now-lastT);
+    vel = 0.7*vel + 0.3*((e.clientY-lastY)/dt); lastY = e.clientY; lastT = now;
+    const nh = Math.min(maxH, Math.max(peekH, h0 - dy));
+    sheet.style.height = nh+"px";
+    body.style.display = nh > peekH+10 ? "" : "none";
+  });
+  const endDrag = ()=>{
+    if (y0===null) return; y0=null;
+    if (!dragged){ sheet.style.height=""; sheet.style.transition=""; body.style.display=""; return; }
+    finishDrag(nearest(sheet.offsetHeight, vel));
+  };
+  h.addEventListener("pointerup", endDrag);
+  h.addEventListener("pointercancel", endDrag);
+  h.addEventListener("click", ()=>{ if (dragged){ dragged=false; return; }
+    const i = snaps.indexOf(sheet.dataset.snap); setSnap(snaps[(i+1)%3]); });
+  h.addEventListener("keydown", e=>{ if (e.key==="Enter"||e.key===" "){ e.preventDefault();
+    const i = snaps.indexOf(sheet.dataset.snap); setSnap(snaps[(i+1)%3]); } });
 })();
 
 function openLocation(n, opts){
