@@ -1585,7 +1585,7 @@ async function rivalLeave(){
   if (btn) btn.disabled = false;
   toast(t("rivals.left_toast"));
 }
-$("rivalLeaveBtn").onclick = () => rivalLeave();
+{ const _rlb = $("rivalLeaveBtn"); if (_rlb) _rlb.onclick = () => rivalLeave(); }
 $("rivalCopyCode").onclick = () => {
   if (!rivalProfile) return;
   navigator.clipboard.writeText(rivalProfile.friend_code).then(() => toast(t("toast.copied")));
