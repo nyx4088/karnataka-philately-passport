@@ -22,6 +22,11 @@ test.beforeEach(async ({ page }, testInfo) => {
   testInfo.errors = errors;
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#nav')).toBeVisible();
+  // Splash screen (brand moment) removes itself in ≤2s; wait it out.
+  await page.locator('#splash').waitFor({ state: 'detached', timeout: 8000 }).catch(() => {});
+  // First-run tutorial overlay intercepts all taps: dismiss it like a real user would.
+  const skip = page.locator('#btnTSkip');
+  if (await skip.isVisible().catch(() => false)) await skip.click();
 });
 
 test.afterEach(async ({ page }, testInfo) => {
@@ -133,11 +138,11 @@ test('photo add, undo, remove flow', async ({ page }) => {
   await tile.locator('.pcam').click();
   
   // Photo picker should appear
-  await expect(page.locator('#photoPicker')).toBeVisible();
+  await expect(page.locator('#photoChoice')).toBeVisible();
   
   // Cancel (we can't actually upload in test)
   await page.locator('#pcCancel').click();
-  await expect(page.locator('#photoPicker')).not.toBeVisible();
+  await expect(page.locator('#photoChoice')).not.toBeVisible();
 });
 
 test('backup export/import round trip', async ({ page }) => {
@@ -154,7 +159,7 @@ test('backup export/import round trip', async ({ page }) => {
 test('malformed JSON import is rejected', async ({ page }) => {
   await page.locator('#nav button[data-tab="passport"]').click();
   // The import uses a file input; we verify the handler exists
-  await expect(page.locator('#importFile')).toBeAttached();
+  await expect(page.locator('#fileImport')).toBeAttached();
 });
 
 test('offline load shows cached app', async ({ page, context }) => {

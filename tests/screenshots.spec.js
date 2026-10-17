@@ -8,7 +8,12 @@ test.use({ viewport: { width: 375, height: 812 } });
 
 async function setup(page, theme, lang) {
   await page.goto('/');
-  await page.waitForTimeout(2000);
+  // Splash screen (brand moment) removes itself in ≤2s; wait it out.
+  await page.locator('#splash').waitFor({ state: 'detached', timeout: 8000 }).catch(() => {});
+  // First-run tutorial overlay intercepts all taps: dismiss it like a real user would.
+  const skip = page.locator('#btnTSkip');
+  if (await skip.isVisible().catch(() => false)) await skip.click();
+  await page.waitForTimeout(500);
   // Set theme
   if (theme === 'dark') {
     await page.click('[data-tab="settings"]');
