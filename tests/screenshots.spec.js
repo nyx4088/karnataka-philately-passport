@@ -17,7 +17,7 @@ async function setup(page, theme, lang) {
   // Set theme
   if (theme === 'dark') {
     await page.click('[data-tab="settings"]');
-    await page.check('#darkThemeToggle');
+    await page.check('#themeToggle');
     await page.waitForTimeout(500);
   }
   // Set language

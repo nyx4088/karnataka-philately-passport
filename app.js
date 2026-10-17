@@ -1557,6 +1557,35 @@ function renderRivalProfile(){
 }
 $("rivalJoinBtn").onclick = () => rivalJoin();
 $("rivalUploadBtn").onclick = () => rivalUpload();
+/* fully opt out: delete profile (progress + friend links cascade), shared photos,
+   sign out, clear flags. Server deletes are best-effort (offline-safe): the local
+   opt-out always applies. */
+async function rivalLeave(){
+  if (!rivalUser || !rivalProfile) return;
+  if (!confirm(t("rivals.leave_confirm"))) return;
+  const btn = $("rivalLeaveBtn");
+  if (btn) btn.disabled = true;
+  const uid = rivalUser.id;
+  try {
+    if (sb){
+      try { await rivalRemovePhotos(); } catch(e){ console.warn("leave: photos", e.message); }
+      try { await sb.from("profiles").delete().eq("id", uid); } catch(e){ console.warn("leave: profile", e.message); }
+      try { await sb.auth.signOut(); } catch(e){}
+    }
+  } catch(e){ console.warn("rivals leave:", e.message); }
+  try {
+    localStorage.removeItem("sq_rivals_joined");
+    localStorage.removeItem("sq_rivals_uploaded");
+    localStorage.removeItem("sq_photo_cleanup");
+    localStorage.removeItem("sq_shared_photos");
+  } catch(_){}
+  rivalUser = null; rivalProfile = null;
+  renderRivalJoinState();
+  renderRivals();
+  if (btn) btn.disabled = false;
+  toast(t("rivals.left_toast"));
+}
+$("rivalLeaveBtn").onclick = () => rivalLeave();
 $("rivalCopyCode").onclick = () => {
   if (!rivalProfile) return;
   navigator.clipboard.writeText(rivalProfile.friend_code).then(() => toast(t("toast.copied")));
@@ -1863,11 +1892,18 @@ function trackSW(reg){
   });
 }
 if ("serviceWorker" in navigator){
+  // Captured at script time: non-null means an older SW already controls this
+  // page, so a later controllerchange signals an update (safe to auto-reload).
+  const swHadController = !!navigator.serviceWorker.controller;
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js").then(trackSW).catch(()=>{});
   });
   navigator.serviceWorker.addEventListener("controllerchange", () => {
-    if (swReloading) return; swReloading = true; location.reload();
+    // Reload only for UPDATES: on first install the page starts uncontrolled
+    // (controller null), so a controllerchange there is just the new SW claiming
+    // — reloading then would bounce every first-time visitor. When an older SW
+    // already controls the page, a change means a new version took over.
+    if (swReloading || !swHadController) return; swReloading = true; location.reload();
   });
   const upd = () => { if (swReg) swReg.update().catch(()=>{}); };
   document.addEventListener("visibilitychange", () => { if (!document.hidden) upd(); });
