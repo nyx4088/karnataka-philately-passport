@@ -1820,10 +1820,10 @@ async function drawStoryCard(withPhotos){
   }
   // footer (above 1670)
   x.font="600 34px "+FD; x.fillStyle=C.ink; x.textAlign="center";
-  x.fillText("STAMPQUEST", cx, 1170);
+  x.fillText("STAMPQUEST", cx, 1200);
   x.font="400 24px "+FS; x.fillStyle=C.ink2;
   const url=(location.origin+location.pathname).replace(/^https?:\/\//,"");
-  x.fillText(url, cx, 1215);
+  x.fillText(url, cx, 1240);
   return cv;
 }
 async function drawShareCard(withPhotos){
@@ -1860,7 +1860,7 @@ async function drawShareCard(withPhotos){
     const ph = photos.find(p => p.n === l.n);
     items.push({ n:l.n, name:l.name, photo:ph });
   }
-  const pw=240, ph=190, gapX=28, gapY=48;
+  const pw=220, ph=170, gapX=24, gapY=40;
   const cols=3, tw=cols*pw+(cols-1)*gapX, tx0=cx-tw/2, ty0=540;
   drawThread(x, tx0-20, ty0-28, tx0+tw+20, ty0-28, C);
   for (let i=0; i<items.length; i++){
