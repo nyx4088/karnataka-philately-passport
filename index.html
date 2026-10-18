@@ -91,6 +91,12 @@ h1,.wm,.explored,.pagehead h1,.sheet-head h2{font-family:var(--font-display);fon
 body{font-variant-numeric:tabular-nums}
 .k{font-size:11px;font-weight:700;letter-spacing:.14em}
 .empty-state{text-align:center;padding:32px 16px}
+.recent-item{flex:none;width:72px;text-align:center;cursor:pointer}
+.recent-ring{width:64px;height:64px;border-radius:50%;padding:3px;background:linear-gradient(135deg,var(--brand),var(--gold));margin:0 auto 6px}
+.recent-ring>div{width:100%;height:100%;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:24px}
+.recent-ring img{width:100%;height:100%;object-fit:cover}
+.recent-name{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#recentScroll::-webkit-scrollbar{display:none}
 .empty-state .note{max-width:260px;margin:0 auto}
 
 /* ---------- views ---------- */
@@ -603,6 +609,18 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 
 <!-- EXPLORE -->
 <section class="view active" id="view-explore">
+  <div id="sotdCard" class="card" style="position:absolute;top:76px;left:12px;right:12px;z-index:500;display:none;padding:12px 14px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:44px;height:44px;border-radius:50%;flex:none;background:linear-gradient(135deg,var(--brand),var(--gold));display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px">✦</div>
+      <div style="flex:1;min-width:0">
+        <div class="k" style="color:var(--brand)" data-i18n="sotd.title">Stamp of the day</div>
+        <div class="serif" id="sotdName" style="font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+        <div class="note" id="sotdFact" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+      </div>
+      <button class="btn ghost" id="sotdView" style="flex:none;padding:8px 12px;font-size:13px" data-i18n="sotd.view">View</button>
+      <button id="sotdClose" style="background:none;border:none;font-size:18px;color:var(--ink-2);cursor:pointer;padding:4px">×</button>
+    </div>
+  </div>
   <div id="map"></div>
   <div class="topbar">
     <div class="hcard">
@@ -715,6 +733,12 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       </div>
       <div class="serif" id="jStory" style="font-size:14px;font-style:italic;margin-top:12px;color:var(--ink-2)"></div>
       <button class="btn ghost" id="wrappedReplay" style="margin-top:12px;width:100%"></button>
+    </div>
+    <div id="recentStrip" style="display:none;margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="serif" style="font-size:16px" data-i18n="recent.title">Recent stamps</div>
+      </div>
+      <div id="recentScroll" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none"></div>
     </div>
     <div class="chips" id="gridFilters">
         <button class="chip on" data-f="all" data-i18n="passport.filter_all" aria-pressed="true">All</button>
