@@ -1172,6 +1172,28 @@ function renderFavs(){
   });
 }
 
+/* ================= Weekly leagues ================= */
+let leagueMode = "alltime";
+function weekStart(){
+  const d = new Date(); d.setHours(0,0,0,0);
+  const day = (d.getDay() + 6) % 7; // Monday = 0
+  d.setDate(d.getDate() - day);
+  return d.toISOString().slice(0, 10);
+}
+function weeklyCount(visitedDates){
+  if (!visitedDates) return 0;
+  const ws = weekStart();
+  return Object.values(visitedDates).filter(d => typeof d === "string" && d >= ws).length;
+}
+function renderLeagueToggle(){
+  const el = $("leagueToggle"); if (!el) return;
+  el.innerHTML = '<button class="chip' + (leagueMode === "alltime" ? " on" : "") + '" data-m="alltime">' + t("league.alltime") + '</button>' +
+    '<button class="chip' + (leagueMode === "weekly" ? " on" : "") + '" data-m="weekly">' + t("league.weekly") + '</button>';
+  el.querySelectorAll(".chip").forEach(ch => {
+    ch.onclick = () => { leagueMode = ch.dataset.m; renderLeagueToggle(); renderRivals(); buzz(8); };
+  });
+}
+
 /* ================= Stamp of the day + Recent stamps ================= */
 function sotdPick(){
   const now = new Date();
@@ -2126,7 +2148,9 @@ function rivalSync(){
 async function doRivalSync(){
   try {
     const visited = Object.keys(state.visited).map(Number);
-    await sb.from("progress").upsert({ user_id: rivalUser.id, visited, updated_at: new Date().toISOString() });
+    const visited_dates = {};
+    Object.keys(state.visited).forEach(n => { visited_dates[n] = state.visited[n]; });
+    await sb.from("progress").upsert({ user_id: rivalUser.id, visited, visited_dates, updated_at: new Date().toISOString() });
     if (!state.sharePhotos) return true; // photo sharing is opt-in; count sync still runs above
     // upload photos not yet shared (tracked in localStorage)
     let shared = {};
