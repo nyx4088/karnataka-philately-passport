@@ -1878,6 +1878,37 @@ async function openRivalProfile(uid){
 }
 function closeRivalSheet(){ if (rsReleaseTrap){ rsReleaseTrap(); rsReleaseTrap = null; } $("rivalSheet").style.display = "none"; }
 $("rsClose").onclick = closeRivalSheet;
+
+// ---- Info (About) modal: moves info sections out of Settings on first open ----
+let infoMoved = false;
+function openInfoModal(){
+  if (!infoMoved){
+    infoMoved = true;
+    const body = document.getElementById("infoBody");
+    if (body){
+      ["settings.about_app","settings.faq","settings.about_data","settings.privacy","settings.tiles"].forEach(key => {
+        const h = document.querySelector('#view-settings h3[data-i18n="'+key+'"]');
+        if (h){
+          const wrap = document.createElement("div");
+          const card = h.nextElementSibling;
+          wrap.appendChild(h);
+          if (card && card.classList.contains("card")) wrap.appendChild(card);
+          body.appendChild(wrap);
+        }
+      });
+    }
+  }
+  const m = document.getElementById("infoModal");
+  if (m) m.style.display = "block";
+}
+function closeInfoModal(){
+  const m = document.getElementById("infoModal");
+  if (m) m.style.display = "none";
+}
+if ($("infoBtn")) $("infoBtn").onclick = openInfoModal;
+if ($("infoClose")) $("infoClose").onclick = closeInfoModal;
+if ($("infoModal")) $("infoModal").addEventListener("click", e => { if (e.target.id === "infoModal") closeInfoModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeInfoModal(); });
 $("rivalSheet").addEventListener("click", e => { if (e.target.id === "rivalSheet") closeRivalSheet(); });
 
 /* ================= deep link / first run / init ================= */
