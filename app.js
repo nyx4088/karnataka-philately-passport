@@ -2241,9 +2241,40 @@ async function renderRivals(){
     return;
   }
   try {
-    const { data: board } = await sb.from("leaderboard").select("*").limit(50);
+    renderLeagueToggle();
     const el = $("rivalBoard");
     el.textContent = "";
+    if (leagueMode === "weekly"){
+      const { data: prog } = await sb.from("progress").select("user_id, visited_dates").limit(100);
+      const { data: profs } = await sb.from("profiles").select("id, display_name, friend_code");
+      const pmap = {}; (profs || []).forEach(p => pmap[p.id] = p);
+      const weekly = (prog || []).map(p => ({
+        name: (pmap[p.user_id] || {}).display_name || "Collector",
+        code: (pmap[p.user_id] || {}).friend_code || "",
+        count: weeklyCount(p.visited_dates)
+      })).filter(r => r.count > 0).sort((a,b) => b.count - a.count).slice(0, 50);
+      // Include self
+      const selfWeekly = weeklyCount(state.visited);
+      if (rivalsJoined() && selfWeekly > 0 && !weekly.some(r => r.code === (rivalUser && rivalUser.code))){
+        weekly.push({ name: t("rivals.you"), code: (rivalUser || {}).code || "", count: selfWeekly, self: true });
+        weekly.sort((a,b) => b.count - a.count);
+      }
+      if (!weekly.length){
+        el.innerHTML = '<div class="note" style="text-align:center;padding:24px">' + t("league.week_empty") + '</div>';
+      } else {
+        const medals = ["🥇","🥈","🥉"];
+        weekly.forEach((r, i) => {
+          const row = document.createElement("div");
+          row.className = "rival-row" + (r.self ? " self" : "");
+          row.innerHTML = '<span style="width:28px">' + (medals[i] || (i+1)) + '</span>' +
+            '<span style="flex:1">' + esc(r.name) + '</span>' +
+            '<b>' + r.count + '</b>';
+          el.appendChild(row);
+        });
+      }
+      return;
+    }
+    const { data: board } = await sb.from("leaderboard").select("*").limit(50);
     if (!board || !board.length){
       const empty = document.createElement("div");
       empty.className = "empty-state";
