@@ -2518,7 +2518,7 @@ else ensureInfoStore();
 function openMenu(){
   ensureInfoStore();
   const m = document.getElementById("menuSheet");
-  if (m) m.style.display = "block";
+  if (m){ m.style.display = "flex"; m.classList.add("active"); }
 }
 function closeMenu(){
   const m = document.getElementById("menuSheet");
