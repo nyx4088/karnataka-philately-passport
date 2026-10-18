@@ -353,7 +353,7 @@ h3.sec{font-size:17px;margin:22px 0 10px;letter-spacing:.5px;margin-bottom:12px}
 .pagehead p{color:var(--ink-2);font-size:12px;margin:4px 0 0}
 
 /* passport */
-.ringwrap{display:flex;gap:16px;align-items:center}
+.ringwrap{display:flex;gap:16px;align-items:center;min-height:130px}
 .ring{position:relative;width:120px;height:120px;flex:none}
 .ring svg{transform:rotate(-90deg)}
 .ring .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -615,7 +615,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 
 <!-- EXPLORE -->
 <section class="view active" id="view-explore">
-  <div id="sotdCard" class="card" style="position:absolute;top:76px;left:12px;right:12px;z-index:500;display:none;padding:12px 14px">
+  <div id="sotdCard" class="card" style="position:absolute;top:150px;left:12px;right:12px;z-index:500;display:none;padding:12px 14px;box-shadow:var(--shadow-float)">
     <div style="display:flex;align-items:center;gap:12px">
       <div style="width:44px;height:44px;border-radius:50%;flex:none;background:linear-gradient(135deg,var(--brand),var(--gold));display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px">✦</div>
       <div style="flex:1;min-width:0">
@@ -846,7 +846,8 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 
 <!-- RIVAL PROFILE SHEET -->
 <div id="menuSheet" style="display:none;position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.5)" role="dialog" aria-label="Menu">
-  <div style="position:absolute;left:0;right:0;bottom:0;max-height:75vh;background:var(--surface);border-radius:18px 18px 0 0;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:18px;padding-bottom:32px">
+  <div style="position:absolute;left:0;right:0;bottom:0;max-height:80dvh;display:flex;flex-direction:column;background:var(--surface);border-radius:18px 18px 0 0;padding:18px;padding-bottom:32px">
+  <div style="overflow-y:scroll;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;flex:1;min-height:0">
     <div style="width:44px;height:5px;border-radius:3px;background:var(--border-subtle);margin:0 auto 16px"></div>
     <div style="font-weight:800;font-size:18px;margin-bottom:12px" data-i18n="menu.title">Menu</div>
     <button class="rowbtn" data-menu="settings.about_app"><span class="grow"><span class="t" data-i18n="settings.about_app">About this app</span></span><span style="color:var(--ink-2)">›</span></button>
@@ -856,6 +857,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
     <button class="rowbtn" data-menu="settings.about_data"><span class="grow"><span class="t" data-i18n="settings.about_data">About this data</span></span><span style="color:var(--ink-2)">›</span></button>
     <button class="rowbtn" data-menu="settings.privacy"><span class="grow"><span class="t" data-i18n="settings.privacy">Privacy</span></span><span style="color:var(--ink-2)">›</span></button>
     <button class="rowbtn" data-menu="settings.tiles"><span class="grow"><span class="t" data-i18n="settings.tiles">Map tiles</span></span><span style="color:var(--ink-2)">›</span></button>
+  </div>
   </div>
 </div>
 <div id="wrappedModal" style="display:none;position:fixed;inset:0;z-index:85;background:rgba(12,8,6,.95);backdrop-filter:blur(10px)" role="dialog" aria-label="Monthly recap">
