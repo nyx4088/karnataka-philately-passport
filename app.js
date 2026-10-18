@@ -2558,9 +2558,12 @@ $("replayTutorial").onclick = () => { tShow(0); $("firstrun").classList.add("sho
   }, { passive:true });
 })();
 
-applyTheme();
-applyLang();
-renderProgress(); renderCircuits(); renderGrid(); wireTripPlanner();
+try { applyTheme(); } catch(e){}
+try { applyLang(); } catch(e){}
+try { renderProgress(); } catch(e){ console.warn("renderProgress", e); }
+try { renderCircuits(); } catch(e){ console.warn("renderCircuits", e); }
+try { renderGrid(); } catch(e){ console.warn("renderGrid", e); }
+try { wireTripPlanner(); } catch(e){}
 /* Rivals is fully opt-in: no auto-init. Nothing (account, profile, sync) happens
    until the user taps "Join" in the Rivals tab. See rivalJoin()/rivalUpload(). */
 splashSet(0.5);
