@@ -1098,7 +1098,11 @@ function switchTab(name){
   if (name !== "explore" && sheet.classList.contains("open")){
     const n = selectedN; closeSheet(); if (n && markers[n]) refreshMarker(n);
   }
-  if (name === "explore"){ setTimeout(()=>map.invalidateSize(), 60); }
+  if (name === "explore" && typeof map !== "undefined" && map){
+    // Fix Leaflet blank map after tab switch: invalidate size after layout settles
+    setTimeout(()=>{ try{ map.invalidateSize(); }catch(e){} }, 60);
+    setTimeout(()=>{ try{ map.invalidateSize(); }catch(e){} }, 300);
+  }
   if (name === "passport"){ renderProgress(); renderGrid(); renderDistricts(); }
   if (name === "circuits") renderCircuits();
   if (name === "rivals") renderRivals();
