@@ -105,10 +105,7 @@ body{font-variant-numeric:tabular-nums}
 .view{position:fixed;inset:0;display:none;flex-direction:column;background:var(--paper);transition:background-color .6s ease}
 .view.active{display:flex}
 .scroll{flex:1 1 0;overflow-y:scroll;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain;padding:16px 16px 96px;min-width:0;min-height:0;height:0}
-#view-passport{display:none}
-#view-passport.active{display:block;position:fixed;top:0;left:0;right:0;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--paper)}
-#view-passport .pagehead{position:sticky;top:0;z-index:10;background:var(--paper);padding-top:calc(14px + env(safe-area-inset-top));padding-bottom:8px}
-#view-passport .scroll{overflow:visible;padding:0 16px 150px}
+#view-passport .pagehead{padding-top:calc(14px + env(safe-area-inset-top))}
 
 /* ---------- explore / map ---------- */
 #map{position:absolute;inset:0;background:var(--mapbg);z-index:0}
