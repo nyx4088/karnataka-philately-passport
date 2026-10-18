@@ -99,6 +99,10 @@ function pinIcon(l, sel){
 LOCATIONS.forEach(l => {
   const m = L.marker([l.lat, l.lng], { icon: pinIcon(l,false), title: fullName(l) });
   m.on("click", () => {
+    if (typeof tripPicking !== "undefined" && tripPicking){
+      tripPicking = false; document.getElementById("map").classList.remove("picking");
+      tripStart = { lat: l.lat, lng: l.lng }; updateTripStartLabel(); switchTab("circuits"); return;
+    }
     if (typeof pickingPos !== "undefined" && pickingPos){
       pickingPos = false; document.getElementById("map").classList.remove("picking");
       setMyPos(l.lat, l.lng); showNearby(); return;
@@ -991,6 +995,14 @@ function tryGeolocate(){
 }
 $("btnLocate").onclick = tryGeolocate;
 map.on("click", e => {
+  if (typeof tripPicking !== "undefined" && tripPicking){
+    tripPicking = false;
+    document.getElementById("map").classList.remove("picking");
+    tripStart = { lat: e.latlng.lat, lng: e.latlng.lng };
+    updateTripStartLabel();
+    switchTab("circuits");
+    return;
+  }
   if (!pickingPos) return;
   pickingPos = false;
   document.getElementById("map").classList.remove("picking");
@@ -1054,6 +1066,98 @@ function switchTab(name){
 }
 document.querySelectorAll("#nav button").forEach(b => b.onclick = () => switchTab(b.dataset.tab));
 $("progChip").onclick = () => switchTab("passport");
+
+/* ================= day-trip planner ================= */
+let tripStart = null;
+let tripRouteLine = null;
+let tripPicking = false;
+function updateTripStartLabel(){
+  const el = document.getElementById("tripStartLabel");
+  if (!el) return;
+  el.textContent = tripStart ? t("trip.start") + ": " + tripStart.lat.toFixed(3) + ", " + tripStart.lng.toFixed(3) : "";
+}
+function fmtTripDur(min){
+  return t("trip.hours", { h: Math.floor(min/60), m: Math.round(min%60) });
+}
+function planTrip(){
+  if (!tripStart){ toast(t("trip.start_needed")); return; }
+  const maxKm = parseFloat(document.getElementById("tripDist").value) || 100;
+  const speed = parseFloat(document.getElementById("tripMode").value) || 35;
+  const cands = LOCATIONS.filter(l => !state.visited[l.n])
+    .map(l => ({ l, d: havKm(tripStart.lat, tripStart.lng, l.lat, l.lng) }))
+    .filter(x => x.d <= maxKm).sort((a,b) => a.d - b.d).slice(0, 10);
+  if (!cands.length){ toast(t("trip.no_stops", { n: maxKm })); return; }
+  const ordered = [];
+  let cur = tripStart;
+  const rem = cands.slice();
+  while (rem.length){
+    let bi = 0, bd = 1e18;
+    rem.forEach((x, i) => { const d = havKm(cur.lat, cur.lng, x.l.lat, x.l.lng); if (d < bd){ bd = d; bi = i; } });
+    const nx = rem.splice(bi, 1)[0];
+    nx.legKm = bd;
+    ordered.push(nx);
+    cur = { lat: nx.l.lat, lng: nx.l.lng };
+  }
+  let totalKm = 0, totalMin = 0;
+  ordered.forEach(x => { totalKm += x.legKm; totalMin += (x.legKm / speed) * 60 + 20; });
+  renderTripResult(ordered, totalKm, totalMin);
+}
+function renderTripResult(ordered, totalKm, totalMin){
+  document.getElementById("tripForm").style.display = "none";
+  const r = document.getElementById("tripResult");
+  r.style.display = "block";
+  r.innerHTML =
+    '<div style="font-weight:800;font-size:16px;margin-bottom:4px">'+esc(t("trip.stops", { n: ordered.length }))+'</div>'+
+    '<div class="note" style="margin-bottom:10px">'+esc(t("trip.total", { km: Math.round(totalKm), time: fmtTripDur(totalMin) }))+'</div>'+
+    ordered.map((x, i) =>
+      '<button class="rowbtn" data-n="'+x.l.n+'">'+
+      '<span class="grow"><span class="t">'+(i+1)+'. '+esc(x.l.name)+'</span>'+
+      '<span class="s" style="display:block">'+esc(t("trip.leg", { n: x.legKm.toFixed(1) }))+' · '+esc(x.l.district)+'</span></span>'+
+      '<span style="color:var(--ink-2)">›</span></button>').join("")+
+    '<div class="actionrow" style="margin-top:10px">'+
+    '<button class="btn ghost" id="tripMapBtn" style="flex:1">'+esc(t("trip.show_on_map"))+'</button>'+
+    '<button class="btn accent" id="tripGmapsBtn" style="flex:1">'+esc(t("trip.open_gmaps"))+'</button></div>'+
+    '<button class="btn ghost" id="tripNewBtn" style="width:100%;margin-top:8px">'+esc(t("trip.new_plan"))+'</button>';
+  r.querySelectorAll(".rowbtn").forEach(b => b.onclick = () => { switchTab("explore"); openLocation(+b.dataset.n); });
+  document.getElementById("tripMapBtn").onclick = () => {
+    if (tripRouteLine){ map.removeLayer(tripRouteLine); tripRouteLine = null; }
+    const pts = [[tripStart.lat, tripStart.lng]].concat(ordered.map(x => [x.l.lat, x.l.lng]));
+    tripRouteLine = L.polyline(pts, { color:"#A91F26", weight:4, opacity:.9 }).addTo(map);
+    switchTab("explore");
+    map.flyToBounds(L.latLngBounds(pts).pad(0.15), { duration:.8 });
+  };
+  document.getElementById("tripGmapsBtn").onclick = () => {
+    const pts = ordered.map(x => x.l.lat.toFixed(5) + "," + x.l.lng.toFixed(5));
+    const url = "https://www.google.com/maps/dir/?api=1&origin="+tripStart.lat.toFixed(5)+","+tripStart.lng.toFixed(5)+
+      "&destination="+pts[pts.length-1]+(pts.length>1 ? "&waypoints="+pts.slice(0,-1).join("|") : "")+"&travelmode=driving";
+    window.open(url, "_blank", "noopener");
+  };
+  document.getElementById("tripNewBtn").onclick = () => {
+    r.style.display = "none";
+    document.getElementById("tripForm").style.display = "block";
+    if (tripRouteLine){ map.removeLayer(tripRouteLine); tripRouteLine = null; }
+  };
+}
+function wireTripPlanner(){
+  if (!document.getElementById("tripGo")) return;
+  document.getElementById("tripUseLoc").onclick = () => {
+    if (myPos){ tripStart = { lat: myPos.lat, lng: myPos.lng }; updateTripStartLabel(); }
+    else if (navigator.geolocation){
+      toast(t("toast.locating"));
+      navigator.geolocation.getCurrentPosition(
+        p => { tripStart = { lat:p.coords.latitude, lng:p.coords.longitude }; setMyPos(p.coords.latitude, p.coords.longitude); updateTripStartLabel(); },
+        () => toast(t("sheet.denied_msg")),
+        { timeout:12000 });
+    } else toast(t("sheet.nogeo_msg"));
+  };
+  document.getElementById("tripPickMap").onclick = () => {
+    switchTab("explore"); closeSheet();
+    tripPicking = true;
+    document.getElementById("map").classList.add("picking");
+    toast(t("sheet.tap_map_hint"));
+  };
+  document.getElementById("tripGo").onclick = planTrip;
+}
 
 /* ================= circuits ================= */
 const REGION_ORDER = ["Coastal","Malnad","Mysuru region","Bengaluru region","North Karnataka"];
@@ -2057,7 +2161,7 @@ $("replayTutorial").onclick = () => { tShow(0); $("firstrun").classList.add("sho
 
 applyTheme();
 applyLang();
-renderProgress(); renderCircuits(); renderGrid(); renderDistricts();
+renderProgress(); renderCircuits(); renderGrid(); renderDistricts(); wireTripPlanner();
 /* Rivals is fully opt-in: no auto-init. Nothing (account, profile, sync) happens
    until the user taps "Join" in the Rivals tab. See rivalJoin()/rivalUpload(). */
 splashSet(0.5);
