@@ -168,6 +168,13 @@ html[data-theme="dark"] .hcard{background:color-mix(in srgb, var(--header-bg) 92
 #photoViewer #pvClose{background:rgba(255,255,255,.15);border:0;color:#fff;font-size:18px;width:44px;height:44px;border-radius:50%;cursor:pointer}
 #photoViewer .pv-nav{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);display:flex;justify-content:space-between;padding:0 8px;pointer-events:none}
 #photoViewer .pv-nav button{pointer-events:auto;background:rgba(255,255,255,.15);border:0;color:#fff;font-size:32px;width:52px;height:52px;border-radius:50%;cursor:pointer;line-height:1}
+#remoteViewer{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
+#remoteViewer.open{opacity:1}
+#remoteViewer #rvImg{max-width:94vw;max-height:82vh;object-fit:contain;border-radius:8px;cursor:pointer}
+#remoteViewer .rv-top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;color:#fff;font-size:15px}
+#remoteViewer #rvClose{background:rgba(255,255,255,.15);border:0;color:#fff;font-size:18px;width:44px;height:44px;border-radius:50%;cursor:pointer}
+#remoteViewer .rv-nav{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);display:flex;justify-content:space-between;padding:0 8px;pointer-events:none}
+#remoteViewer .rv-nav button{pointer-events:auto;background:rgba(255,255,255,.15);border:0;color:#fff;font-size:32px;width:52px;height:52px;border-radius:50%;cursor:pointer;line-height:1}
 /* photo bottom sheet */
 .photosheet{position:fixed;left:0;right:0;bottom:0;z-index:960;background:var(--surface);
   border-top:1px solid var(--border-subtle);border-radius:18px 18px 0 0;box-shadow:var(--shadow);
