@@ -1833,38 +1833,42 @@ async function drawShareCard(withPhotos){
   x.fillStyle=C.paper; x.fillRect(0,0,W,H);
   x.strokeStyle=C.subtle; x.lineWidth=3; x.strokeRect(40,40,W-80,H-80);
   const cx=W/2, c=visitedCount();
-  // header
-  drawPostmark(x, cx, 220, 70, C.brand);
-  x.save(); x.translate(cx,220); x.rotate(-0.12);
-  x.fillStyle=C.brand; x.font="600 44px "+FD; x.textAlign="center"; x.fillText("100",0,15); x.restore();
-  x.fillStyle=C.ink; x.font="600 36px "+FD; x.textAlign="center";
-  x.fillText("MY PHILATELY JOURNEY", cx, 330);
-  x.font="600 140px "+FD; x.fillStyle=C.brand; x.fillText(c+"", cx, 490);
-  x.font="400 30px "+FS; x.fillStyle=C.ink2; x.fillText("of 100 post offices collected", cx, 540);
+  // header: 100 badge left, title right
+  const hx=140, hy=170;
+  drawPostmark(x, hx, hy, 55, C.brand);
+  x.save(); x.translate(hx,hy); x.rotate(-0.12);
+  x.fillStyle=C.brand; x.font="600 36px "+FD; x.textAlign="center"; x.fillText("100",0,12); x.restore();
+  x.fillStyle=C.ink; x.font="600 34px "+FD; x.textAlign="left";
+  x.fillText("MY PHILATELY", hx+90, hy-8);
+  x.fillText("JOURNEY", hx+90, hy+32);
+  // count
+  x.textAlign="center";
+  x.font="600 110px "+FD; x.fillStyle=C.brand; x.fillText(c+"", cx, 380);
+  x.font="400 28px "+FS; x.fillStyle=C.ink2; x.fillText("of 100 post offices collected", cx, 425);
   const bw=W-360; x.fillStyle=C.subtle;
-  const barY=580, barH=26;
+  const barY=455, barH=22;
   x.fillRect((W-bw)/2, barY, bw, barH);
   x.fillStyle=C.collected; x.fillRect((W-bw)/2, barY, Math.max(barH, bw*c/100), barH);
-  x.font="500 24px "+FS; x.fillStyle=C.ink2;
-  x.fillText(Math.round(c)+" %", cx, barY+barH+32);
+  x.font="500 22px "+FS; x.fillStyle=C.ink2;
+  x.fillText(Math.round(c)+" %", cx, barY+barH+28);
   // polaroids: 6 max, 3 per row x 2 rows
-  const photos = withPhotos ? await recentPhotos(6) : [];
+  const photos = withPhotos ? await recentPhotos(9) : [];
   const visited = LOCATIONS.filter(l => state.visited[l.n]).sort((a,b)=>b.n-a.n);
   const items = [];
-  for (let i=0; i<6 && i<visited.length; i++){
+  for (let i=0; i<9 && i<visited.length; i++){
     const l = visited[i];
     const ph = photos.find(p => p.n === l.n);
     items.push({ n:l.n, name:l.name, photo:ph });
   }
-  const pw=280, ph=240, gapX=32, gapY=25;
-  const cols=3, tw=cols*pw+(cols-1)*gapX, tx0=cx-tw/2, ty0=700;
+  const pw=240, ph=200, gapX=28, gapY=22;
+  const cols=3, tw=cols*pw+(cols-1)*gapX, tx0=cx-tw/2, ty0=540;
   drawThread(x, tx0-20, ty0-28, tx0+tw+20, ty0-28, C);
   for (let i=0; i<items.length; i++){
     const r=Math.floor(i/cols), col=i%cols;
     await drawPolaroid(x, tx0+col*(pw+gapX), ty0+r*(ph+gapY), pw, ph, items[i].photo, items[i].n, items[i].name, C);
   }
   const remaining = c - items.length;
-  let fy = ty0 + 2*(ph+gapY) + 15;
+  let fy = ty0 + 3*(ph+gapY) + 15;
   if (remaining > 0){
     x.font="500 28px "+FS; x.fillStyle=C.ink2; x.textAlign="center";
     x.fillText("+"+remaining+" more stamp"+(remaining>1?"s":"")+" collected", cx, fy); fy += 38;
