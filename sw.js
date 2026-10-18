@@ -1,7 +1,8 @@
-const CACHE = "stampquest-v9";
+const CACHE = "stampquest-v10";
 const SHELL = [
   "./",
   "index.html",
+  "offline.html",
   "manifest.json",
   "vendor/bundle.css",
   "vendor/leaflet.js",
@@ -62,7 +63,9 @@ self.addEventListener("fetch", e => {
         }
         return res;
       }).catch(() =>
-        caches.match(req).then(r => r || caches.match("index.html"))
+        caches.match(req)
+          .then(r => r || caches.match("index.html"))
+          .then(r => r || caches.match("offline.html"))
       )
     );
     return;

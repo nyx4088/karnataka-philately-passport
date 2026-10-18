@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nyx4088.github.io/karnataka-philately-passport/sitemap.xml
