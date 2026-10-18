@@ -2556,7 +2556,7 @@ $("replayTutorial").onclick = () => { tShow(0); $("firstrun").classList.add("sho
 
 applyTheme();
 applyLang();
-renderProgress(); renderCircuits(); renderGrid(); renderDistricts(); wireTripPlanner();
+renderProgress(); renderCircuits(); renderGrid(); wireTripPlanner();
 /* Rivals is fully opt-in: no auto-init. Nothing (account, profile, sync) happens
    until the user taps "Join" in the Rivals tab. See rivalJoin()/rivalUpload(). */
 splashSet(0.5);
