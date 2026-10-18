@@ -1103,34 +1103,37 @@ document.querySelectorAll("#nav button").forEach(b => b.onclick = () => switchTa
 $("progChip").onclick = () => switchTab("passport");
 
 /* ================= Monthly streak + Pinned favorites ================= */
-function monthKey(y, m){ return y + "-" + String(m + 1).padStart(2, "0"); }
+function weekKey(d){
+  const x = new Date(d); x.setHours(0,0,0,0);
+  const day = (x.getDay() + 6) % 7;
+  x.setDate(x.getDate() - day);
+  return x.toISOString().slice(0, 10);
+}
 function computeStreak(){
   const now = new Date();
-  const monthsWithStamps = new Set();
+  const weeksWithStamps = new Set();
   LOCATIONS.forEach(l => {
     const d = state.visited[l.n];
-    if (d && typeof d === "string" && d.length >= 7) monthsWithStamps.add(d.slice(0, 7));
+    if (d && typeof d === "string" && d.length >= 10) weeksWithStamps.add(weekKey(new Date(d)));
   });
-  let streak = 0, y = now.getFullYear(), m = now.getMonth();
+  let streak = 0;
+  let cursor = new Date(now);
   let freezeUsed = false;
-  try { freezeUsed = localStorage.getItem("monsoon_freeze_" + y + "_Q" + (Math.floor(m/3)+1)) === "1"; } catch(e){}
-  // If current month has no stamp yet, don't break streak (month still in progress)
-  if (!monthsWithStamps.has(monthKey(y, m))){ m--; if (m < 0){ m = 11; y--; } }
-  while (monthsWithStamps.has(monthKey(y, m))){
+  try { freezeUsed = localStorage.getItem("freeze_" + now.getFullYear() + "_" + (now.getMonth()+1)) === "1"; } catch(e){}
+  // If current week has no stamp yet, don't break streak (week still in progress)
+  if (!weeksWithStamps.has(weekKey(cursor))){ cursor.setDate(cursor.getDate() - 7); }
+  while (weeksWithStamps.has(weekKey(cursor))){
     streak++;
-    m--; if (m < 0){ m = 11; y--; }
+    cursor.setDate(cursor.getDate() - 7);
   }
-  // Check if we need freeze for the gap month
+  // One missing week — apply freeze (once per calendar month)
   let freezeApplied = false;
-  if (streak > 0 && !monthsWithStamps.has(monthKey(y, m)) && !freezeUsed){
-    // One missing month — apply Monsoon Pass
+  if (streak > 0 && !weeksWithStamps.has(weekKey(cursor)) && !freezeUsed){
     try {
-      const q = "monsoon_freeze_" + now.getFullYear() + "_Q" + (Math.floor(now.getMonth()/3)+1);
-      localStorage.setItem(q, "1");
+      localStorage.setItem("freeze_" + now.getFullYear() + "_" + (now.getMonth()+1), "1");
       freezeApplied = true;
-      // Recount skipping the frozen month
-      m--; if (m < 0){ m = 11; y--; }
-      while (monthsWithStamps.has(monthKey(y, m))){ streak++; m--; if (m < 0){ m = 11; y--; } }
+      cursor.setDate(cursor.getDate() - 7);
+      while (weeksWithStamps.has(weekKey(cursor))){ streak++; cursor.setDate(cursor.getDate() - 7); }
     } catch(e){}
   }
   return { streak, freezeApplied };
@@ -1141,7 +1144,7 @@ function renderStreak(){
   if (streak < 2){ badge.style.display = "none"; return; }
   badge.style.display = "flex";
   $("streakNum").textContent = streak;
-  badge.title = streak + " " + t(streak === 1 ? "streak.month" : "streak.months") +
+  badge.title = streak + " " + t(streak === 1 ? "streak.week" : "streak.weeks") +
     (freezeApplied ? " • " + t("streak.freeze_used") : "");
   if (freezeApplied) toast(t("streak.freeze_used"));
 }
