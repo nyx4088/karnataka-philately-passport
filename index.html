@@ -1087,5 +1087,14 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 <script src="vendor/lenis.min.js"></script>
 <script src="i18n-strings.js"></script>
 <script src="app.js"></script>
+<script>
+/* Bulletproof splash fallback: independent of app.js — removes splash after 4s no matter what */
+setTimeout(function(){
+  try {
+    var s = document.getElementById("splash");
+    if (s){ s.style.transition = "opacity .4s"; s.style.opacity = "0"; setTimeout(function(){ s.remove(); }, 450); }
+  } catch(e){}
+}, 4000);
+</script>
 </body>
 </html>
