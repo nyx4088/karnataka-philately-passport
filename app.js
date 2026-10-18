@@ -1405,6 +1405,13 @@ document.addEventListener("click", e => {
 
 /* ================= day-trip planner ================= */
 /* ===== Day Planner ===== */
+// Local haversine (4 numbers) - avoids conflict with other havKm definitions
+function plannerHav(lat1, lng1, lat2, lng2){
+  const R = 6371, r = x => x * Math.PI/180;
+  const dLa = r(lat2-lat1), dLo = r(lng2-lng1);
+  const h = Math.sin(dLa/2)**2 + Math.cos(r(lat1))*Math.cos(r(lat2))*Math.sin(dLo/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h));
+}
 let plannerState = {
   start: null, // {lat, lng, label}
   maxDist: 250,
@@ -1440,13 +1447,6 @@ function savePlannerSettings(){
   } catch(e){}
 }
 
-function havKm(lat1, lng1, lat2, lng2){
-  const R = 6371;
-  const dLat = (lat2-lat1) * Math.PI/180;
-  const dLng = (lng2-lng1) * Math.PI/180;
-  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
-  return 2 * R * Math.asin(Math.sqrt(a));
-}
 
 // Nearest neighbour + 2-opt
 function orderStops(start, offices){
@@ -1460,7 +1460,7 @@ function orderStops(start, offices){
   while (unvisited.length > 0){
     let bestIdx = 0, bestD = Infinity;
     for (let i=0; i<unvisited.length; i++){
-      const d = havKm(cur.lat, cur.lng, unvisited[i].lat, unvisited[i].lng);
+      const d = plannerHav(cur.lat, cur.lng, unvisited[i].lat, unvisited[i].lng);
       if (d < bestD){ bestD = d; bestIdx = i; }
     }
     ordered.push(unvisited.splice(bestIdx, 1)[0]);
@@ -1469,7 +1469,7 @@ function orderStops(start, offices){
   
   // 2-opt improvement
   let improved = true;
-  const dist = (a, b) => havKm(a.lat, a.lng, b.lat, b.lng);
+  const dist = (a, b) => plannerHav(a.lat, a.lng, b.lat, b.lng);
   const totalDist = (ord) => {
     let d = dist(start, ord[0]);
     for (let i=1; i<ord.length; i++) d += dist(ord[i-1], ord[i]);
@@ -1500,17 +1500,17 @@ function selectDensestCluster(start, candidates, cap){
   // Try: for each candidate as "seed", take cap nearest to seed, order them, pick best
   let best = null, bestScore = Infinity;
   const sampleSeeds = candidates.length > 20 ? 
-    candidates.sort((a,b) => havKm(start.lat,start.lng,a.lat,a.lng) - havKm(start.lat,start.lng,b.lat,b.lng)).slice(0, 20) :
+    candidates.sort((a,b) => plannerHav(start.lat,start.lng,a.lat,a.lng) - plannerHav(start.lat,start.lng,b.lat,b.lng)).slice(0, 20) :
     candidates;
   
   for (const seed of sampleSeeds){
     const nearest = [...candidates]
-      .sort((a,b) => havKm(seed.lat,seed.lng,a.lat,a.lng) - havKm(seed.lat,seed.lng,b.lat,b.lng))
+      .sort((a,b) => plannerHav(seed.lat,seed.lng,a.lat,a.lng) - plannerHav(seed.lat,seed.lng,b.lat,b.lng))
       .slice(0, cap);
     const ordered = orderStops(start, nearest);
     // Score: total distance (lower is better)
-    let d = havKm(start.lat, start.lng, ordered[0].lat, ordered[0].lng);
-    for (let i=1; i<ordered.length; i++) d += havKm(ordered[i-1].lat, ordered[i-1].lng, ordered[i].lat, ordered[i].lng);
+    let d = plannerHav(start.lat, start.lng, ordered[0].lat, ordered[0].lng);
+    for (let i=1; i<ordered.length; i++) d += plannerHav(ordered[i-1].lat, ordered[i-1].lng, ordered[i].lat, ordered[i].lng);
     if (d < bestScore){ bestScore = d; best = ordered; }
   }
   return best || candidates.slice(0, cap);
@@ -1527,7 +1527,7 @@ function planDay(start, excludeNs, dayNum){
     if (excludeNs.has(l.n)) return false; // exclude previous days
     if (scope === 'unvisited' && state.planned[l.n]) return false;
     if (typeof l.lat !== 'number' || typeof l.lng !== 'number') return false;
-    const d = havKm(start.lat, start.lng, l.lat, l.lng);
+    const d = plannerHav(start.lat, start.lng, l.lat, l.lng);
     return d <= maxDist;
   });
   
@@ -1546,7 +1546,7 @@ function planDay(start, excludeNs, dayNum){
   let prev = start;
   let totalKm = 0;
   for (const stop of stops){
-    const straightKm = havKm(prev.lat, prev.lng, stop.lat, stop.lng);
+    const straightKm = plannerHav(prev.lat, prev.lng, stop.lat, stop.lng);
     const roadKm = straightKm * 1.3;
     legs.push({ stop, straightKm, roadKm });
     totalKm += roadKm;
@@ -1557,7 +1557,7 @@ function planDay(start, excludeNs, dayNum){
   let returnLeg = null;
   if (plannerState.returnToStart && stops.length > 0){
     const last = stops[stops.length-1];
-    const straightKm = havKm(last.lat, last.lng, start.lat, start.lng);
+    const straightKm = plannerHav(last.lat, last.lng, start.lat, start.lng);
     const roadKm = straightKm * 1.3;
     returnLeg = { straightKm, roadKm };
     totalKm += roadKm;
@@ -1697,7 +1697,7 @@ function wirePlannerResultEvents(day){
       newDay.legs = [];
       let prev = day.start, totalKm = 0;
       for (const stop of stops){
-        const straightKm = havKm(prev.lat, prev.lng, stop.lat, stop.lng);
+        const straightKm = plannerHav(prev.lat, prev.lng, stop.lat, stop.lng);
         const roadKm = straightKm * 1.3;
         newDay.legs.push({ stop, straightKm, roadKm });
         totalKm += roadKm;
@@ -1705,7 +1705,7 @@ function wirePlannerResultEvents(day){
       }
       if (plannerState.returnToStart && stops.length > 0){
         const last = stops[stops.length-1];
-        const straightKm = havKm(last.lat, last.lng, day.start.lat, day.start.lng);
+        const straightKm = plannerHav(last.lat, last.lng, day.start.lat, day.start.lng);
         const roadKm = straightKm * 1.3;
         newDay.returnLeg = { straightKm, roadKm };
         totalKm += roadKm;
