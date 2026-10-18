@@ -546,10 +546,28 @@ function togglePlanned(n){
   save(); refreshMarker(n); renderSheetBody(byN[n]); renderGrid();
   toast(state.planned[n] ? t("toast.postbox_add") : t("toast.postbox_remove"));
 }
+function showMilestoneTakeover(m){
+  const modal = $("msModal"); if (!modal) return;
+  $("msNum").textContent = m;
+  $("msTitle").textContent = t("milestone.title_" + m);
+  const sub = { 25: t("toast.milestone",{m:25}), 50: t("toast.milestone",{m:50}), 75: t("toast.milestone",{m:75}), 100: t("toast.milestone_100") };
+  $("msSub").textContent = sub[m] || "";
+  modal.style.display = "block";
+  if (!REDUCED && typeof confetti !== "undefined"){
+    setTimeout(() => stampBurst(true, { particleCount: 120, spread: 100, origin: { y: 0.4 } }), 300);
+  }
+  buzz(40);
+}
+$("msClose") && $("msClose").addEventListener("click", () => { $("msModal").style.display = "none"; });
+$("msShare") && $("msShare").addEventListener("click", () => {
+  $("msModal").style.display = "none";
+  if (typeof openShareCard === "function") openShareCard();
+});
 function checkMilestones(){
   const c = visitedCount();
   [25,50,75,100].forEach(m => {
     if (c >= m && !state.milestones.includes(m)){ state.milestones.push(m); save();
+      showMilestoneTakeover(m);
       if (m === 100){
         stampBurst(true);
         setTimeout(() => stampBurst(true), 400);
@@ -1260,9 +1278,29 @@ function renderCircuits(){
 
 /* ================= passport ================= */
 let gridFilter = "all";
+function havKm(a, b){
+  const R = 6371, dLa = (b.lat - a.lat) * Math.PI/180, dLo = (b.lng - a.lng) * Math.PI/180;
+  const s = Math.sin(dLa/2)**2 + Math.cos(a.lat*Math.PI/180) * Math.cos(b.lat*Math.PI/180) * Math.sin(dLo/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+}
+function renderJourney(){
+  const card = $("journeyCard"); if (!card) return;
+  const vis = LOCATIONS.filter(l => state.visited[l.n]);
+  if (!vis.length){ card.style.display = "none"; return; }
+  card.style.display = "block";
+  const byDate = vis.slice().sort((a,b) => String(state.visited[a.n]).localeCompare(String(state.visited[b.n])));
+  let km = 0;
+  for (let i = 1; i < byDate.length; i++) km += havKm(byDate[i-1], byDate[i]);
+  $("jKm").textContent = Math.round(km);
+  $("jDist").textContent = new Set(vis.map(l => l.district)).size + "/31";
+  const dates = vis.map(l => state.visited[l.n]).filter(Boolean).sort();
+  $("jFirst").textContent = dates.length ? dates[0].slice(5).split("-").reverse().join("/") : "–";
+  $("jCount").textContent = vis.length;
+}
 function renderProgress(){
   const c = visitedCount();
   renderRingCount(c);
+  renderJourney();
   $("ringFg").style.strokeDashoffset = (326.7 * (1 - c/100)).toFixed(1);
   const msgs = [[0,"passport.ring_empty"],[1,"passport.msg_start"],[25,"passport.msg_quarter"],[50,"passport.msg_half"],[75,"passport.msg_final"],[100,"passport.msg_done"]];
   let m = t(msgs[0][1]); msgs.forEach(([th,key]) => { if (c >= th) m = t(key); });
