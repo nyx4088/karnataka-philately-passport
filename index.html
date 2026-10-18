@@ -702,58 +702,6 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
   <div class="pagehead"><h1 data-i18n="circuits.title">Circuits</h1><p data-i18n="circuits.subtitle">Suggested region-wise routes. Neutral for everyone — start wherever you are.</p></div>
   <div class="scroll">
 
-  <div class="card" id="dayPlannerCard" style="margin-bottom:16px">
-    <div class="serif" style="font-size:17px;font-weight:700;margin-bottom:4px" data-i18n="planner.title">Day Planner</div>
-    <div class="note" style="margin-bottom:14px" data-i18n="planner.subtitle">Plan an efficient route through unvisited offices.</div>
-    
-    <!-- Start point -->
-    <div style="font-size:13px;font-weight:700;margin-bottom:6px" data-i18n="planner.start">Start from</div>
-    <div class="actionrow" style="margin-bottom:10px">
-      <button class="btn ghost" id="plannerNearMe" style="flex:1" data-i18n="planner.near_me">📍 Near me</button>
-      <button class="btn ghost" id="plannerPickOffice" style="flex:1" data-i18n="planner.pick_office">Pick office</button>
-    </div>
-    <input type="text" id="plannerTownInput" data-i18n-ph="planner.town_ph" placeholder="Or type a town name..." style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border-subtle);background:var(--surface);color:var(--ink);font-size:14px;margin-bottom:10px;box-sizing:border-box">
-    <div id="plannerStartLabel" class="note" style="margin-bottom:12px"></div>
-    
-    <!-- Max distance chips -->
-    <div style="font-size:13px;font-weight:700;margin-bottom:6px" data-i18n="planner.max_dist">Max distance</div>
-    <div class="chiprow" id="plannerDistChips" style="margin-bottom:12px">
-      <button class="chip" data-dist="50">50 km</button>
-      <button class="chip" data-dist="100">100 km</button>
-      <button class="chip" data-dist="200">200 km</button>
-      <button class="chip on" data-dist="250">250 km</button>
-    </div>
-    
-    <!-- Vehicle chips -->
-    <div style="font-size:13px;font-weight:700;margin-bottom:6px" data-i18n="planner.vehicle">Vehicle</div>
-    <div class="chiprow" id="plannerVehicleChips" style="margin-bottom:12px">
-      <button class="chip on" data-vehicle="car" data-i18n="planner.car">🚗 Car</button>
-      <button class="chip" data-vehicle="bike" data-i18n="planner.bike">🏍️ Bike</button>
-    </div>
-    
-    <!-- Scope -->
-    <div style="font-size:13px;font-weight:700;margin-bottom:6px" data-i18n="planner.scope">Include</div>
-    <div class="chiprow" id="plannerScopeChips" style="margin-bottom:12px">
-      <button class="chip on" data-scope="unvisited" data-i18n="planner.unvisited_only">Unvisited only</button>
-      <button class="chip" data-scope="with_planned" data-i18n="planner.with_planned">Unvisited + Planned</button>
-    </div>
-    
-    <!-- Max stops -->
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-      <div style="font-size:13px;font-weight:700" data-i18n="planner.max_stops">Max stops</div>
-      <div style="font-size:13px;color:var(--ink-2)"><span id="plannerStopsVal">6</span></div>
-    </div>
-    <input type="range" id="plannerStops" min="2" max="9" value="6" style="width:100%;margin-bottom:12px">
-    
-    <!-- Return to start -->
-    <label style="display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:14px;cursor:pointer">
-      <input type="checkbox" id="plannerReturn" style="width:18px;height:18px;accent-color:var(--brand)">
-      <span data-i18n="planner.return">Return to start</span>
-    </label>
-    
-    <button class="btn accent" id="plannerGo" style="width:100%" data-i18n="planner.plan_btn">Plan my day</button>
-    <div id="plannerResult" style="display:none;margin-top:14px"></div>
-  </div>
   <div id="circuitList"></div>
 </div>
 </section>
@@ -1022,12 +970,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       </details>
       <details>
         <summary data-i18n="faq.backup.q">Is my progress backed up anywhere?</summary>
-        <div class="a" data-i18n="faq.backup.a">Only if you back it up: use <b>Export progress</b> under Share &amp; backup to save a JSON file, and <b>Import</b> to restore it. Photos are not part of the backup. Clearing browser data erases everything unless you exported.</div>
-      
-      <details>
-        <summary data-i18n="faq.planner.q">How does the Day Planner work?</summary>
-        <div class="a" data-i18n="faq.planner.a">Pick a start point and max distance. The planner finds unvisited offices within range, orders them for the shortest route, and shows estimated distances and drive times. These are estimates — Google Maps gives the real route.</div>
-      </details></details>
+        <div class="a" data-i18n="faq.backup.a">Only if you back it up: use <b>Export progress</b> under Share &amp; backup to save a JSON file, and <b>Import</b> to restore it. Photos are not part of the backup. Clearing browser data erases everything unless you exported.</div></details>
       <details>
         <summary data-i18n="faq.circuits.q">What are Circuits?</summary>
         <div class="a" data-i18n="faq.circuits.a">Suggested region-wise routes (North, Coastal, South, etc.) to plan multi-stop stamp runs. They're neutral suggestions — start wherever you are.</div>
