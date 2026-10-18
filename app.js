@@ -1820,10 +1820,10 @@ async function drawStoryCard(withPhotos){
   }
   // footer (above 1670)
   x.font="600 34px "+FD; x.fillStyle=C.ink; x.textAlign="center";
-  x.fillText("STAMPQUEST", cx, 1620);
+  x.fillText("STAMPQUEST", cx, 1180);
   x.font="400 24px "+FS; x.fillStyle=C.ink2;
   const url=(location.origin+location.pathname).replace(/^https?:\/\//,"");
-  x.fillText(url, cx, 1655);
+  x.fillText(url, cx, 1220);
   return cv;
 }
 async function drawShareCard(withPhotos){
@@ -1837,11 +1837,16 @@ async function drawShareCard(withPhotos){
   drawPostmark(x, cx, 220, 70, C.brand);
   x.save(); x.translate(cx,220); x.rotate(-0.12);
   x.fillStyle=C.brand; x.font="600 44px "+FD; x.textAlign="center"; x.fillText("100",0,15); x.restore();
-  x.fillStyle=C.ink; x.font="600 44px "+FD; x.fillText("MY PHILATELY JOURNEY", cx, 340);
-  x.font="600 120px "+FD; x.fillStyle=C.brand; x.fillText(c+"", cx, 480);
-  x.font="400 34px "+FS; x.fillStyle=C.ink2; x.fillText("of 100 post offices", cx, 530);
-  const bw=W-400; x.fillStyle=C.subtle; x.fillRect((W-bw)/2, 570, bw, 20);
-  x.fillStyle=C.collected; x.fillRect((W-bw)/2, 570, bw*c/100, 20);
+  x.fillStyle=C.ink; x.font="600 36px "+FD; x.textAlign="center";
+  x.fillText("MY PHILATELY JOURNEY", cx, 330);
+  x.font="600 140px "+FD; x.fillStyle=C.brand; x.fillText(c+"", cx, 490);
+  x.font="400 30px "+FS; x.fillStyle=C.ink2; x.fillText("of 100 post offices collected", cx, 540);
+  const bw=W-360; x.fillStyle=C.subtle;
+  const barY=580, barH=26;
+  x.fillRect((W-bw)/2, barY, bw, barH);
+  x.fillStyle=C.collected; x.fillRect((W-bw)/2, barY, Math.max(barH, bw*c/100), barH);
+  x.font="500 24px "+FS; x.fillStyle=C.ink2;
+  x.fillText(Math.round(c)+" %", cx, barY+barH+32);
   // polaroids: 6 max, 3 per row x 2 rows
   const photos = withPhotos ? await recentPhotos(6) : [];
   const visited = LOCATIONS.filter(l => state.visited[l.n]).sort((a,b)=>b.n-a.n);
@@ -1852,7 +1857,7 @@ async function drawShareCard(withPhotos){
     items.push({ n:l.n, name:l.name, photo:ph });
   }
   const pw=280, ph=240, gapX=32, gapY=25;
-  const cols=3, tw=cols*pw+(cols-1)*gapX, tx0=cx-tw/2, ty0=650;
+  const cols=3, tw=cols*pw+(cols-1)*gapX, tx0=cx-tw/2, ty0=700;
   drawThread(x, tx0-20, ty0-28, tx0+tw+20, ty0-28, C);
   for (let i=0; i<items.length; i++){
     const r=Math.floor(i/cols), col=i%cols;
