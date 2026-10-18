@@ -1833,50 +1833,73 @@ async function drawShareCard(withPhotos){
   x.fillStyle=C.paper; x.fillRect(0,0,W,H);
   x.strokeStyle=C.subtle; x.lineWidth=3; x.strokeRect(40,40,W-80,H-80);
   const cx=W/2, c=visitedCount();
-  // header: 100 badge left, title right
-  const hx=140, hy=170;
-  drawPostmark(x, hx, hy, 55, C.brand);
+  const hx=130, hy=140;
+  drawPostmark(x, hx, hy, 50, C.brand);
   x.save(); x.translate(hx,hy); x.rotate(-0.12);
-  x.fillStyle=C.brand; x.font="600 36px "+FD; x.textAlign="center"; x.fillText("100",0,12); x.restore();
-  x.fillStyle=C.ink; x.font="600 34px "+FD; x.textAlign="left";
-  x.fillText("MY PHILATELY", hx+90, hy-8);
-  x.fillText("JOURNEY", hx+90, hy+32);
-  // count
+  x.fillStyle=C.brand; x.font="600 34px "+FD; x.textAlign="center"; x.fillText("100",0,12); x.restore();
+  x.fillStyle=C.ink; x.font="700 44px "+FD; x.textAlign="left";
+  x.fillText("MY PHILATELY JOURNEY", hx+75, hy+15);
   x.textAlign="center";
-  x.font="600 90px "+FD; x.fillStyle=C.brand; x.fillText(c+"", cx, 360);
-  x.font="400 26px "+FS; x.fillStyle=C.ink2; x.fillText("of 100 post offices collected", cx, 400);
-  const bw=W-360; x.fillStyle=C.subtle;
-  const barY=430, barH=22;
-  x.fillRect((W-bw)/2, barY, bw, barH);
+  const countStr = c+"";
+  const restStr = " of 100 post offices collected";
+  x.font="400 30px "+FS; x.fillStyle=C.ink2;
+  const restW = x.measureText(restStr).width;
+  x.font="700 56px "+FD;
+  const countW = x.measureText(countStr).width;
+  const totalW = countW + restW;
+  const startX = cx - totalW/2;
+  x.fillStyle=C.brand; x.fillText(countStr, startX + countW/2, 250);
+  x.font="400 30px "+FS; x.fillStyle=C.ink2;
+  x.textAlign="left"; x.fillText(restStr, startX + countW, 250);
+  x.textAlign="center";
+  const bw=W-320, barY=285, barH=14;
+  x.fillStyle=C.subtle; x.fillRect((W-bw)/2, barY, bw, barH);
   x.fillStyle=C.collected; x.fillRect((W-bw)/2, barY, Math.max(barH, bw*c/100), barH);
-  x.font="500 22px "+FS; x.fillStyle=C.ink2;
-  x.fillText(Math.round(c)+" %", cx, barY+barH+28);
-  // polaroids: 6 max, 3 per row x 2 rows
   const photos = withPhotos ? await recentPhotos(9) : [];
   const visited = LOCATIONS.filter(l => state.visited[l.n]).sort((a,b)=>b.n-a.n);
   const items = [];
-  for (let i=0; i<9 && i<visited.length; i++){
+  const showCount = Math.min(9, visited.length);
+  for (let i=0; i<showCount; i++){
     const l = visited[i];
     const ph = photos.find(p => p.n === l.n);
     items.push({ n:l.n, name:l.name, photo:ph });
   }
-  const pw=220, ph=170, gapX=24, gapY=40;
-  const cols=3, tw=cols*pw+(cols-1)*gapX, tx0=cx-tw/2, ty0=540;
-  drawThread(x, tx0-20, ty0-28, tx0+tw+20, ty0-28, C);
+  const pw=260, ph2=210, gapX=30, gapY=55;
+  const cols=3, rows=Math.ceil(items.length/cols);
+  const tw=cols*pw+(cols-1)*gapX, tx0=cx-tw/2;
+  const ty0=360;
   for (let i=0; i<items.length; i++){
     const r=Math.floor(i/cols), col=i%cols;
-    await drawPolaroid(x, tx0+col*(pw+gapX), ty0+r*(ph+gapY), pw, ph, items[i].photo, items[i].n, items[i].name, C);
+    const x0=tx0+col*(pw+gapX), y0=ty0+r*(ph2+gapY);
+    if (col===0){
+      drawThread(x, tx0-30, y0-15, tx0+tw+30, y0-15, C);
+    }
+    await drawPolaroid(x, x0, y0, pw, ph2, items[i].photo, items[i].n, items[i].name, C);
   }
   const remaining = c - items.length;
-  let fy = ty0 + 3*(ph+gapY) + 15;
-  if (remaining > 0){
-    x.font="500 28px "+FS; x.fillStyle=C.ink2; x.textAlign="center";
-    x.fillText("+"+remaining+" more stamp"+(remaining>1?"s":"")+" collected", cx, fy); fy += 38;
+  let pillY = ty0 + rows*(ph2+gapY) - gapY + 55;
+  if (remaining > 0 && items.length > 0){
+    const pillText = "+"+remaining+" collected";
+    x.font="600 26px "+FS;
+    const ptw = x.measureText(pillText).width + 56;
+    const pth = 52, px0 = cx - ptw/2, py0 = pillY;
+    x.strokeStyle=C.brand; x.lineWidth=2;
+    x.beginPath();
+    if (x.roundRect) x.roundRect(px0, py0, ptw, pth, pth/2);
+    else x.rect(px0, py0, ptw, pth);
+    x.stroke();
+    x.fillStyle=C.brand; x.textAlign="center";
+    x.fillText(pillText, cx, py0 + pth/2 + 9);
+    pillY += pth + 30;
+  } else if (items.length === 0){
+    pillY = ty0 + 40;
   }
-  x.font="600 32px "+FD; x.fillStyle=C.ink; x.textAlign="center"; x.fillText("STAMPQUEST", cx, 1220);
+  const fy = Math.max(pillY + 40, H - 180);
+  x.font="700 36px "+FD; x.fillStyle=C.ink; x.textAlign="center";
+  x.fillText("STAMPQUEST", cx, fy);
   x.font="400 22px "+FS; x.fillStyle=C.ink2;
   const url=(location.origin+location.pathname).replace(/^https?:\/\//,"");
-  x.fillText(url, cx, 1270);
+  x.fillText(url, cx, fy+38);
   return cv;
 }
 let shareFmt = "post";
