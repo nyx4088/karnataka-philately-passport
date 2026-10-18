@@ -1173,7 +1173,7 @@ function renderCircuits(){
     const done = stops.filter(l => state.visited[l.n]).length;
     const open = !!circuitOpen[rg];
     const cid = "cr-" + ri;
-    return '<div class="card" data-region="'+esc(rg)+'"><button class="chead" aria-expanded="'+open+'" aria-controls="'+cid+'" id="ch-'+ri+'">'+
+    return '<div class="card rise" data-region="'+esc(rg)+'" style="animation-delay:'+(ri*70)+'ms"><button class="chead" aria-expanded="'+open+'" aria-controls="'+cid+'" id="ch-'+ri+'">'+
       '<span class="serif" style="font-size:17px">'+esc(t('region.'+rg) !== 'region.'+rg ? t('region.'+rg) : rg)+'</span>'+
       '<span class="cmeta"><span class="note">'+t("circuits.collected", { done: done, total: stops.length })+'</span><span class="chev'+(open?" open":"")+'">›</span></span></button>'+
       '<div class="cbody'+(open?" open":"")+'" id="'+cid+'" role="region" aria-labelledby="ch-'+ri+'">'+
