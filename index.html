@@ -906,12 +906,15 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
   </div>
 </div>
 <div id="infoModal" style="display:none;position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.5)" role="dialog" data-i18n-aria="info.open_aria" aria-label="About this app">
-  <div style="position:absolute;left:0;right:0;bottom:0;max-height:85vh;background:var(--surface);border-radius:18px 18px 0 0;overflow-y:auto;padding:18px">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+  <div style="position:absolute;left:0;right:0;bottom:0;max-height:85dvh;display:flex;flex-direction:column;background:var(--surface);border-radius:18px 18px 0 0;padding:18px">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex:none">
+      <button id="infoBack" aria-label="Back to menu" style="display:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--border-subtle);background:var(--surface);font-size:20px;cursor:pointer;flex:none">‹</button>
       <div style="flex:1;font-weight:800;font-size:18px" data-i18n="info.title">About</div>
       <button class="btn ghost" id="infoClose" data-i18n-aria="info.close_aria" aria-label="Close" style="padding:8px 12px">✕</button>
     </div>
+    <div style="overflow-y:scroll;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;flex:1;min-height:0">
     <div id="infoBody"></div>
+    </div>
   </div>
 </div>
 
