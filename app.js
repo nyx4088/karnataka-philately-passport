@@ -1055,6 +1055,9 @@ function switchTab(name){
   const sBox = document.getElementById("searchResults");
   if (sBox) sBox.style.display = "none";
   document.querySelectorAll(".toast").forEach(t => t.remove());
+  if (typeof closeInfoModal === "function") closeInfoModal();
+  if (typeof closeMenu === "function") closeMenu();
+  if (typeof closeRivalSheet === "function"){ const rs = document.getElementById("rivalSheet"); if (rs && rs.style.display === "block") closeRivalSheet(); }
   if (name !== "explore" && sheet.classList.contains("open")){
     const n = selectedN; closeSheet(); if (n && markers[n]) refreshMarker(n);
   }
@@ -1976,7 +1979,8 @@ let rsReleaseTrap = null;
 let rsPhotoList = [];
 async function openRivalProfile(uid){
   $("rivalSheet").style.display = "block";
-  if (typeof rsResetPanel === "function") rsResetPanel();
+  const rsPanel = $("rivalSheet").querySelector(":scope > div");
+  if (rsPanel) rsPanel.style.transform = "";
   rsReleaseTrap = trapFocus($("rivalSheet"), closeRivalSheet);
   const grid = $("rsPhotos");
   grid.textContent = "";
@@ -2060,73 +2064,75 @@ function closeRemoteViewer(){
   if (v){ if (v._onKey) document.removeEventListener("keydown", v._onKey); v.remove(); }
 }
 
-// ---- Rival sheet: drag handle to expand/collapse/dismiss ----
+// ---- Rival sheet: drag handle + swipe-down-to-dismiss ----
 (function(){
   const sheet = document.getElementById("rivalSheet");
   if (!sheet) return;
   const panel = sheet.querySelector(":scope > div");
   if (!panel) return;
-  let handle = document.getElementById("rsDrag");
-  if (!handle){
-    handle = document.createElement("div");
-    handle.id = "rsDrag";
-    handle.style.cssText = "width:44px;height:5px;border-radius:3px;background:var(--border-subtle);margin:0 auto 12px;cursor:grab;touch-action:none;flex:none";
-    panel.insertBefore(handle, panel.firstChild);
-  }
-  let sY = 0, sH = 0, on = false;
-  const minH = () => Math.round(window.innerHeight * 0.32);
-  const maxH = () => Math.round(window.innerHeight * 0.92);
-  handle.addEventListener("touchstart", e => {
-    on = true; sY = e.touches[0].clientY; sH = panel.offsetHeight;
-    panel.style.transition = "none";
-  }, { passive:true });
+  const handle = document.createElement("div");
+  handle.id = "rsDrag";
+  handle.style.cssText = "width:44px;height:5px;border-radius:3px;background:var(--border-subtle);margin:0 auto 12px;cursor:grab;touch-action:none";
+  panel.insertBefore(handle, panel.firstChild);
+  let sY = 0, dY = 0, on = false;
+  handle.addEventListener("touchstart", e => { on = true; sY = dY = e.touches[0].clientY; panel.style.transition = "none"; }, { passive:true });
   handle.addEventListener("touchmove", e => {
     if (!on) return;
-    const dy = e.touches[0].clientY - sY;
-    const nh = Math.max(minH()*0.6, Math.min(maxH(), sH - dy));
-    panel.style.height = nh + "px";
-    panel.style.maxHeight = "none";
+    dY = e.touches[0].clientY;
+    panel.style.transform = "translateY(" + Math.max(0, dY - sY) + "px)";
   }, { passive:true });
   const end = () => {
     if (!on) return; on = false;
-    const h = panel.offsetHeight;
-    panel.style.transition = "height .25s cubic-bezier(.32,.72,.35,1)";
-    if (h < minH()*0.85){
-      panel.style.height = "0px";
-      setTimeout(() => { closeRivalSheet(); panel.style.height = ""; panel.style.maxHeight = ""; }, 240);
-    } else {
-      const targets = [minH(), (minH()+maxH())/2, maxH()];
-      let best = targets[0], bd = 1e18;
-      targets.forEach(tg => { const d = Math.abs(h - tg); if (d < bd){ bd = d; best = tg; } });
-      panel.style.height = best + "px";
-    }
+    panel.style.transition = "transform .25s ease";
+    if (dY - sY > 90){ panel.style.transform = "translateY(105%)"; setTimeout(closeRivalSheet, 220); }
+    else panel.style.transform = "";
   };
   handle.addEventListener("touchend", end);
   handle.addEventListener("touchcancel", end);
 })();
-function rsResetPanel(){
-  const panel = document.querySelector("#rivalSheet > div");
-  if (panel){ panel.style.height = ""; panel.style.maxHeight = ""; panel.style.transform = ""; panel.style.transition = ""; }
-}
 
-// ---- Info (About) modal: moves info sections out of Settings on first open ----
+// ---- Settings hamburger menu + single-section info modal ----
+let infoStore = null;
 let infoMoved = false;
-function openInfoModal(){
-  if (!infoMoved){
-    infoMoved = true;
-    const body = document.getElementById("infoBody");
-    if (body){
-      ["settings.about_app","settings.faq","settings.about_data","settings.privacy","settings.tiles"].forEach(key => {
-        const h = document.querySelector('#view-settings h3[data-i18n="'+key+'"]');
-        if (h){
-          const wrap = document.createElement("div");
-          const card = h.nextElementSibling;
-          wrap.appendChild(h);
-          if (card && card.classList.contains("card")) wrap.appendChild(card);
-          body.appendChild(wrap);
-        }
-      });
+function ensureInfoStore(){
+  if (infoMoved) return;
+  infoMoved = true;
+  infoStore = document.createElement("div");
+  infoStore.id = "infoStore";
+  infoStore.style.display = "none";
+  document.body.appendChild(infoStore);
+  ["settings.about_app","settings.faq","settings.about_data","settings.privacy","settings.tiles"].forEach(key => {
+    const h = document.querySelector('#view-settings h3[data-i18n="'+key+'"]');
+    if (h){
+      const wrap = document.createElement("div");
+      wrap.dataset.section = key;
+      const card = h.nextElementSibling;
+      wrap.appendChild(h);
+      if (card && card.classList.contains("card")) wrap.appendChild(card);
+      infoStore.appendChild(wrap);
     }
+  });
+}
+function openMenu(){
+  ensureInfoStore();
+  const m = document.getElementById("menuSheet");
+  if (m) m.style.display = "block";
+}
+function closeMenu(){
+  const m = document.getElementById("menuSheet");
+  if (m) m.style.display = "none";
+}
+function openInfoSection(key){
+  ensureInfoStore();
+  closeMenu();
+  const body = document.getElementById("infoBody");
+  const title = document.querySelector("#infoModal [data-i18n='info.title']");
+  if (!body) return;
+  body.textContent = "";
+  const sec = infoStore ? infoStore.querySelector('[data-section="'+key+'"]') : null;
+  if (sec){
+    body.appendChild(sec);
+    if (title) title.textContent = t(key);
   }
   const m = document.getElementById("infoModal");
   if (m) m.style.display = "block";
@@ -2134,11 +2140,21 @@ function openInfoModal(){
 function closeInfoModal(){
   const m = document.getElementById("infoModal");
   if (m) m.style.display = "none";
+  // return section to store
+  const body = document.getElementById("infoBody");
+  if (body && infoStore){
+    const sec = body.querySelector("[data-section]");
+    if (sec) infoStore.appendChild(sec);
+  }
 }
-if ($("infoBtn")) $("infoBtn").onclick = openInfoModal;
+if ($("menuBtn")) $("menuBtn").onclick = openMenu;
+if ($("menuSheet")) $("menuSheet").addEventListener("click", e => { if (e.target.id === "menuSheet") closeMenu(); });
+document.querySelectorAll("#menuSheet [data-menu]").forEach(b => {
+  b.addEventListener("click", () => openInfoSection(b.dataset.menu));
+});
 if ($("infoClose")) $("infoClose").onclick = closeInfoModal;
 if ($("infoModal")) $("infoModal").addEventListener("click", e => { if (e.target.id === "infoModal") closeInfoModal(); });
-document.addEventListener("keydown", e => { if (e.key === "Escape") closeInfoModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape"){ closeInfoModal(); closeMenu(); } });
 $("rivalSheet").addEventListener("click", e => { if (e.target.id === "rivalSheet") closeRivalSheet(); });
 
 /* ================= deep link / first run / init ================= */
