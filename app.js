@@ -1243,7 +1243,7 @@ function renderRecent(){
 const MONTHS_EN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const MONTHS_KN = ["ಜನವರಿ","ಫೆಬ್ರವರಿ","ಮಾರ್ಚ್","ಏಪ್ರಿಲ್","ಮೇ","ಜೂನ್","ಜುಲೈ","ಆಗಸ್ಟ್","ಸೆಪ್ಟೆಂಬರ್","ಅಕ್ಟೋಬರ್","ನವೆಂಬರ್","ಡಿಸೆಂಬರ್"];
 function monthName(idx){
-  const lang = (typeof getLang === "function" ? getLang() : "en");
+  const lang = (typeof state !== "undefined" && state.lang) || "en";
   return (lang === "kn" ? MONTHS_KN : MONTHS_EN)[idx];
 }
 function monthStamps(year, month){
