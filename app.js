@@ -1820,10 +1820,10 @@ async function drawStoryCard(withPhotos){
   }
   // footer (above 1670)
   x.font="600 34px "+FD; x.fillStyle=C.ink; x.textAlign="center";
-  x.fillText("STAMPQUEST", cx, 1180);
+  x.fillText("STAMPQUEST", cx, 1170);
   x.font="400 24px "+FS; x.fillStyle=C.ink2;
   const url=(location.origin+location.pathname).replace(/^https?:\/\//,"");
-  x.fillText(url, cx, 1220);
+  x.fillText(url, cx, 1215);
   return cv;
 }
 async function drawShareCard(withPhotos){
@@ -1843,10 +1843,10 @@ async function drawShareCard(withPhotos){
   x.fillText("JOURNEY", hx+90, hy+32);
   // count
   x.textAlign="center";
-  x.font="600 110px "+FD; x.fillStyle=C.brand; x.fillText(c+"", cx, 380);
-  x.font="400 28px "+FS; x.fillStyle=C.ink2; x.fillText("of 100 post offices collected", cx, 425);
+  x.font="600 90px "+FD; x.fillStyle=C.brand; x.fillText(c+"", cx, 360);
+  x.font="400 26px "+FS; x.fillStyle=C.ink2; x.fillText("of 100 post offices collected", cx, 400);
   const bw=W-360; x.fillStyle=C.subtle;
-  const barY=455, barH=22;
+  const barY=430, barH=22;
   x.fillRect((W-bw)/2, barY, bw, barH);
   x.fillStyle=C.collected; x.fillRect((W-bw)/2, barY, Math.max(barH, bw*c/100), barH);
   x.font="500 22px "+FS; x.fillStyle=C.ink2;
@@ -1860,7 +1860,7 @@ async function drawShareCard(withPhotos){
     const ph = photos.find(p => p.n === l.n);
     items.push({ n:l.n, name:l.name, photo:ph });
   }
-  const pw=240, ph=200, gapX=28, gapY=22;
+  const pw=240, ph=190, gapX=28, gapY=48;
   const cols=3, tw=cols*pw+(cols-1)*gapX, tx0=cx-tw/2, ty0=540;
   drawThread(x, tx0-20, ty0-28, tx0+tw+20, ty0-28, C);
   for (let i=0; i<items.length; i++){
