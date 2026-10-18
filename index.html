@@ -687,39 +687,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 <section class="view" id="view-circuits">
   <div class="pagehead"><h1 data-i18n="circuits.title">Circuits</h1><p data-i18n="circuits.subtitle">Suggested region-wise routes. Neutral for everyone — start wherever you are.</p></div>
   <div class="scroll">
-  <div class="card" id="tripCard">
-    <div class="serif" style="font-size:17px" data-i18n="trip.title">Plan a day trip</div>
-    <div class="note" style="margin:6px 0 12px" data-i18n="trip.subtitle">Turn your unvisited offices into one efficient route.</div>
-    <div id="tripForm">
-      <div style="font-size:13px;font-weight:700;margin-bottom:6px" data-i18n="trip.start">Start from</div>
-      <div class="actionrow" style="margin-bottom:12px">
-        <button class="btn ghost" id="tripUseLoc" style="flex:1" data-i18n="trip.use_my_loc">Use my location</button>
-        <button class="btn ghost" id="tripPickMap" style="flex:1" data-i18n="sheet.pick_on_map">Pick on map</button>
-      </div>
-      <div id="tripStartLabel" class="note" style="margin-bottom:12px"></div>
-      <div style="display:flex;gap:10px;margin-bottom:12px">
-        <div style="flex:1">
-          <div style="font-size:13px;font-weight:700;margin-bottom:6px" data-i18n="trip.max_dist">Max distance</div>
-          <select id="tripDist" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border-subtle);background:var(--surface);color:var(--ink);font-size:14px">
-            <option value="50">50 km</option>
-            <option value="100" selected>100 km</option>
-            <option value="150">150 km</option>
-            <option value="200">200 km</option>
-          </select>
-        </div>
-        <div style="flex:1">
-          <div style="font-size:13px;font-weight:700;margin-bottom:6px" data-i18n="trip.transport">Transport</div>
-          <select id="tripMode" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border-subtle);background:var(--surface);color:var(--ink);font-size:14px">
-            <option value="35" data-i18n="trip.scooter">Scooter</option>
-            <option value="45" data-i18n="trip.car">Car</option>
-            <option value="28" data-i18n="trip.bus">Bus</option>
-          </select>
-        </div>
-      </div>
-      <button class="btn accent" id="tripGo" style="width:100%" data-i18n="trip.plan_btn">Plan my trip</button>
-    </div>
-    <div id="tripResult" style="display:none"></div>
-  </div>
+
   <div id="circuitList"></div>
 </div>
 </section>
@@ -798,10 +766,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       <div class="note" style="margin-top:10px" data-i18n="passport.backup_note">Your progress lives in this browser.</div>
     </div>
 
-    <h3 class="sec" data-i18n="passport.photos_section">Stamp photos</h3>
-    <div class="card" style="margin-bottom:16px">
-      <div id="photoMeter"></div>
-    </div>
+
   </div>
 </section>
 
