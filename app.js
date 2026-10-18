@@ -1462,6 +1462,7 @@ $("btnReset").onclick = async () => {
   const photoCount = await photoCountAll().catch(()=>0);
   const photoMsg = photoCount > 0 ? " "+t("confirm.kept_photos", {n:photoCount}) : "";
   if (!confirm(t("confirm.reset", {n:vCount})+photoMsg)) return;
+  if (!confirm(t("confirm.reset_final"))) return;
   let delPhotos = false;
   if (photoCount > 0){
     delPhotos = confirm(t("confirm.delete_photos", { n: photoCount }));
