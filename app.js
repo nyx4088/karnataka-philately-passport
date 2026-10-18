@@ -1098,7 +1098,7 @@ document.querySelectorAll("#nav button").forEach(b => b.onclick = () => switchTa
 $("progChip").onclick = () => switchTab("passport");
 
 /* ================= tip jar (UPI) ================= */
-const TIP_UPI_ID = "REPLACE_WITH_UPI_ID"; // TODO: set your UPI ID
+const TIP_UPI_ID = "stampquest@naviaxis";
 const TIP_NAME = "StampQuest";
 let tipAmt = 50;
 function openTip(){
