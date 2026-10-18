@@ -52,20 +52,26 @@
 :root{
   --paper:#F3EBD8; --surface:#FBF6E9; --ink:#1F1B16; --ink-2:#54493C;
   --border:#D9CFB4; --border-strong:#6E6254; --border-subtle:#D9CFB4;
+  --card-border:rgba(169,31,38,0.14);
   --brand:#A91F26; --brand-hover:#8F1822; --on-brand:#FFFFFF; --focus:#1D3557;
   --collected:#2B6A46; --planned:#7A5600; --error:#8E1B1B;
   --header-bg:#6B2236; --header-paper:#F3EBD8; --header-gold:#E3A512;
+  --gold:#C9973F;
   --locked-fill:#E4DBC4; --milestone:#E3A512;
   --mapbg:#E7DFC9;
-  --shadow:0 2px 12px rgba(31,27,22,.14);
-  --r:14px;
+  --shadow:0 1px 2px rgba(60,20,20,.05);
+  --shadow-float:0 12px 32px rgba(0,0,0,.18);
+  --r:18px;
+  --space:8px;
   --font-display:"Fraunces",Georgia,"Times New Roman",serif;
   --font-sans:"DM Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --font-mono:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
 }
 html[data-theme="dark"]{
-  --paper:#16120F; --surface:#221C17; --ink:#F3EDE0; --ink-2:#B9AF9F;
-  --border:#3A322A; --border-strong:#8C8272; --border-subtle:#3A322A;
+  --paper:#0C0A09; --surface:#161210; --ink:#F3EDE0; --ink-2:#B9AF9F;
+  --border:#2A2420; --border-strong:#8C8272; --border-subtle:#2A2420;
+  --card-border:rgba(255,255,255,0.09);
+  --gold:#D4A94E;
   --brand:#F0707A; --brand-hover:#F58D95; --on-brand:#16120F; --focus:#F3EDE0;
   --collected:#6FCB9A; --planned:#E8B84A; --error:#F0707A;
   --locked-fill:#3E3226;
@@ -81,6 +87,9 @@ html[lang=kn] body,html[lang=kn] button,html[lang=kn] input{font-family:"Noto Sa
 button:focus-visible,a:focus-visible,input:focus-visible{outline:2.5px solid var(--focus);outline-offset:2px;border-radius:6px}
 .serif{font-family:var(--font-display);font-variation-settings:"SOFT" 50,"WONK" 0}
 h1,.wm,.explored,.pagehead h1,.sheet-head h2{font-family:var(--font-display);font-variation-settings:"SOFT" 50,"WONK" 0;font-weight:600}
+.pagehead h1,.serif{letter-spacing:-0.02em;line-height:1.08}
+body{font-variant-numeric:tabular-nums}
+.k{font-size:11px;font-weight:700;letter-spacing:.14em}
 
 /* ---------- views ---------- */
 .view{position:fixed;inset:0;display:none;flex-direction:column;background:var(--paper);transition:background-color .6s ease}
@@ -312,9 +321,9 @@ body.sheet-open .mapctl{display:none}
 #nav button.on svg{opacity:1;fill:currentColor}
 
 /* ---------- generic ---------- */
-h3.sec{font-size:17px;margin:22px 0 10px;letter-spacing:.5px}
-.card{background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);
-  margin-bottom:12px;transition:background-color .6s ease,border-color .6s ease;min-width:0}
+h3.sec{font-size:17px;margin:22px 0 10px;letter-spacing:.5px;margin-bottom:12px}
+.card{background:var(--surface);border:1px solid var(--card-border);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);
+  margin-bottom:16px;transition:background-color .6s ease,border-color .6s ease;min-width:0}
 .rowbtn{display:flex;align-items:center;gap:12px;width:100%;background:var(--surface);border:1px solid var(--border-subtle);
   border-radius:12px;padding:12px;margin-bottom:8px;color:var(--ink);text-align:left;font-size:13px;min-height:48px;
   transition:background-color .6s ease}
