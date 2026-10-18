@@ -563,6 +563,10 @@ $("msShare") && $("msShare").addEventListener("click", () => {
   $("msModal").style.display = "none";
   if (typeof openShareCard === "function") openShareCard();
 });
+$("msTip") && $("msTip").addEventListener("click", () => {
+  $("msModal").style.display = "none";
+  if (typeof openTip === "function") openTip();
+});
 function checkMilestones(){
   const c = visitedCount();
   [25,50,75,100].forEach(m => {
@@ -1296,6 +1300,15 @@ function renderJourney(){
   const dates = vis.map(l => state.visited[l.n]).filter(Boolean).sort();
   $("jFirst").textContent = dates.length ? dates[0].slice(5).split("-").reverse().join("/") : "–";
   $("jCount").textContent = vis.length;
+  const distN = new Set(vis.map(l => l.district)).size;
+  const storyEl = $("jStory");
+  if (storyEl){
+    let story;
+    if (km > 350) story = t("journey.story_far");
+    else if (distN >= 2) story = t("journey.story_mid", { n: distN });
+    else story = t("journey.story_start");
+    storyEl.textContent = story;
+  }
 }
 function renderProgress(){
   const c = visitedCount();
