@@ -1412,13 +1412,36 @@ function fmtTripDur(min){
   return t("trip.hours", { h: Math.floor(min/60), m: Math.round(min%60) });
 }
 function planTrip(){
-  if (!tripStart){ toast(t("trip.start_needed")); return; }
+  if (!tripStart || typeof tripStart.lat !== "number" || typeof tripStart.lng !== "number"){
+    toast(t("trip.start_needed")); return;
+  }
   const maxKm = parseFloat(document.getElementById("tripDist").value) || 100;
   const speed = parseFloat(document.getElementById("tripMode").value) || 35;
-  const cands = LOCATIONS.filter(l => !state.visited[l.n])
-    .map(l => ({ l, d: havKm(tripStart.lat, tripStart.lng, l.lat, l.lng) }))
-    .filter(x => x.d <= maxKm).sort((a,b) => a.d - b.d).slice(0, 10);
-  if (!cands.length){ toast(t("trip.no_stops", { n: maxKm })); return; }
+  const visited = (state && state.visited) || {};
+  let cands = [];
+  try {
+    cands = LOCATIONS
+      .filter(l => l && typeof l.lat === "number" && typeof l.lng === "number" && !visited[l.n])
+      .map(l => ({ l, d: havKm(tripStart.lat, tripStart.lng, l.lat, l.lng) }))
+      .filter(x => typeof x.d === "number" && !isNaN(x.d) && x.d <= maxKm)
+      .sort((a,b) => a.d - b.d).slice(0, 10);
+  } catch(e){ cands = []; }
+  if (!cands.length){
+    // Fallback: show nearest 10 unvisited regardless of distance
+    try {
+      const nearest = LOCATIONS
+        .filter(l => l && typeof l.lat === "number" && typeof l.lng === "number" && !visited[l.n])
+        .map(l => ({ l, d: havKm(tripStart.lat, tripStart.lng, l.lat, l.lng) }))
+        .filter(x => typeof x.d === "number" && !isNaN(x.d))
+        .sort((a,b) => a.d - b.d).slice(0, 10);
+      if (nearest.length){
+        toast(t("trip.no_stops", { n: maxKm }) + " " + t("trip.showing_nearest"));
+        cands = nearest;
+      } else {
+        toast(t("trip.no_stops", { n: maxKm })); return;
+      }
+    } catch(e){ toast(t("trip.no_stops", { n: maxKm })); return; }
+  }
   const ordered = [];
   let cur = tripStart;
   const rem = cands.slice();
