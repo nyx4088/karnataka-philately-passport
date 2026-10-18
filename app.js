@@ -2027,7 +2027,10 @@ async function renderRivals(){
     el.textContent = "";
     if (!board || !board.length){
       const empty = document.createElement("div");
-      empty.className = "note"; empty.textContent = t("rivals.no_collectors");
+      empty.className = "empty-state";
+      empty.innerHTML = '<svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="var(--brand)" stroke-width="2" opacity="0.5"><circle cx="24" cy="24" r="16"/><circle cx="24" cy="24" r="10" stroke-dasharray="3 3"/><text x="24" y="29" text-anchor="middle" font-size="12" fill="var(--brand)" stroke="none">✉</text></svg>'
+        + '<div class="serif" style="font-size:16px;margin:8px 0 4px">' + t("rivals.no_collectors") + '</div>'
+        + '<div class="note">' + t("rivals.empty_hint") + '</div>';
       el.appendChild(empty);
     } else {
       board.forEach((r, i) => el.appendChild(buildRivalRow(r, i, "var(--brand)")));
