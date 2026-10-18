@@ -121,6 +121,26 @@ html[data-theme="dark"] .hcard{background:color-mix(in srgb, var(--header-bg) 92
 #infoBtn{width:34px;height:34px;flex:none;border-radius:50%;background:transparent;border:1.5px solid color-mix(in srgb, var(--header-paper) 45%, transparent);color:var(--header-paper);font-size:16px;font-weight:700;font-style:italic;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
 #map.picking{cursor:crosshair}
 #map.picking .leaflet-grab{cursor:crosshair}
+/* ---- premium motion pass ---- */
+.view.active{animation:viewIn .32s cubic-bezier(.32,.72,.35,1)}
+@keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.btn,.btn.accent,.btn.ghost,.btn.primary{transition:background-color .6s ease,border-color .6s ease,transform .15s cubic-bezier(.34,1.56,.64,1)}
+.btn:active,.btn.accent:active,.btn.ghost:active,.btn.primary:active{transform:scale(.95)}
+#nav button{transition:color .2s ease,transform .15s cubic-bezier(.34,1.56,.64,1)}
+#nav button:active{transform:scale(.88)}
+.rowbtn{transition:background-color .2s ease,transform .15s ease}
+.rowbtn:active{transform:scale(.97)}
+#rivalSheet,#infoModal{animation:fadeIn .28s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+#rivalSheet>div,#infoModal>div{animation:sheetUp .34s cubic-bezier(.32,.72,.35,1)}
+@keyframes sheetUp{from{transform:translateY(48px);opacity:.5}to{transform:none;opacity:1}}
+.card.rise{animation:riseIn .45s cubic-bezier(.32,.72,.35,1) both}
+@keyframes riseIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .view.active,#rivalSheet,#infoModal,#rivalSheet>div,#infoModal>div,.card.rise{animation:none}
+  .btn,.btn.accent,.btn.ghost,.btn.primary,#nav button,.rowbtn{transition:none}
+  .btn:active,.btn.accent:active,.btn.ghost:active,.btn.primary:active,#nav button:active,.rowbtn:active{transform:none}
+}
 .hcard .progchip .dot{background:var(--header-gold)}
 .hcard .searchbox{background:var(--surface);border-color:var(--border-subtle)}
 .hrow1{display:flex;align-items:center;justify-content:space-between;min-height:44px}
