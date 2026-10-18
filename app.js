@@ -1101,6 +1101,72 @@ function switchTab(name){
 document.querySelectorAll("#nav button").forEach(b => b.onclick = () => switchTab(b.dataset.tab));
 $("progChip").onclick = () => switchTab("passport");
 
+/* ================= Quest Wrapped (monthly recap) ================= */
+const MONTHS_EN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const MONTHS_KN = ["ಜನವರಿ","ಫೆಬ್ರವರಿ","ಮಾರ್ಚ್","ಏಪ್ರಿಲ್","ಮೇ","ಜೂನ್","ಜುಲೈ","ಆಗಸ್ಟ್","ಸೆಪ್ಟೆಂಬರ್","ಅಕ್ಟೋಬರ್","ನವೆಂಬರ್","ಡಿಸೆಂಬರ್"];
+function monthName(idx){
+  const lang = (typeof getLang === "function" ? getLang() : "en");
+  return (lang === "kn" ? MONTHS_KN : MONTHS_EN)[idx];
+}
+function monthStamps(year, month){
+  const prefix = year + "-" + String(month + 1).padStart(2, "0");
+  return LOCATIONS.filter(l => state.visited[l.n] && String(state.visited[l.n]).startsWith(prefix));
+}
+let wrappedCards = [], wrappedIdx = 0;
+function buildWrappedCards(){
+  const now = new Date(), y = now.getFullYear(), m = now.getMonth();
+  const ms = monthStamps(y, m);
+  if (!ms.length) return [];
+  const byDate = ms.slice().sort((a,b) => String(state.visited[a.n]).localeCompare(String(state.visited[b.n])));
+  let km = 0;
+  for (let i = 1; i < byDate.length; i++) km += havKm(byDate[i-1], byDate[i]);
+  const dists = new Set(ms.map(l => l.district)).size;
+  const mn = monthName(m);
+  return [
+    { kicker: t("wrapped.title", { month: mn }), num: ms.length, label: t("wrapped.stamps"), sub: "" },
+    { kicker: t("wrapped.title", { month: mn }), num: Math.round(km), label: t("wrapped.km"), sub: km > 0 ? "" : t("journey.story_start") },
+    { kicker: t("wrapped.title", { month: mn }), num: dists, label: t("wrapped.districts"), sub: "" },
+    { kicker: t("wrapped.title", { month: mn }), num: "✦", label: t("milestone.title_" + (ms.length >= 75 ? "100" : ms.length >= 50 ? "75" : ms.length >= 25 ? "50" : "25")), sub: t("wrapped.share") }
+  ];
+}
+function renderWrappedCard(){
+  const c = wrappedCards[wrappedIdx]; if (!c) return;
+  $("wrappedKicker").textContent = c.kicker;
+  $("wrappedNum").textContent = c.num;
+  $("wrappedLabel").textContent = c.label;
+  $("wrappedSub").textContent = c.sub || "";
+  $("wrappedDots").innerHTML = wrappedCards.map((_, i) =>
+    '<span style="width:8px;height:8px;border-radius:50%;background:' + (i === wrappedIdx ? "var(--brand)" : "var(--border)") + '"></span>').join("");
+  $("wrappedPrev").style.opacity = wrappedIdx === 0 ? "0.3" : "1";
+  $("wrappedNext").style.opacity = wrappedIdx === wrappedCards.length - 1 ? "0.3" : "1";
+  $("wrappedShare").style.display = wrappedIdx === wrappedCards.length - 1 ? "" : "none";
+}
+function showWrapped(){
+  wrappedCards = buildWrappedCards();
+  if (!wrappedCards.length){ toast(t("wrapped.empty")); return; }
+  wrappedIdx = 0;
+  renderWrappedCard();
+  $("wrappedModal").style.display = "block";
+  buzz(15);
+}
+function closeWrapped(){ $("wrappedModal").style.display = "none"; }
+$("wrappedPrev") && $("wrappedPrev").addEventListener("click", () => { if (wrappedIdx > 0){ wrappedIdx--; renderWrappedCard(); buzz(8); } });
+$("wrappedNext") && $("wrappedNext").addEventListener("click", () => { if (wrappedIdx < wrappedCards.length - 1){ wrappedIdx++; renderWrappedCard(); buzz(8); } });
+$("wrappedClose") && $("wrappedClose").addEventListener("click", closeWrapped);
+$("wrappedShare") && $("wrappedShare").addEventListener("click", () => { closeWrapped(); if (typeof openShareCard === "function") openShareCard(); });
+$("wrappedReplay") && $("wrappedReplay").addEventListener("click", showWrapped);
+// Auto-show once per month (if activity)
+(function wrappedAuto(){
+  try {
+    const now = new Date(), key = "wrapped_" + now.getFullYear() + "_" + (now.getMonth() + 1);
+    if (localStorage.getItem(key)) return;
+    const ms = monthStamps(now.getFullYear(), now.getMonth());
+    if (!ms.length) return;
+    localStorage.setItem(key, "1");
+    setTimeout(showWrapped, 2500);
+  } catch(e){}
+})();
+
 /* ================= tip jar (UPI) ================= */
 const TIP_UPI_ID = "stampquest@naviaxis";
 const TIP_NAME = "StampQuest";
@@ -1300,6 +1366,8 @@ function renderJourney(){
   const dates = vis.map(l => state.visited[l.n]).filter(Boolean).sort();
   $("jFirst").textContent = dates.length ? dates[0].slice(5).split("-").reverse().join("/") : "–";
   $("jCount").textContent = vis.length;
+  const wr = $("wrappedReplay");
+  if (wr){ wr.textContent = t("wrapped.replay", { month: monthName(new Date().getMonth()) }); wr.style.display = ""; }
   const distN = new Set(vis.map(l => l.district)).size;
   const storyEl = $("jStory");
   if (storyEl){
