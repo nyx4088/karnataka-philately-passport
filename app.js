@@ -1070,6 +1070,12 @@ function switchTab(name){
 document.querySelectorAll("#nav button").forEach(b => b.onclick = () => switchTab(b.dataset.tab));
 $("progChip").onclick = () => switchTab("passport");
 
+/* ================= haptic tap feedback ================= */
+function buzz(ms){ try{ if (navigator.vibrate) navigator.vibrate(ms || 8); }catch(e){} }
+document.addEventListener("click", e => {
+  if (e.target.closest(".btn, #nav button, .rowbtn, .progchip, #menuBtn, .chead")) buzz(8);
+}, { passive:true });
+
 /* ================= day-trip planner ================= */
 let tripStart = null;
 let tripRouteLine = null;
