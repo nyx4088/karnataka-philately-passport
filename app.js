@@ -1101,6 +1101,76 @@ function switchTab(name){
 document.querySelectorAll("#nav button").forEach(b => b.onclick = () => switchTab(b.dataset.tab));
 $("progChip").onclick = () => switchTab("passport");
 
+/* ================= Monthly streak + Pinned favorites ================= */
+function monthKey(y, m){ return y + "-" + String(m + 1).padStart(2, "0"); }
+function computeStreak(){
+  const now = new Date();
+  const monthsWithStamps = new Set();
+  LOCATIONS.forEach(l => {
+    const d = state.visited[l.n];
+    if (d && typeof d === "string" && d.length >= 7) monthsWithStamps.add(d.slice(0, 7));
+  });
+  let streak = 0, y = now.getFullYear(), m = now.getMonth();
+  let freezeUsed = false;
+  try { freezeUsed = localStorage.getItem("monsoon_freeze_" + y + "_Q" + (Math.floor(m/3)+1)) === "1"; } catch(e){}
+  // If current month has no stamp yet, don't break streak (month still in progress)
+  if (!monthsWithStamps.has(monthKey(y, m))){ m--; if (m < 0){ m = 11; y--; } }
+  while (monthsWithStamps.has(monthKey(y, m))){
+    streak++;
+    m--; if (m < 0){ m = 11; y--; }
+  }
+  // Check if we need freeze for the gap month
+  let freezeApplied = false;
+  if (streak > 0 && !monthsWithStamps.has(monthKey(y, m)) && !freezeUsed){
+    // One missing month — apply Monsoon Pass
+    try {
+      const q = "monsoon_freeze_" + now.getFullYear() + "_Q" + (Math.floor(now.getMonth()/3)+1);
+      localStorage.setItem(q, "1");
+      freezeApplied = true;
+      // Recount skipping the frozen month
+      m--; if (m < 0){ m = 11; y--; }
+      while (monthsWithStamps.has(monthKey(y, m))){ streak++; m--; if (m < 0){ m = 11; y--; } }
+    } catch(e){}
+  }
+  return { streak, freezeApplied };
+}
+function renderStreak(){
+  const badge = $("streakBadge"); if (!badge) return;
+  const { streak, freezeApplied } = computeStreak();
+  if (streak < 2){ badge.style.display = "none"; return; }
+  badge.style.display = "flex";
+  $("streakNum").textContent = streak;
+  badge.title = streak + " " + t(streak === 1 ? "streak.month" : "streak.months") +
+    (freezeApplied ? " • " + t("streak.freeze_used") : "");
+  if (freezeApplied) toast(t("streak.freeze_used"));
+}
+function togglePin(n){
+  if (!state.pinned) state.pinned = [];
+  const i = state.pinned.indexOf(n);
+  if (i >= 0) state.pinned.splice(i, 1);
+  else {
+    if (state.pinned.length >= 3){ toast(t("pin.max")); return; }
+    state.pinned.push(n);
+  }
+  save(); renderGrid(); renderFavs();
+}
+function renderFavs(){
+  const row = $("favRow"), scroll = $("favScroll");
+  if (!row || !scroll) return;
+  const pinned = (state.pinned || []).map(n => byN[n]).filter(Boolean);
+  if (!pinned.length){ row.style.display = "none"; return; }
+  row.style.display = "block";
+  scroll.innerHTML = pinned.map(l => {
+    const photo = (state.photos && state.photos[l.n]) ? '<img src="' + state.photos[l.n] + '" alt="">' : "✉";
+    return '<div class="recent-item" data-n="' + l.n + '"><div class="recent-ring" style="position:relative"><div>' + photo + '</div>' +
+      '<span style="position:absolute;top:-4px;right:-4px;font-size:16px">📌</span></div>' +
+      '<div class="recent-name">' + esc(dispName(l).split(" ")[0]) + '</div></div>';
+  }).join("");
+  scroll.querySelectorAll(".recent-item").forEach(el => {
+    el.onclick = () => { openLocation(+el.dataset.n); buzz(8); };
+  });
+}
+
 /* ================= Stamp of the day + Recent stamps ================= */
 function sotdPick(){
   const now = new Date();
@@ -1423,6 +1493,8 @@ function renderProgress(){
   renderRingCount(c);
   renderJourney();
   renderRecent();
+  renderStreak();
+  renderFavs();
   $("ringFg").style.strokeDashoffset = (326.7 * (1 - c/100)).toFixed(1);
   const msgs = [[0,"passport.ring_empty"],[1,"passport.msg_start"],[25,"passport.msg_quarter"],[50,"passport.msg_half"],[75,"passport.msg_final"],[100,"passport.msg_done"]];
   let m = t(msgs[0][1]); msgs.forEach(([th,key]) => { if (c >= th) m = t(key); });
