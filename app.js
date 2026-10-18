@@ -1831,11 +1831,15 @@ $("rivalAddBtn").onclick = async () => {
   else toast(t("toast.already_added"));
 };
 let rsReleaseTrap = null;
+let rsPhotoList = [];
 async function openRivalProfile(uid){
   $("rivalSheet").style.display = "block";
+  const rsPanel = $("rivalSheet").querySelector(":scope > div");
+  if (rsPanel) rsPanel.style.transform = "";
   rsReleaseTrap = trapFocus($("rivalSheet"), closeRivalSheet);
   const grid = $("rsPhotos");
   grid.textContent = "";
+  rsPhotoList = [];
   const loading = document.createElement("div");
   loading.className = "note"; loading.textContent = t("rivals.loading");
   grid.appendChild(loading);
@@ -1859,7 +1863,7 @@ async function openRivalProfile(uid){
       const n = parseInt(f.name);
       const loc = byN[n];
       const d = document.createElement("div");
-      d.style.cssText = "position:relative;border-radius:10px;overflow:hidden;aspect-ratio:1;background:var(--surface-2)";
+      d.style.cssText = "position:relative;border-radius:10px;overflow:hidden;aspect-ratio:1;background:var(--surface-2);cursor:pointer";
       const img = document.createElement("img");
       img.src = publicUrl; img.loading = "lazy"; img.alt = t("rivalsheet.photo_alt");
       img.style.cssText = "width:100%;height:100%;object-fit:cover";
@@ -1867,6 +1871,9 @@ async function openRivalProfile(uid){
       cap.style.cssText = "position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);color:#fff;font-size:12px;padding:4px 6px";
       cap.textContent = (isNaN(n) ? "" : n + ". ") + (loc ? loc.name : "");
       d.appendChild(img); d.appendChild(cap);
+      rsPhotoList.push({ url: publicUrl, cap: cap.textContent });
+      const rIdx = rsPhotoList.length - 1;
+      d.onclick = () => openRemoteViewer(rsPhotoList, rIdx);
       grid.appendChild(d);
     }
   } catch(e){
@@ -1878,6 +1885,66 @@ async function openRivalProfile(uid){
 }
 function closeRivalSheet(){ if (rsReleaseTrap){ rsReleaseTrap(); rsReleaseTrap = null; } $("rivalSheet").style.display = "none"; }
 $("rsClose").onclick = closeRivalSheet;
+
+// ---- Rival sheet: fullscreen viewer for shared (remote) photos ----
+function openRemoteViewer(list, idx){
+  closeRemoteViewer();
+  const v = document.createElement("div");
+  v.id = "remoteViewer";
+  v.innerHTML = '<div class="rv-top"><span id="rvCap"></span><button id="rvClose" aria-label="Close">\u2715</button></div>'+
+    '<img id="rvImg" alt="Shared stamp photo"><div class="rv-nav"><button id="rvPrev" aria-label="Previous">\u2039</button><button id="rvNext" aria-label="Next">\u203a</button></div>';
+  document.body.appendChild(v);
+  let i = idx;
+  const show = (j) => {
+    i = (j + list.length) % list.length;
+    $("rvImg").src = list[i].url;
+    $("rvCap").textContent = list[i].cap || "";
+  };
+  const onKey = (e) => {
+    if (e.key === "Escape") closeRemoteViewer();
+    else if (e.key === "ArrowLeft") show(i-1);
+    else if (e.key === "ArrowRight") show(i+1);
+  };
+  $("rvClose").onclick = closeRemoteViewer;
+  $("rvPrev").onclick = (e) => { e.stopPropagation(); show(i-1); };
+  $("rvNext").onclick = (e) => { e.stopPropagation(); show(i+1); };
+  v.onclick = (e) => { if (e.target === v || e.target.id === "rvImg") closeRemoteViewer(); };
+  document.addEventListener("keydown", onKey);
+  v._onKey = onKey;
+  requestAnimationFrame(() => v.classList.add("open"));
+  show(idx);
+}
+function closeRemoteViewer(){
+  const v = document.getElementById("remoteViewer");
+  if (v){ if (v._onKey) document.removeEventListener("keydown", v._onKey); v.remove(); }
+}
+
+// ---- Rival sheet: drag handle + swipe-down-to-dismiss ----
+(function(){
+  const sheet = document.getElementById("rivalSheet");
+  if (!sheet) return;
+  const panel = sheet.querySelector(":scope > div");
+  if (!panel) return;
+  const handle = document.createElement("div");
+  handle.id = "rsDrag";
+  handle.style.cssText = "width:44px;height:5px;border-radius:3px;background:var(--border-subtle);margin:0 auto 12px;cursor:grab;touch-action:none";
+  panel.insertBefore(handle, panel.firstChild);
+  let sY = 0, dY = 0, on = false;
+  handle.addEventListener("touchstart", e => { on = true; sY = dY = e.touches[0].clientY; panel.style.transition = "none"; }, { passive:true });
+  handle.addEventListener("touchmove", e => {
+    if (!on) return;
+    dY = e.touches[0].clientY;
+    panel.style.transform = "translateY(" + Math.max(0, dY - sY) + "px)";
+  }, { passive:true });
+  const end = () => {
+    if (!on) return; on = false;
+    panel.style.transition = "transform .25s ease";
+    if (dY - sY > 90){ panel.style.transform = "translateY(105%)"; setTimeout(closeRivalSheet, 220); }
+    else panel.style.transform = "";
+  };
+  handle.addEventListener("touchend", end);
+  handle.addEventListener("touchcancel", end);
+})();
 
 // ---- Info (About) modal: moves info sections out of Settings on first open ----
 let infoMoved = false;
