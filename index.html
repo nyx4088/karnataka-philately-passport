@@ -130,9 +130,9 @@ html[data-theme="dark"] .hcard{background:color-mix(in srgb, var(--header-bg) 92
 #nav button:active{transform:scale(.88)}
 .rowbtn{transition:background-color .2s ease,transform .15s ease}
 .rowbtn:active{transform:scale(.97)}
-#rivalSheet,#infoModal,#menuSheet{animation:fadeIn .28s ease}
+#rivalSheet,#infoModal,#menuSheet,#tipModal{animation:fadeIn .28s ease}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-#rivalSheet>div,#infoModal>div,#menuSheet>div{animation:sheetUp .34s cubic-bezier(.32,.72,.35,1)}
+#rivalSheet>div,#infoModal>div,#menuSheet>div,#tipModal>div{animation:sheetUp .34s cubic-bezier(.32,.72,.35,1)}
 @keyframes sheetUp{from{transform:translateY(48px);opacity:.5}to{transform:none;opacity:1}}
 .card.rise{animation:riseIn .45s cubic-bezier(.32,.72,.35,1) both}
 @keyframes riseIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
@@ -779,6 +779,35 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 </section>
 
 <!-- RIVAL PROFILE SHEET -->
+<div id="menuSheet" style="display:none;position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.5)" role="dialog" aria-label="Menu">
+  <div style="position:absolute;left:0;right:0;bottom:0;max-height:70vh;background:var(--surface);border-radius:18px 18px 0 0;overflow-y:auto;padding:18px">
+    <div style="width:44px;height:5px;border-radius:3px;background:var(--border-subtle);margin:0 auto 16px"></div>
+    <div style="font-weight:800;font-size:18px;margin-bottom:12px" data-i18n="menu.title">Menu</div>
+    <button class="rowbtn" data-menu="settings.about_app"><span class="grow"><span class="t" data-i18n="settings.about_app">About this app</span></span><span style="color:var(--ink-2)">›</span></button>
+    <a class="rowbtn" href="mailto:pannova89@gmail.com?subject=StampQuest%20feedback" style="text-decoration:none"><span class="grow"><span class="t" data-i18n="settings.feedback">Send feedback</span></span><span style="color:var(--ink-2)">›</span></a>
+    <button class="rowbtn" data-menu="tip"><span class="grow"><span class="t" data-i18n="menu.support">Support StampQuest</span></span><span style="color:var(--ink-2)">›</span></button>
+    <button class="rowbtn" data-menu="settings.faq"><span class="grow"><span class="t" data-i18n="settings.faq">FAQ</span></span><span style="color:var(--ink-2)">›</span></button>
+    <button class="rowbtn" data-menu="settings.about_data"><span class="grow"><span class="t" data-i18n="settings.about_data">About this data</span></span><span style="color:var(--ink-2)">›</span></button>
+    <button class="rowbtn" data-menu="settings.privacy"><span class="grow"><span class="t" data-i18n="settings.privacy">Privacy</span></span><span style="color:var(--ink-2)">›</span></button>
+    <button class="rowbtn" data-menu="settings.tiles"><span class="grow"><span class="t" data-i18n="settings.tiles">Map tiles</span></span><span style="color:var(--ink-2)">›</span></button>
+  </div>
+</div>
+<div id="tipModal" style="display:none;position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.5)" role="dialog" aria-label="Support">
+  <div style="position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:18px 18px 0 0;overflow-y:auto;padding:22px 18px;max-height:80vh">
+    <div style="width:44px;height:5px;border-radius:3px;background:var(--border-subtle);margin:0 auto 16px"></div>
+    <div style="font-weight:800;font-size:20px;margin-bottom:8px;text-align:center" data-i18n="tip.title">Support StampQuest</div>
+    <div class="note" style="text-align:center;margin-bottom:16px" data-i18n="tip.body">Built solo by a fellow collector...</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="btn ghost tip-amt" data-amt="10" style="flex:1">₹10</button>
+      <button class="btn ghost tip-amt" data-amt="50" style="flex:1">₹50</button>
+      <button class="btn ghost tip-amt" data-amt="100" style="flex:1">₹100</button>
+    </div>
+    <input id="tipCustom" inputmode="numeric" data-i18n-ph="tip.custom" placeholder="Custom amount" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--border-subtle);font-size:15px;margin-bottom:12px;box-sizing:border-box">
+    <button class="btn accent" id="tipPay" style="width:100%;padding:14px;font-size:16px" data-i18n="tip.pay">Pay via UPI</button>
+    <div class="note" style="text-align:center;margin-top:10px;font-size:12px" data-i18n="tip.note">Pay what you want.</div>
+    <button class="btn ghost" id="tipClose" style="width:100%;margin-top:12px">✕</button>
+  </div>
+</div>
 <div id="infoModal" style="display:none;position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.5)" role="dialog" data-i18n-aria="info.open_aria" aria-label="About this app">
   <div style="position:absolute;left:0;right:0;bottom:0;max-height:85vh;background:var(--surface);border-radius:18px 18px 0 0;overflow-y:auto;padding:18px">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
@@ -806,7 +835,9 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 
 <!-- SETTINGS -->
 <section class="view" id="view-settings">
-  <div class="pagehead"><h1 data-i18n="settings.title">Settings</h1><p data-i18n="settings.subtitle">App preferences and information.</p></div>
+  <div class="pagehead" style="display:flex;align-items:flex-start;gap:12px">
+  <button id="menuBtn" aria-label="Menu" style="width:44px;height:44px;flex:none;border-radius:12px;border:1px solid var(--border-subtle);background:var(--surface);font-size:20px;cursor:pointer;margin-top:2px">☰</button>
+  <div><h1 data-i18n="settings.title">Settings</h1><p data-i18n="settings.subtitle">App preferences and information.</p></div></div>
   <div class="scroll">
     <div class="card">
       <div class="togglerow"><span data-i18n="settings.dark">Dark theme</span>
