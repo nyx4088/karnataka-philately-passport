@@ -722,11 +722,12 @@ function openTilePhotoActions(n){
   d.id = "photoChoice"; d.className = "photosheet"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", t("sheet.photo_options"));
   const l = byN[n];
   d.innerHTML = '<div style="text-align:center;padding:8px 0 4px;font-weight:600;color:var(--ink)">'+(l ? l.n + '. ' + esc(l.name) : '')+'</div>'+
-    '<button id="tpChange">'+t("sheet.change_photo")+'</button><button id="tpRemove" style="color:var(--error)">'+t("sheet.remove_photo")+'</button><button id="tpCancel" class="cancel">'+t("sheet.cancel")+'</button>';
+    '<button id="tpChange">'+t("sheet.change_photo")+'</button><button id="tpRemove" style="color:var(--error)">'+t("sheet.remove_photo")+'</button><button id="tpPin">'+((state.pinned||[]).indexOf(n) >= 0 ? t("pin.unpin") : t("pin.pin"))+'</button><button id="tpCancel" class="cancel">'+t("sheet.cancel")+'</button>';
   document.body.appendChild(d);
   requestAnimationFrame(() => d.classList.add("open"));
   $("tpChange").onclick = () => { closePhotoPicker(); openPhotoPicker(n); };
   $("tpRemove").onclick = () => { closePhotoPicker(); removePhoto(n); };
+  $("tpPin").onclick = () => { closePhotoPicker(); togglePin(n); };
   $("tpCancel").onclick = closePhotoPicker;
   document.addEventListener("keydown", photoEscHandler);
   pushPhotoSheet();
