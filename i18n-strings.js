@@ -167,6 +167,8 @@ en: {
 "app.press_back_exit": "Press back again to exit",
 "menu.support": "Support StampQuest",
 "tip.title": "Support StampQuest",
+    "tip.card_title": "Enjoying StampQuest?",
+    "tip.card_sub": "Built solo by a fellow collector. Your tip keeps it going.",
 "tip.body": "Built solo by a fellow collector, with a little AI help. If this app is helping your quest, chip in whatever you like — every rupee keeps it running and free for everyone.",
 "tip.pay": "Pay via UPI",
 "tip.custom": "Custom amount",
