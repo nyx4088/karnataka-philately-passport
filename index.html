@@ -713,6 +713,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
         <div><div class="serif" style="font-size:26px;line-height:1" id="jFirst">–</div><div class="k" style="margin-top:4px" data-i18n="journey.first">FIRST STAMP</div></div>
         <div><div class="serif" style="font-size:26px;line-height:1" id="jCount">0</div><div class="k" style="margin-top:4px" data-i18n="journey.stamps">STAMPS</div></div>
       </div>
+      <div class="serif" id="jStory" style="font-size:14px;font-style:italic;margin-top:12px;color:var(--ink-2)"></div>
     </div>
     <div class="chips" id="gridFilters">
         <button class="chip on" data-f="all" data-i18n="passport.filter_all" aria-pressed="true">All</button>
@@ -817,7 +818,8 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
   <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center">
     <div class="serif" id="msNum" style="font-size:96px;line-height:1;color:var(--gold);letter-spacing:-0.03em">25</div>
     <div class="serif" id="msTitle" style="font-size:28px;margin:8px 0 12px;color:var(--ink)">Wanderer</div>
-    <div class="note" id="msSub" style="max-width:280px;margin-bottom:28px"></div>
+    <div class="note" id="msSub" style="max-width:280px;margin-bottom:16px"></div>
+    <button id="msTip" style="background:none;border:none;color:var(--gold);font-size:13px;text-decoration:underline;cursor:pointer;margin-bottom:20px;padding:8px" data-i18n="milestone.tip_cta">This quest stays free because collectors like you keep it alive.</button>
     <button class="btn accent" id="msShare" style="min-width:200px;margin-bottom:10px" data-i18n="milestone.share">Share</button>
     <button class="btn ghost" id="msClose" style="min-width:200px" data-i18n="milestone.close">Continue</button>
   </div>
