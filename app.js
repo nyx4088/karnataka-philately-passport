@@ -528,7 +528,7 @@ function toggleVisited(n){
   const was = !!state.visited[n];
   if (was) delete state.visited[n];
   else { state.visited[n] = new Date().toISOString().slice(0, 10); delete state.planned[n]; }
-  save(); refreshMarker(n); renderSheetBody(byN[n]); renderProgress(); renderGrid(); renderDistricts();
+  save(); refreshMarker(n); renderSheetBody(byN[n]); renderProgress(); renderGrid();
   if (typeof rivalSync === "function") rivalSync();
   if (!was){
     stampPop(); stampBurst(false); checkMilestones(); toast(t("toast.stamped", { n: visitedCount() }));
@@ -2447,6 +2447,9 @@ function closeRemoteViewer(){
 let infoStore = null;
 let infoMoved = false;
 function ensureInfoStore(){
+// Move info sections out of Settings on load (they live in the menu now)
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", ensureInfoStore);
+else ensureInfoStore();
   if (infoMoved) return;
   infoMoved = true;
   infoStore = document.createElement("div");
