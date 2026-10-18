@@ -2533,12 +2533,10 @@ function openInfoSection(key, fromMenu){
     body.appendChild(sec);
     if (title) title.textContent = t(key);
   }
-  const m = document.getElementById("infoModal");
-  if (m) m.style.display = "block";
 }
 function closeInfoModal(){
   const m = document.getElementById("infoModal");
-  if (m) m.style.display = "none";
+  if (m){ m.style.display = "none"; m.classList.remove("active"); }
   // return section to store
   const body = document.getElementById("infoBody");
   if (body && infoStore){
