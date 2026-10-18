@@ -98,7 +98,13 @@ function pinIcon(l, sel){
 }
 LOCATIONS.forEach(l => {
   const m = L.marker([l.lat, l.lng], { icon: pinIcon(l,false), title: fullName(l) });
-  m.on("click", () => openLocation(l.n, { pan:false }));
+  m.on("click", () => {
+    if (typeof pickingPos !== "undefined" && pickingPos){
+      pickingPos = false; document.getElementById("map").classList.remove("picking");
+      setMyPos(l.lat, l.lng); showNearby(); return;
+    }
+    openLocation(l.n, { pan:false });
+  });
   m._locN = l.n; markers[l.n] = m; cluster.addLayer(m);
 });
 map.addLayer(cluster);
@@ -126,7 +132,7 @@ fetch("karnataka.geojson").then(r => { if (!r.ok) throw 0; return r.json(); }).t
   /* opaque inverted mask: huge outer rectangle with Karnataka cut out (covers any gesture/transition) */
   const outer = [[-90,-180],[90,-180],[90,180],[-90,180]];
   const fog = L.polygon([outer, ...kaRings], { className:"fog-poly", stroke:false, fillOpacity:1 }).addTo(map);
-  fog.on("click", () => toast(t("toast.beyond")));
+  fog.on("click", () => { if (typeof pickingPos === "undefined" || !pickingPos) toast(t("toast.beyond")); });
   /* brand border along the edge */
   L.polygon(kaRings, { className:"ka-border", stroke:true, fill:false, interactive:false }).addTo(map);
   /* (fog label removed per #4e; tap-on-fog toast stays) */
@@ -950,33 +956,55 @@ document.addEventListener("click", e => { if (!e.target.closest(".topbar")) sBox
 
 /* ================= nearest to me ================= */
 let myPos = null;
-$("btnLocate").onclick = () => {
-  if (!navigator.geolocation){ nearbyManual("Geolocation isn't available on this device."); return; }
+let pickingPos = false;
+let meMarker = null;
+function setMyPos(lat, lng){
+  myPos = { lat, lng };
+  if (meMarker) meMarker.setLatLng([lat, lng]);
+  else meMarker = L.circleMarker([lat, lng], { radius:8, color:"#fff", weight:3, fillColor:"#1a73e8", fillOpacity:1 }).addTo(map);
+}
+function tryGeolocate(){
+  if (pickingPos){
+    pickingPos = false;
+    document.getElementById("map").classList.remove("picking");
+    toast(t("sheet.pick_cancelled"));
+    return;
+  }
+  if (!navigator.geolocation){ nearbyManual(t("sheet.nogeo_msg")); return; }
   $("btnLocate").classList.add("on"); toast(t("toast.locating"));
   navigator.geolocation.getCurrentPosition(
-    p => { $("btnLocate").classList.remove("on"); myPos = { lat:p.coords.latitude, lng:p.coords.longitude };
+    p => { $("btnLocate").classList.remove("on"); setMyPos(p.coords.latitude, p.coords.longitude);
       if (!kaContains(myPos.lat, myPos.lng)) toast(t("toast.outside"));
       showNearby(); },
-    err => { $("btnLocate").classList.remove("on"); nearbyManual("Location permission was denied."); },
+    err => { $("btnLocate").classList.remove("on"); nearbyManual(t("sheet.denied_msg")); },
     { timeout:12000 });
-};
+}
+$("btnLocate").onclick = tryGeolocate;
+map.on("click", e => {
+  if (!pickingPos) return;
+  pickingPos = false;
+  document.getElementById("map").classList.remove("picking");
+  setMyPos(e.latlng.lat, e.latlng.lng);
+  showNearby();
+});
 function nearbyManual(msg){
   selectedN = null;
   $("shNo").textContent = t("sheet.nearby_no"); $("shName").textContent = t("sheet.nearby_title");
   $("shMeta").textContent = t("sheet.nearby_meta");
   const b = $("shBadge"); b.className = "badge unvisited"; b.textContent = t("sheet.nearby_no");
   $("sheetBody").innerHTML = '<div class="stampcard"><div class="note" style="font-size:13px;color:var(--ink)">'+esc(msg||"")+
-    ' '+t("sheet.manual_note")+'</div><div class="manrow">'+
-    '<input id="manLat" inputmode="decimal" placeholder="Latitude e.g. 12.87">'+
-    '<input id="manLng" inputmode="decimal" placeholder="Longitude e.g. 74.84"></div>'+
-    '<div class="actionrow"><button class="btn accent" id="manGo" style="flex:1">'+t("sheet.use_location")+'</button></div></div>';
+    ' '+t("sheet.denied_note")+'</div>'+
+    '<div class="actionrow"><button class="btn accent" id="pickMapBtn" style="flex:1">'+t("sheet.pick_on_map")+'</button>'+
+    '<button class="btn ghost" id="tryGeoBtn" style="flex:1">'+t("sheet.try_again")+'</button></div></div>';
   $("sheetFoot").innerHTML = "";
   openSheet();
-  $("manGo").onclick = () => {
-    const la = parseFloat($("manLat").value), ln = parseFloat($("manLng").value);
-    if (!isFinite(la) || !isFinite(ln)){ toast(t("toast.latlng")); return; }
-    myPos = { lat:la, lng:ln }; showNearby();
+  $("pickMapBtn").onclick = () => {
+    closeSheet();
+    pickingPos = true;
+    document.getElementById("map").classList.add("picking");
+    toast(t("sheet.tap_map_hint"));
   };
+  $("tryGeoBtn").onclick = () => { closeSheet(); tryGeolocate(); };
 }
 function showNearby(){
   if (!myPos) return;
