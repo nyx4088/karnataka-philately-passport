@@ -1057,6 +1057,7 @@ function switchTab(name){
   document.querySelectorAll(".toast").forEach(t => t.remove());
   if (typeof closeInfoModal === "function") closeInfoModal();
   if (typeof closeMenu === "function") closeMenu();
+  if (typeof closeTip === "function") closeTip();
   if (typeof closeRivalSheet === "function"){ const rs = document.getElementById("rivalSheet"); if (rs && rs.style.display === "block") closeRivalSheet(); }
   if (name !== "explore" && sheet.classList.contains("open")){
     const n = selectedN; closeSheet(); if (n && markers[n]) refreshMarker(n);
@@ -1069,6 +1070,49 @@ function switchTab(name){
 }
 document.querySelectorAll("#nav button").forEach(b => b.onclick = () => switchTab(b.dataset.tab));
 $("progChip").onclick = () => switchTab("passport");
+
+/* ================= tip jar (UPI) ================= */
+const TIP_UPI_ID = "REPLACE_WITH_UPI_ID"; // TODO: set your UPI ID
+const TIP_NAME = "StampQuest";
+let tipAmt = 50;
+function openTip(){
+  const m = document.getElementById("tipModal");
+  if (m) m.style.display = "block";
+  document.querySelectorAll(".tip-amt").forEach(b => {
+    b.classList.toggle("accent", b.dataset.amt == tipAmt);
+    b.classList.toggle("ghost", b.dataset.amt != tipAmt);
+  });
+}
+function closeTip(){
+  const m = document.getElementById("tipModal");
+  if (m) m.style.display = "none";
+}
+document.querySelectorAll(".tip-amt").forEach(b => {
+  b.addEventListener("click", () => {
+    tipAmt = parseInt(b.dataset.amt, 10) || 50;
+    document.getElementById("tipCustom").value = "";
+    document.querySelectorAll(".tip-amt").forEach(x => {
+      x.classList.toggle("accent", x === b);
+      x.classList.toggle("ghost", x !== b);
+    });
+    buzz(8);
+  });
+});
+const tipPayBtn = document.getElementById("tipPay");
+if (tipPayBtn) tipPayBtn.addEventListener("click", () => {
+  const custom = parseInt((document.getElementById("tipCustom") || {}).value, 10);
+  const amt = (custom > 0) ? custom : tipAmt;
+  const url = "upi://pay?pa=" + encodeURIComponent(TIP_UPI_ID) +
+    "&pn=" + encodeURIComponent(TIP_NAME) +
+    "&cu=INR&am=" + amt +
+    "&tn=" + encodeURIComponent("StampQuest support");
+  window.location.href = url;
+  setTimeout(() => toast(t("tip.thanks")), 800);
+});
+const tipCloseBtn = document.getElementById("tipClose");
+if (tipCloseBtn) tipCloseBtn.addEventListener("click", closeTip);
+const tipModalEl = document.getElementById("tipModal");
+if (tipModalEl) tipModalEl.addEventListener("click", e => { if (e.target.id === "tipModal") closeTip(); });
 
 /* ================= haptic tap feedback ================= */
 function buzz(ms){ try{ if (navigator.vibrate) navigator.vibrate(ms || 8); }catch(e){} }
@@ -2156,11 +2200,14 @@ function closeInfoModal(){
 if ($("menuBtn")) $("menuBtn").onclick = openMenu;
 if ($("menuSheet")) $("menuSheet").addEventListener("click", e => { if (e.target.id === "menuSheet") closeMenu(); });
 document.querySelectorAll("#menuSheet [data-menu]").forEach(b => {
-  b.addEventListener("click", () => openInfoSection(b.dataset.menu));
+  b.addEventListener("click", () => {
+    if (b.dataset.menu === "tip"){ closeMenu(); openTip(); }
+    else openInfoSection(b.dataset.menu);
+  });
 });
 if ($("infoClose")) $("infoClose").onclick = closeInfoModal;
 if ($("infoModal")) $("infoModal").addEventListener("click", e => { if (e.target.id === "infoModal") closeInfoModal(); });
-document.addEventListener("keydown", e => { if (e.key === "Escape"){ closeInfoModal(); closeMenu(); } });
+document.addEventListener("keydown", e => { if (e.key === "Escape"){ closeInfoModal(); closeMenu(); closeTip(); } });
 $("rivalSheet").addEventListener("click", e => { if (e.target.id === "rivalSheet") closeRivalSheet(); });
 
 /* ================= deep link / first run / init ================= */
