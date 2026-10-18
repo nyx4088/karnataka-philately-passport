@@ -1341,19 +1341,6 @@ window.addEventListener("popstate", () => {
   try { history.pushState({ app: true }, ""); } catch(e){}
   setTimeout(() => { backExitArmed = false; }, 2000);
 });
-// Back button in info modal (returns to menu)
-function addInfoBackBtn(){
-  const modal = document.getElementById("infoModal");
-  if (!modal || document.getElementById("infoBackBtn")) return;
-  const btn = document.createElement("button");
-  btn.id = "infoBackBtn";
-  btn.innerHTML = "‹";
-  btn.setAttribute("aria-label", "Back to menu");
-  btn.style.cssText = "position:absolute;top:14px;left:14px;width:40px;height:40px;border-radius:50%;border:1px solid var(--border-subtle);background:var(--surface);font-size:22px;cursor:pointer;display:none;z-index:5";
-  btn.onclick = () => { closeInfoModal(); openMenu(); };
-  modal.querySelector("div").appendChild(btn);
-}
-
 /* ================= tip jar (UPI) ================= */
 const TIP_UPI_ID = "stampquest@naviaxis";
 const TIP_NAME = "StampQuest";
@@ -2530,10 +2517,11 @@ function closeMenu(){
   const m = document.getElementById("menuSheet");
   if (m) m.style.display = "none";
 }
+let infoFromMenu = false;
 function openInfoSection(key, fromMenu){
-  addInfoBackBtn();
-  const bb = document.getElementById("infoBackBtn");
-  if (bb) bb.style.display = fromMenu ? "block" : "none";
+  infoFromMenu = !!fromMenu;
+  const bb = document.getElementById("infoBack");
+  if (bb) bb.style.display = infoFromMenu ? "block" : "none";
   ensureInfoStore();
   closeMenu();
   const body = document.getElementById("infoBody");
