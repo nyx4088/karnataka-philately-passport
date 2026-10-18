@@ -1,4 +1,4 @@
-const CACHE = "stampquest-v29";
+const CACHE = "stampquest-v30";
 const SHELL = [
   "./",
   "index.html",
