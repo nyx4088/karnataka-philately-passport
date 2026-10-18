@@ -546,6 +546,7 @@ function togglePlanned(n){
   save(); refreshMarker(n); renderSheetBody(byN[n]); renderGrid();
   toast(state.planned[n] ? t("toast.postbox_add") : t("toast.postbox_remove"));
 }
+function closeMsModal(){ const m = $("msModal"); if (m) m.style.display = "none"; }
 function showMilestoneTakeover(m){
   const modal = $("msModal"); if (!modal) return;
   $("msNum").textContent = m;
@@ -1089,6 +1090,8 @@ function switchTab(name){
   if (typeof closeInfoModal === "function") closeInfoModal();
   if (typeof closeMenu === "function") closeMenu();
   if (typeof closeTip === "function") closeTip();
+  if (typeof closeMsModal === "function") closeMsModal();
+  if (typeof closeWrapped === "function") closeWrapped();
   if (typeof closeRivalSheet === "function"){ const rs = document.getElementById("rivalSheet"); if (rs && rs.style.display === "block") closeRivalSheet(); }
   if (name !== "explore" && sheet.classList.contains("open")){
     const n = selectedN; closeSheet(); if (n && markers[n]) refreshMarker(n);
@@ -1608,8 +1611,9 @@ function renderGrid(){
   if (empty) empty.style.display = g.children.length ? "none" : "block";
 }
 function renderDistricts(){
+  const el = $("districtProg"); if (!el) return; /* district progress removed */
   const seen = []; LOCATIONS.forEach(l => { if (!seen.includes(l.district)) seen.push(l.district); });
-  $("districtProg").innerHTML = seen.map(d => {
+  el.innerHTML = seen.map(d => {
     const ds = LOCATIONS.filter(l => l.district === d), done = ds.filter(l => state.visited[l.n]).length;
     return '<div style="padding:6px 0"><div class="drow"><span>'+esc(tDistrict(d))+'</span><b>'+done+'/'+ds.length+'</b></div>'+
       '<div class="dbar"><i style="width:'+(done/ds.length*100)+'%"></i></div></div>';
@@ -2512,7 +2516,7 @@ document.querySelectorAll("#menuSheet [data-menu]").forEach(b => {
 });
 if ($("infoClose")) $("infoClose").onclick = closeInfoModal;
 if ($("infoModal")) $("infoModal").addEventListener("click", e => { if (e.target.id === "infoModal") closeInfoModal(); });
-document.addEventListener("keydown", e => { if (e.key === "Escape"){ closeInfoModal(); closeMenu(); closeTip(); } });
+document.addEventListener("keydown", e => { if (e.key === "Escape"){ closeInfoModal(); closeMenu(); closeTip(); closeMsModal(); closeWrapped(); } });
 $("rivalSheet").addEventListener("click", e => { if (e.target.id === "rivalSheet") closeRivalSheet(); });
 
 /* ================= deep link / first run / init ================= */
