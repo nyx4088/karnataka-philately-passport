@@ -2447,9 +2447,6 @@ function closeRemoteViewer(){
 let infoStore = null;
 let infoMoved = false;
 function ensureInfoStore(){
-// Move info sections out of Settings on load (they live in the menu now)
-if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", ensureInfoStore);
-else ensureInfoStore();
   if (infoMoved) return;
   infoMoved = true;
   infoStore = document.createElement("div");
@@ -2468,6 +2465,9 @@ else ensureInfoStore();
     }
   });
 }
+// Move info sections out of Settings on load (they live in the menu now)
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", ensureInfoStore);
+else ensureInfoStore();
 function openMenu(){
   ensureInfoStore();
   const m = document.getElementById("menuSheet");
