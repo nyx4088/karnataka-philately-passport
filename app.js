@@ -1317,7 +1317,14 @@ function closeTopModal(){
   const order = ["wrappedModal","msModal","tipModal","infoModal","menuSheet","rivalSheet"];
   for (const id of order){
     const el = document.getElementById(id);
-    if (el && el.style.display === "block"){ el.style.display = "none"; return true; }
+    if (el && (el.style.display === "block" || el.style.display === "flex")){
+      // Use proper close function for full-page views
+      if (id === "menuSheet") closeMenu();
+      else if (id === "infoModal") closeInfoModal();
+      else if (id === "tipModal") closeTip();
+      else { el.style.display = "none"; }
+      return true;
+    }
   }
   // location sheet
   const ls = document.getElementById("sheet");
