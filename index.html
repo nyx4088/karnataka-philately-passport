@@ -358,6 +358,9 @@ h3.sec{font-size:17px;margin:22px 0 10px;letter-spacing:.5px;margin-bottom:12px}
 .pagehead h1{font-size:24px;margin:0;letter-spacing:1px}
 .pagehead p{color:var(--ink-2);font-size:12px;margin:4px 0 0}
 
+/* dark mode form fixes */
+select, input, textarea { color: var(--ink); }
+select option { background: var(--surface); color: var(--ink); }
 /* passport */
 .ringwrap{display:flex;gap:16px;align-items:center;min-height:130px}
 .ring{position:relative;width:120px;height:120px;flex:none}
@@ -697,7 +700,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       <div style="display:flex;gap:10px;margin-bottom:12px">
         <div style="flex:1">
           <div style="font-size:13px;font-weight:700;margin-bottom:6px" data-i18n="trip.max_dist">Max distance</div>
-          <select id="tripDist" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border-subtle);background:var(--surface);font-size:14px">
+          <select id="tripDist" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border-subtle);background:var(--surface);color:var(--ink);font-size:14px">
             <option value="50">50 km</option>
             <option value="100" selected>100 km</option>
             <option value="150">150 km</option>
@@ -706,7 +709,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
         </div>
         <div style="flex:1">
           <div style="font-size:13px;font-weight:700;margin-bottom:6px" data-i18n="trip.transport">Transport</div>
-          <select id="tripMode" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border-subtle);background:var(--surface);font-size:14px">
+          <select id="tripMode" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border-subtle);background:var(--surface);color:var(--ink);font-size:14px">
             <option value="35" data-i18n="trip.scooter">Scooter</option>
             <option value="45" data-i18n="trip.car">Car</option>
             <option value="28" data-i18n="trip.bus">Bus</option>
