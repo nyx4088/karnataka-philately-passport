@@ -358,7 +358,7 @@ h3.sec{font-size:17px;margin:22px 0 10px;letter-spacing:.5px;margin-bottom:12px}
 .ringwrap{display:flex;gap:16px;align-items:center;min-height:130px}
 .ring{position:relative;width:120px;height:120px;flex:none}
 .ring svg{transform:rotate(-90deg)}
-.ring .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .ctr{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
 .ring .ctr b{font-family:var(--font-display);font-weight:600;font-size:26px}
 .ring .ctr span{font-size:12px;color:var(--ink-2);letter-spacing:1px}
 .explored{font-size:24px;margin:14px 0 4px}
@@ -721,27 +721,24 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 <section class="view" id="view-passport">
   <div class="pagehead"><h1 class="serif" data-i18n="passport.title">My Passport</h1><p data-i18n="passport.subtitle">Add a stamp photo to mark an office visited. Your stamps and dates stay on this device; your stamp count joins the Rivals leaderboard.</p></div>
   <div class="scroll">
-    <div class="card">
-      <div class="ringwrap">
-        <div class="ring">
-          <svg width="120" height="120" viewBox="0 0 120 120">
-            <circle cx="60" cy="60" r="52" fill="none" stroke="var(--border)" stroke-width="11"/>
-            <circle id="ringFg" cx="60" cy="60" r="52" fill="none" stroke="var(--brand)" stroke-width="11"
+    <div class="card" style="padding:14px 16px">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div class="ring" style="width:72px;height:72px;flex:none">
+          <svg width="72" height="72" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="var(--border)" stroke-width="14"/>
+            <circle id="ringFg" cx="60" cy="60" r="52" fill="none" stroke="var(--brand)" stroke-width="14"
               stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7" style="transition:stroke-dashoffset .6s ease,stroke .6s ease"/>
           </svg>
-          <div class="ctr"><b id="ringNum">0</b><span>OF 100</span></div>
+          <div class="ctr"><b id="ringNum" style="font-size:20px">0</b></div>
         </div>
-        <div>
-          <div class="serif" style="font-size:17px" id="ringMsg">Your passport is waiting for its first stamp.</div>
-          <div class="note" style="margin-top:6px" data-i18n="passport.mark_hint">Mark a post office visited from its map card to grow your collection.</div>
+        <div style="flex:1;min-width:0">
+          <div class="serif" style="font-size:16px" id="ringMsg">Your passport is waiting for its first stamp.</div>
+          <div class="note" style="margin-top:4px;font-size:12px"><b id="exploredNum">0</b> / 100 explored</div>
         </div>
       </div>
-      <div class="explored"><b id="exploredNum">0</b><span data-i18n="passport.explored"> / 100 explored</span></div>
-      <div class="notchbar" id="notchBar" aria-hidden="true"></div>
+      <div class="notchbar" id="notchBar" aria-hidden="true" style="margin-top:10px"></div>
       <div class="milestones" id="milestoneBadges"></div>
     </div>
-    <div class="card rise" id="journeyCard" style="display:none">
-      <div class="serif" style="font-size:16px;margin-bottom:12px" data-i18n="journey.title">Your journey</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
         <div><div class="serif" style="font-size:26px;line-height:1" id="jKm">0</div><div class="k" style="margin-top:4px" data-i18n="journey.km">KM TRAVELLED</div></div>
         <div><div class="serif" style="font-size:26px;line-height:1" id="jDist">0/31</div><div class="k" style="margin-top:4px" data-i18n="journey.districts">DISTRICTS</div></div>
@@ -751,13 +748,8 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       <div class="serif" id="jStory" style="font-size:14px;font-style:italic;margin-top:12px;color:var(--ink-2)"></div>
       <button class="btn ghost" id="wrappedReplay" style="margin-top:12px;width:100%"></button>
     </div>
-    <div id="favRow" style="display:none;margin-bottom:16px">
-      <div class="serif" style="font-size:16px;margin-bottom:10px" data-i18n="pin.favorites">Favorites</div>
       <div id="favScroll" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none"></div>
     </div>
-    <div id="recentStrip" style="display:none;margin-bottom:16px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div class="serif" style="font-size:16px" data-i18n="recent.title">Recent stamps</div>
       </div>
       <div id="recentScroll" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none"></div>
     </div>
@@ -769,6 +761,13 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       </div>
       <div class="tilegrid" id="tileGrid"></div>
       <div class="note" id="gridEmpty" style="display:none;text-align:center;padding:18px 8px" data-i18n="passport.empty_filter">Nothing here yet — tap a pin on the map to start collecting.</div>
+    <div class="card rise" id="journeyCard" style="display:none">
+      <div class="serif" style="font-size:16px;margin-bottom:12px" data-i18n="journey.title">Your journey</div>
+    <div id="favRow" style="display:none;margin-bottom:16px">
+      <div class="serif" style="font-size:16px;margin-bottom:10px" data-i18n="pin.favorites">Favorites</div>
+    <div id="recentStrip" style="display:none;margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="serif" style="font-size:16px" data-i18n="recent.title">Recent stamps</div>
     </div>
 
     <h3 class="sec" data-i18n="passport.share_backup">Share &amp; backup</h3>
