@@ -108,7 +108,7 @@ body{font-variant-numeric:tabular-nums}
 #view-passport{display:none}
 #view-passport.active{display:block;position:fixed;top:0;left:0;right:0;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--paper)}
 #view-passport .pagehead{position:sticky;top:0;z-index:10;background:var(--paper);padding-top:calc(14px + env(safe-area-inset-top));padding-bottom:8px}
-#view-passport .scroll{overflow:visible;padding:0 16px 120px}
+#view-passport .scroll{overflow:visible;padding:0 16px 150px}
 
 /* ---------- explore / map ---------- */
 #map{position:absolute;inset:0;background:var(--mapbg);z-index:0}
@@ -993,6 +993,13 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       <span data-i18n="settings.about_app_body">StampQuest was built solo by a fellow passport holder, with a little AI help along the way — so you may run into a glitch or a wrong detail. Spotted something? I'd genuinely like to hear about it. Loving it? Share it with your fellow collectors.</span>
       <br><br>
       <a class="btn" style="width:100%;text-decoration:none;text-align:center;display:block" data-i18n="settings.feedback" href="mailto:pannova89@gmail.com?subject=StampQuest%20feedback">Send feedback</a>
+    </div>
+    <h3 class="sec" data-i18n="menu.support">Support StampQuest</h3>
+    <div class="card" style="text-align:center;padding:20px">
+      <div style="font-size:32px;margin-bottom:8px">❤️</div>
+      <div style="font-weight:700;margin-bottom:6px" data-i18n="tip.card_title">Enjoying StampQuest?</div>
+      <div class="note" style="margin-bottom:14px" data-i18n="tip.card_sub">Built solo by a fellow collector. Your tip keeps it going.</div>
+      <button class="btn accent" id="btnSupportFromSettings" style="width:100%" data-i18n="menu.support">Support StampQuest</button>
     </div>
     <h3 class="sec" data-i18n="settings.danger">Danger zone</h3>
     <div class="card">
