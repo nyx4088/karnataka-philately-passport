@@ -723,17 +723,19 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 
 <!-- PASSPORT -->
 <section class="view" id="view-passport">
-  <div class="pagehead"><h1 class="serif" data-i18n="passport.title">My Passport</h1><p data-i18n="passport.subtitle">Add a stamp photo to mark an office visited. Your stamps and dates stay on this device; your stamp count joins the Rivals leaderboard.</p></div>
+  <div class="pagehead">
+    <h1 class="serif" data-i18n="passport.title">My Passport</h1>
+    <p data-i18n="passport.subtitle">Add a stamp photo to mark an office visited. Your stamps and dates stay on this device — nothing reaches the Rivals leaderboard unless you join and upload.</p>
+  </div>
   <div class="scroll">
-    <div class="card" style="padding:14px 16px">
+    <div class="card" style="padding:14px 16px;margin-bottom:16px">
       <div style="display:flex;align-items:center;gap:14px">
-        <div class="ring" style="width:72px;height:72px;flex:none">
+        <div class="ring" style="width:72px;height:72px;flex:none;position:relative">
           <svg width="72" height="72" viewBox="0 0 120 120">
             <circle cx="60" cy="60" r="52" fill="none" stroke="var(--border)" stroke-width="14"/>
-            <circle id="ringFg" cx="60" cy="60" r="52" fill="none" stroke="var(--brand)" stroke-width="14"
-              stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7" style="transition:stroke-dashoffset .6s ease,stroke .6s ease"/>
+            <circle id="ringFg" cx="60" cy="60" r="52" fill="none" stroke="var(--brand)" stroke-width="14" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7" style="transition:stroke-dashoffset .6s ease"/>
           </svg>
-          <div class="ctr"><b id="ringNum" style="font-size:20px">0</b></div>
+          <div class="ctr" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><b id="ringNum" style="font-size:20px">0</b></div>
         </div>
         <div style="flex:1;min-width:0">
           <div class="serif" style="font-size:16px" id="ringMsg">Your passport is waiting for its first stamp.</div>
@@ -743,6 +745,18 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       <div class="notchbar" id="notchBar" aria-hidden="true" style="margin-top:10px"></div>
       <div class="milestones" id="milestoneBadges"></div>
     </div>
+
+    <div class="chips" id="gridFilters" style="margin-bottom:12px">
+      <button class="chip on" data-f="all" data-i18n="passport.filter_all" aria-pressed="true">All</button>
+      <button class="chip" data-f="visited" data-i18n="passport.filter_visited" aria-pressed="false">Visited</button>
+      <button class="chip" data-f="planned" data-i18n="passport.filter_planned" aria-pressed="false">Planned</button>
+      <button class="chip" data-f="unvisited" data-i18n="passport.filter_unvisited" aria-pressed="false">Unvisited</button>
+    </div>
+    <div class="tilegrid" id="tileGrid"></div>
+    <div class="note" id="gridEmpty" style="display:none;text-align:center;padding:18px 8px" data-i18n="passport.empty_filter">Nothing here yet — tap a pin on the map to start collecting.</div>
+
+    <div class="card rise" id="journeyCard" style="display:none;margin-top:16px">
+      <div class="serif" style="font-size:16px;margin-bottom:12px" data-i18n="journey.title">Your journey</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
         <div><div class="serif" style="font-size:26px;line-height:1" id="jKm">0</div><div class="k" style="margin-top:4px" data-i18n="journey.km">KM TRAVELLED</div></div>
         <div><div class="serif" style="font-size:26px;line-height:1" id="jDist">0/31</div><div class="k" style="margin-top:4px" data-i18n="journey.districts">DISTRICTS</div></div>
@@ -752,47 +766,37 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       <div class="serif" id="jStory" style="font-size:14px;font-style:italic;margin-top:12px;color:var(--ink-2)"></div>
       <button class="btn ghost" id="wrappedReplay" style="margin-top:12px;width:100%"></button>
     </div>
-      <div id="favScroll" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none"></div>
-    </div>
-      </div>
-      <div id="recentScroll" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none"></div>
-    </div>
-    <div class="chips" id="gridFilters">
-        <button class="chip on" data-f="all" data-i18n="passport.filter_all" aria-pressed="true">All</button>
-        <button class="chip" data-f="visited" data-i18n="passport.filter_visited" aria-pressed="false">Visited</button>
-        <button class="chip" data-f="planned" data-i18n="passport.filter_planned" aria-pressed="false">Planned</button>
-        <button class="chip" data-f="unvisited" data-i18n="passport.filter_unvisited" aria-pressed="false">Unvisited</button>
-      </div>
-      <div class="tilegrid" id="tileGrid"></div>
-      <div class="note" id="gridEmpty" style="display:none;text-align:center;padding:18px 8px" data-i18n="passport.empty_filter">Nothing here yet — tap a pin on the map to start collecting.</div>
-    <div class="card rise" id="journeyCard" style="display:none">
-      <div class="serif" style="font-size:16px;margin-bottom:12px" data-i18n="journey.title">Your journey</div>
-    <div id="favRow" style="display:none;margin-bottom:16px">
+
+    <div id="favRow" style="display:none;margin:16px 0">
       <div class="serif" style="font-size:16px;margin-bottom:10px" data-i18n="pin.favorites">Favorites</div>
-    <div id="recentStrip" style="display:none;margin-bottom:16px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div class="serif" style="font-size:16px" data-i18n="recent.title">Recent stamps</div>
+      <div id="favScroll" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:8px"></div>
     </div>
 
-    <h3 class="sec" data-i18n="passport.share_backup">Share &amp; backup</h3>
+    <div id="recentStrip" style="display:none;margin:16px 0">
+      <div class="serif" style="font-size:16px;margin-bottom:10px" data-i18n="recent.title">Recent stamps</div>
+      <div id="recentScroll" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:8px"></div>
+    </div>
+
+    <h3 class="sec" data-i18n="passport.share_backup" style="margin-top:20px">Share &amp; backup</h3>
     <div class="card">
-      <div class="segrow" id="shareFmt" role="group" data-i18n-aria="passport.share_format" aria-label="Share card format">
+      <div class="segrow" id="shareFmt" role="group" aria-label="Share card format">
         <button class="seg on" data-fmt="post" data-i18n="passport.fmt_post">Post · 4:5</button>
         <button class="seg" data-fmt="story" data-i18n="passport.fmt_story">Story · 9:16</button>
       </div>
-      <label class="checkrow"><input type="checkbox" id="sharePhotos" checked data-i18n="passport.include_photos"> <span>Include my stamp photos</span></label>
+      <label class="checkrow"><input type="checkbox" id="sharePhotos" checked> <span data-i18n="passport.include_photos">Include my stamp photos</span></label>
       <div class="actionrow" style="margin-top:10px">
         <button class="btn accent" id="btnShare" data-i18n="passport.share_journey">Share my journey</button>
       </div>
       <div id="sharePreview" style="display:none;margin-top:12px"></div>
       <div class="actionrow">
         <button class="btn ghost" id="btnExport" data-i18n="passport.export" style="flex:1">Export backup</button>
-        <label class="btn ghost filebtn" style="flex:1;text-align:center">Import backup<input type="file" id="fileImport" accept="application/json"></label>
+        <label class="btn ghost filebtn" style="flex:1;text-align:center"><span data-i18n="passport.import">Import backup</span><input type="file" id="fileImport" accept="application/json" style="display:none"></label>
       </div>
-      <div class="note" style="margin-top:10px" data-i18n="passport.backup_note">Your progress lives in this browser. Your stamp count also syncs to the Rivals leaderboard, but it cannot restore your passport on a new device — export a backup file before clearing browser data or switching devices. Stamp photos are <b>not</b> included in the JSON backup.</div>
+      <div class="note" style="margin-top:10px" data-i18n="passport.backup_note">Your progress lives in this browser.</div>
     </div>
+
     <h3 class="sec" data-i18n="passport.photos_section">Stamp photos</h3>
-    <div class="card">
+    <div class="card" style="margin-bottom:16px">
       <div id="photoMeter"></div>
     </div>
   </div>
