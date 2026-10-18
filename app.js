@@ -1019,10 +1019,12 @@ function tryGeolocate(){
   if (!navigator.geolocation){ nearbyManual(t("sheet.nogeo_msg")); return; }
   $("btnLocate").classList.add("on"); toast(t("toast.locating"));
   navigator.geolocation.getCurrentPosition(
-    p => { $("btnLocate").classList.remove("on"); setMyPos(p.coords.latitude, p.coords.longitude);
+    p => { $("btnLocate").classList.remove("on"); document.getElementById("toast").classList.remove("show");
+      setMyPos(p.coords.latitude, p.coords.longitude);
       if (!kaContains(myPos.lat, myPos.lng)) toast(t("toast.outside"));
       showNearby(); },
-    err => { $("btnLocate").classList.remove("on"); nearbyManual(t("sheet.denied_msg")); },
+    err => { $("btnLocate").classList.remove("on"); document.getElementById("toast").classList.remove("show");
+      nearbyManual(t("sheet.denied_msg")); },
     { timeout:12000 });
 }
 $("btnLocate").onclick = tryGeolocate;
