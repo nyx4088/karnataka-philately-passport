@@ -1101,6 +1101,45 @@ function switchTab(name){
 document.querySelectorAll("#nav button").forEach(b => b.onclick = () => switchTab(b.dataset.tab));
 $("progChip").onclick = () => switchTab("passport");
 
+/* ================= Stamp of the day + Recent stamps ================= */
+function sotdPick(){
+  const now = new Date();
+  const seed = now.getFullYear() * 1000 + (now.getMonth() + 1) * 40 + now.getDate();
+  const unvis = LOCATIONS.filter(l => !state.visited[l.n]);
+  const pool = unvis.length ? unvis : LOCATIONS;
+  return pool[seed % pool.length];
+}
+function renderSOTD(){
+  const card = $("sotdCard"); if (!card) return;
+  try { if (localStorage.getItem("sotd_dismissed") === new Date().toISOString().slice(0,10)) return; } catch(e){}
+  const l = sotdPick(); if (!l) return;
+  $("sotdName").textContent = dispName(l);
+  $("sotdFact").textContent = l.fact || (l.district + " • " + l.pin);
+  card.style.display = "block";
+  $("sotdView").onclick = () => { openLocation(l.n); buzz(8); };
+  $("sotdClose").onclick = () => {
+    card.style.display = "none";
+    try { localStorage.setItem("sotd_dismissed", new Date().toISOString().slice(0,10)); } catch(e){}
+  };
+}
+function renderRecent(){
+  const strip = $("recentStrip"), scroll = $("recentScroll");
+  if (!strip || !scroll) return;
+  const vis = LOCATIONS.filter(l => state.visited[l.n])
+    .sort((a,b) => String(state.visited[b.n]).localeCompare(String(state.visited[a.n])))
+    .slice(0, 6);
+  if (!vis.length){ strip.style.display = "none"; return; }
+  strip.style.display = "block";
+  scroll.innerHTML = vis.map(l => {
+    const photo = (state.photos && state.photos[l.n]) ? '<img src="' + state.photos[l.n] + '" alt="">' : "✉";
+    return '<div class="recent-item" data-n="' + l.n + '"><div class="recent-ring"><div>' + photo + '</div></div>' +
+      '<div class="recent-name">' + esc(dispName(l).split(" ")[0]) + '</div></div>';
+  }).join("");
+  scroll.querySelectorAll(".recent-item").forEach(el => {
+    el.onclick = () => { openLocation(+el.dataset.n); buzz(8); };
+  });
+}
+
 /* ================= Quest Wrapped (monthly recap) ================= */
 const MONTHS_EN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const MONTHS_KN = ["ಜನವರಿ","ಫೆಬ್ರವರಿ","ಮಾರ್ಚ್","ಏಪ್ರಿಲ್","ಮೇ","ಜೂನ್","ಜುಲೈ","ಆಗಸ್ಟ್","ಸೆಪ್ಟೆಂಬರ್","ಅಕ್ಟೋಬರ್","ನವೆಂಬರ್","ಡಿಸೆಂಬರ್"];
@@ -1378,10 +1417,12 @@ function renderJourney(){
     storyEl.textContent = story;
   }
 }
+setTimeout(renderSOTD, 1500);
 function renderProgress(){
   const c = visitedCount();
   renderRingCount(c);
   renderJourney();
+  renderRecent();
   $("ringFg").style.strokeDashoffset = (326.7 * (1 - c/100)).toFixed(1);
   const msgs = [[0,"passport.ring_empty"],[1,"passport.msg_start"],[25,"passport.msg_quarter"],[50,"passport.msg_half"],[75,"passport.msg_final"],[100,"passport.msg_done"]];
   let m = t(msgs[0][1]); msgs.forEach(([th,key]) => { if (c >= th) m = t(key); });
