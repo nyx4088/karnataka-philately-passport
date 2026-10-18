@@ -847,20 +847,19 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 
 <!-- RIVAL PROFILE SHEET -->
 <div id="menuSheet" class="view" style="display:none;z-index:60" role="dialog" aria-label="Menu">
-  <div class="pagehead" style="display:flex;align-items:center;gap:12px">
-    <button id="menuBack" aria-label="Back" style="width:40px;height:40px;border-radius:50%;border:1px solid var(--border-subtle);background:var(--surface);font-size:20px;cursor:pointer;flex:none">‹</button>
-    <h1 class="serif" style="margin:0;font-size:24px">Menu</h1>
+  <div class="pagehead" style="display:flex;align-items:center;gap:12px;padding-top:calc(12px + env(safe-area-inset-top))">
+    <button id="menuBack" aria-label="Back" style="width:36px;height:36px;border-radius:50%;border:none;background:transparent;font-size:24px;cursor:pointer;flex:none;color:var(--ink)">‹</button>
+    <h1 style="margin:0;font-size:18px;font-weight:700">Menu</h1>
   </div>
   <div class="scroll" style="touch-action:pan-y">
-    <div style="width:44px;height:5px;border-radius:3px;background:var(--border-subtle);margin:0 auto 16px"></div>
-    <div style="font-weight:800;font-size:18px;margin-bottom:12px" data-i18n="menu.title">Menu</div>
-    <button class="rowbtn" data-menu="settings.about_app"><span class="grow"><span class="t" data-i18n="settings.about_app">About this app</span></span><span style="color:var(--ink-2)">›</span></button>
-    <a class="rowbtn" href="mailto:pannova89@gmail.com?subject=StampQuest%20feedback" style="text-decoration:none"><span class="grow"><span class="t" data-i18n="settings.feedback">Send feedback</span></span><span style="color:var(--ink-2)">›</span></a>
-    <button class="rowbtn" data-menu="tip"><span class="grow"><span class="t" data-i18n="menu.support">Support StampQuest</span></span><span style="color:var(--ink-2)">›</span></button>
-    <button class="rowbtn" data-menu="settings.faq"><span class="grow"><span class="t" data-i18n="settings.faq">FAQ</span></span><span style="color:var(--ink-2)">›</span></button>
-    <button class="rowbtn" data-menu="settings.about_data"><span class="grow"><span class="t" data-i18n="settings.about_data">About this data</span></span><span style="color:var(--ink-2)">›</span></button>
-    <button class="rowbtn" data-menu="settings.privacy"><span class="grow"><span class="t" data-i18n="settings.privacy">Privacy</span></span><span style="color:var(--ink-2)">›</span></button>
-    <button class="rowbtn" data-menu="settings.tiles"><span class="grow"><span class="t" data-i18n="settings.tiles">Map tiles</span></span><span style="color:var(--ink-2)">›</span></button>
+    <button class="rowbtn" data-menu="settings.about_app" style="padding:16px"><span style="font-size:20px;margin-right:12px">ℹ️</span><span class="grow"><span class="t" data-i18n="settings.about_app">About this app</span></span><span style="color:var(--ink-2)">›</span></button>
+    <a class="rowbtn" href="mailto:pannova89@gmail.com?subject=StampQuest%20feedback" style="text-decoration:none;padding:16px"><span style="font-size:20px;margin-right:12px">💬</span><span class="grow"><span class="t" data-i18n="settings.feedback">Send feedback</span></span><span style="color:var(--ink-2)">›</span></a>
+    <button class="rowbtn" data-menu="tip" style="padding:16px"><span style="font-size:20px;margin-right:12px">❤️</span><span class="grow"><span class="t" data-i18n="menu.support">Support StampQuest</span></span><span style="color:var(--ink-2)">›</span></button>
+    <div style="height:12px"></div>
+    <button class="rowbtn" data-menu="settings.faq" style="padding:16px"><span style="font-size:20px;margin-right:12px">❓</span><span class="grow"><span class="t" data-i18n="settings.faq">FAQ</span></span><span style="color:var(--ink-2)">›</span></button>
+    <button class="rowbtn" data-menu="settings.about_data" style="padding:16px"><span style="font-size:20px;margin-right:12px">📊</span><span class="grow"><span class="t" data-i18n="settings.about_data">About this data</span></span><span style="color:var(--ink-2)">›</span></button>
+    <button class="rowbtn" data-menu="settings.privacy" style="padding:16px"><span style="font-size:20px;margin-right:12px">🔒</span><span class="grow"><span class="t" data-i18n="settings.privacy">Privacy</span></span><span style="color:var(--ink-2)">›</span></button>
+    <button class="rowbtn" data-menu="settings.tiles" style="padding:16px"><span style="font-size:20px;margin-right:12px">🗺️</span><span class="grow"><span class="t" data-i18n="settings.tiles">Map tiles</span></span><span style="color:var(--ink-2)">›</span></button>
   </div>
   </div>
 </div>
@@ -910,9 +909,9 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
   </div>
 </div>
 <div id="infoModal" class="view" style="display:none;z-index:61" role="dialog" data-i18n-aria="info.open_aria" aria-label="About this app">
-  <div class="pagehead" style="display:flex;align-items:center;gap:12px">
-      <button id="infoBack" aria-label="Back" style="width:40px;height:40px;border-radius:50%;border:1px solid var(--border-subtle);background:var(--surface);font-size:20px;cursor:pointer;flex:none">‹</button>
-      <div style="flex:1;font-weight:800;font-size:20px" data-i18n="info.title">About</div>
+  <div class="pagehead" style="display:flex;align-items:center;gap:12px;padding-top:calc(12px + env(safe-area-inset-top))">
+      <button id="infoBack" aria-label="Back" style="width:36px;height:36px;border-radius:50%;border:none;background:transparent;font-size:24px;cursor:pointer;flex:none;color:var(--ink)">‹</button>
+      <div style="flex:1;font-weight:700;font-size:18px" data-i18n="info.title">About</div>
     </div>
     <div class="scroll" style="touch-action:pan-y">
     <div id="infoBody"></div>
