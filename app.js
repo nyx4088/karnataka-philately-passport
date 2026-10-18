@@ -1347,7 +1347,7 @@ const TIP_NAME = "StampQuest";
 let tipAmt = 50;
 function openTip(){
   const m = document.getElementById("tipModal");
-  if (m) m.style.display = "block";
+  if (m){ m.style.display = "flex"; m.classList.add("active"); }
   document.querySelectorAll(".tip-amt").forEach(b => {
     b.classList.toggle("accent", b.dataset.amt == tipAmt);
     b.classList.toggle("ghost", b.dataset.amt != tipAmt);
@@ -1355,7 +1355,7 @@ function openTip(){
 }
 function closeTip(){
   const m = document.getElementById("tipModal");
-  if (m) m.style.display = "none";
+  if (m){ m.style.display = "none"; m.classList.remove("active"); }
 }
 document.querySelectorAll(".tip-amt").forEach(b => {
   b.addEventListener("click", () => {
@@ -2548,6 +2548,8 @@ function closeInfoModal(){
 }
 if ($("menuBtn")) $("menuBtn").onclick = openMenu;
 $("menuBack") && $("menuBack").addEventListener("click", closeMenu);
+$("infoBack") && $("infoBack").addEventListener("click", () => { closeInfoModal(); if (typeof infoFromMenu !== "undefined" && infoFromMenu) openMenu(); });
+$("tipBack") && $("tipBack").addEventListener("click", () => { closeTip(); openMenu(); });
 document.querySelectorAll("#menuSheet [data-menu]").forEach(b => {
   b.addEventListener("click", () => {
     if (b.dataset.menu === "tip"){ closeMenu(); openTip(); }
