@@ -377,7 +377,8 @@ function stampBurst(big, extra){
 }
 let lastRingCount = -1;
 function renderRingCount(c){
-  const set = n => { $("ringNum").textContent = n; $("progChipTxt").textContent = n + "/100"; $("exploredNum").textContent = n; };
+  const set = n => { $("ringNum").textContent = n; $("progChipTxt").textContent = n + "/100"; $("exploredNum").textContent = n;
+    const rf = $("progRingFg"); if (rf) rf.style.strokeDashoffset = (113.1 * (1 - n/100)).toFixed(1); };
   if (REDUCED || typeof gsap === "undefined" || lastRingCount < 0){ set(c); }
   else if (lastRingCount !== c){
     const o = { v: lastRingCount };
@@ -529,7 +530,14 @@ function toggleVisited(n){
   else { state.visited[n] = new Date().toISOString().slice(0, 10); delete state.planned[n]; }
   save(); refreshMarker(n); renderSheetBody(byN[n]); renderProgress(); renderGrid(); renderDistricts();
   if (typeof rivalSync === "function") rivalSync();
-  if (!was){ stampPop(); stampBurst(false); checkMilestones(); toast(t("toast.stamped", { n: visitedCount() })); }
+  if (!was){
+    stampPop(); stampBurst(false); checkMilestones(); toast(t("toast.stamped", { n: visitedCount() }));
+    try {
+      const tile = document.querySelector('.tile[data-n="'+n+'"]');
+      if (tile && !REDUCED){ tile.classList.add("slam"); setTimeout(() => tile.classList.remove("slam"), 600); }
+    } catch(e){}
+    buzz(25);
+  }
   else toast(t("toast.removed"));
 }
 function togglePlanned(n){
