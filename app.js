@@ -2022,7 +2022,8 @@ function applyLang(){
   if (typeof renderPhotoMeter === "function") renderPhotoMeter();
 }
 function dispName(l){ return (state.lang === "kn" && l.kn_name) ? l.kn_name : l.name; }
-$("btnReset").onclick = async () => {
+$("btnSupportFromSettings") && $("btnSupportFromSettings").addEventListener("click", () => { if (typeof openTipPage === "function") openTipPage(); });
+    $("btnReset").onclick = async () => {
   const vCount = Object.keys(state.visited).length;
   const photoCount = await photoCountAll().catch(()=>0);
   const photoMsg = photoCount > 0 ? " "+t("confirm.kept_photos", {n:photoCount}) : "";
