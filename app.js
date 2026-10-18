@@ -1400,119 +1400,571 @@ document.addEventListener("click", e => {
 }, { passive:true });
 
 /* ================= day-trip planner ================= */
-let tripStart = null;
-let tripRouteLine = null;
-let tripPicking = false;
-function updateTripStartLabel(){
-  const el = document.getElementById("tripStartLabel");
-  if (!el) return;
-  el.textContent = tripStart ? t("trip.start") + ": " + tripStart.lat.toFixed(3) + ", " + tripStart.lng.toFixed(3) : "";
-}
-function fmtTripDur(min){
-  return t("trip.hours", { h: Math.floor(min/60), m: Math.round(min%60) });
-}
-function planTrip(){
-  if (!tripStart || typeof tripStart.lat !== "number" || typeof tripStart.lng !== "number"){
-    toast(t("trip.start_needed")); return;
-  }
-  const maxKm = parseFloat(document.getElementById("tripDist").value) || 100;
-  const speed = parseFloat(document.getElementById("tripMode").value) || 35;
-  const visited = (state && state.visited) || {};
-  let cands = [];
+/* ===== Day Planner ===== */
+let plannerState = {
+  start: null, // {lat, lng, label}
+  maxDist: 250,
+  vehicle: 'car', // 'car' | 'bike'
+  scope: 'unvisited', // 'unvisited' | 'with_planned'
+  maxStops: 6,
+  returnToStart: false,
+  days: [], // array of day plans
+  currentDay: 0,
+  routeLine: null,
+  routeMarkers: []
+};
+
+// Load persisted settings
+try {
+  const saved = JSON.parse(localStorage.getItem('plannerSettings') || '{}');
+  if (saved.maxDist) plannerState.maxDist = saved.maxDist;
+  if (saved.vehicle) plannerState.vehicle = saved.vehicle;
+  if (saved.maxStops) plannerState.maxStops = saved.maxStops;
+  if (saved.scope) plannerState.scope = saved.scope;
+  if (typeof saved.returnToStart === 'boolean') plannerState.returnToStart = saved.returnToStart;
+} catch(e){}
+
+function savePlannerSettings(){
   try {
-    cands = LOCATIONS
-      .filter(l => l && typeof l.lat === "number" && typeof l.lng === "number" && !visited[l.n])
-      .map(l => ({ l, d: havKm(tripStart.lat, tripStart.lng, l.lat, l.lng) }))
-      .filter(x => typeof x.d === "number" && !isNaN(x.d) && x.d <= maxKm)
-      .sort((a,b) => a.d - b.d).slice(0, 10);
-  } catch(e){ cands = []; }
-  if (!cands.length){
-    // Fallback: show nearest 10 unvisited regardless of distance
-    try {
-      const nearest = LOCATIONS
-        .filter(l => l && typeof l.lat === "number" && typeof l.lng === "number" && !visited[l.n])
-        .map(l => ({ l, d: havKm(tripStart.lat, tripStart.lng, l.lat, l.lng) }))
-        .filter(x => typeof x.d === "number" && !isNaN(x.d))
-        .sort((a,b) => a.d - b.d).slice(0, 10);
-      if (nearest.length){
-        toast(t("trip.no_stops", { n: maxKm }) + " " + t("trip.showing_nearest"));
-        cands = nearest;
-      } else {
-        toast(t("trip.no_stops", { n: maxKm })); return;
-      }
-    } catch(e){ toast(t("trip.no_stops", { n: maxKm })); return; }
-  }
+    localStorage.setItem('plannerSettings', JSON.stringify({
+      maxDist: plannerState.maxDist,
+      vehicle: plannerState.vehicle,
+      maxStops: plannerState.maxStops,
+      scope: plannerState.scope,
+      returnToStart: plannerState.returnToStart
+    }));
+  } catch(e){}
+}
+
+function havKm(lat1, lng1, lat2, lng2){
+  const R = 6371;
+  const dLat = (lat2-lat1) * Math.PI/180;
+  const dLng = (lng2-lng1) * Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+// Nearest neighbour + 2-opt
+function orderStops(start, offices){
+  if (offices.length === 0) return [];
+  if (offices.length === 1) return offices;
+  
+  // Nearest neighbour
+  const unvisited = [...offices];
   const ordered = [];
-  let cur = tripStart;
-  const rem = cands.slice();
-  while (rem.length){
-    let bi = 0, bd = 1e18;
-    rem.forEach((x, i) => { const d = havKm(cur.lat, cur.lng, x.l.lat, x.l.lng); if (d < bd){ bd = d; bi = i; } });
-    const nx = rem.splice(bi, 1)[0];
-    nx.legKm = bd;
-    ordered.push(nx);
-    cur = { lat: nx.l.lat, lng: nx.l.lng };
+  let cur = start;
+  while (unvisited.length > 0){
+    let bestIdx = 0, bestD = Infinity;
+    for (let i=0; i<unvisited.length; i++){
+      const d = havKm(cur.lat, cur.lng, unvisited[i].lat, unvisited[i].lng);
+      if (d < bestD){ bestD = d; bestIdx = i; }
+    }
+    ordered.push(unvisited.splice(bestIdx, 1)[0]);
+    cur = ordered[ordered.length-1];
   }
-  let totalKm = 0, totalMin = 0;
-  ordered.forEach(x => { totalKm += x.legKm; totalMin += (x.legKm / speed) * 60 + 20; });
-  renderTripResult(ordered, totalKm, totalMin);
+  
+  // 2-opt improvement
+  let improved = true;
+  const dist = (a, b) => havKm(a.lat, a.lng, b.lat, b.lng);
+  const totalDist = (ord) => {
+    let d = dist(start, ord[0]);
+    for (let i=1; i<ord.length; i++) d += dist(ord[i-1], ord[i]);
+    return d;
+  };
+  
+  while (improved){
+    improved = false;
+    const best = totalDist(ordered);
+    for (let i=0; i<ordered.length-1; i++){
+      for (let j=i+1; j<ordered.length; j++){
+        const swapped = [...ordered];
+        [swapped[i], swapped[j]] = [swapped[j], swapped[i]];
+        if (totalDist(swapped) < best - 0.01){
+          ordered[i] = swapped[i]; ordered[j] = swapped[j];
+          improved = true;
+        }
+      }
+    }
+  }
+  return ordered;
 }
-function renderTripResult(ordered, totalKm, totalMin){
-  document.getElementById("tripForm").style.display = "none";
-  const r = document.getElementById("tripResult");
-  r.style.display = "block";
-  r.innerHTML =
-    '<div style="font-weight:800;font-size:16px;margin-bottom:4px">'+esc(t("trip.stops", { n: ordered.length }))+'</div>'+
-    '<div class="note" style="margin-bottom:10px">'+esc(t("trip.total", { km: Math.round(totalKm), time: fmtTripDur(totalMin) }))+'</div>'+
-    ordered.map((x, i) =>
-      '<button class="rowbtn" data-n="'+x.l.n+'">'+
-      '<span class="grow"><span class="t">'+(i+1)+'. '+esc(x.l.name)+'</span>'+
-      '<span class="s" style="display:block">'+esc(t("trip.leg", { n: x.legKm.toFixed(1) }))+' · '+esc(x.l.district)+'</span></span>'+
-      '<span style="color:var(--ink-2)">›</span></button>').join("")+
-    '<div class="actionrow" style="margin-top:10px">'+
-    '<button class="btn ghost" id="tripMapBtn" style="flex:1">'+esc(t("trip.show_on_map"))+'</button>'+
-    '<button class="btn accent" id="tripGmapsBtn" style="flex:1">'+esc(t("trip.open_gmaps"))+'</button></div>'+
-    '<button class="btn ghost" id="tripNewBtn" style="width:100%;margin-top:8px">'+esc(t("trip.new_plan"))+'</button>';
-  r.querySelectorAll(".rowbtn").forEach(b => b.onclick = () => { switchTab("explore"); openLocation(+b.dataset.n); });
-  document.getElementById("tripMapBtn").onclick = () => {
-    if (tripRouteLine){ map.removeLayer(tripRouteLine); tripRouteLine = null; }
-    const pts = [[tripStart.lat, tripStart.lng]].concat(ordered.map(x => [x.l.lat, x.l.lng]));
-    tripRouteLine = L.polyline(pts, { color:"#A91F26", weight:4, opacity:.9 }).addTo(map);
-    switchTab("explore");
-    map.flyToBounds(L.latLngBounds(pts).pad(0.15), { duration:.8 });
-  };
-  document.getElementById("tripGmapsBtn").onclick = () => {
-    const pts = ordered.map(x => x.l.lat.toFixed(5) + "," + x.l.lng.toFixed(5));
-    const url = "https://www.google.com/maps/dir/?api=1&origin="+tripStart.lat.toFixed(5)+","+tripStart.lng.toFixed(5)+
-      "&destination="+pts[pts.length-1]+(pts.length>1 ? "&waypoints="+pts.slice(0,-1).join("|") : "")+"&travelmode=driving";
-    window.open(url, "_blank", "noopener");
-  };
-  document.getElementById("tripNewBtn").onclick = () => {
-    r.style.display = "none";
-    document.getElementById("tripForm").style.display = "block";
-    if (tripRouteLine){ map.removeLayer(tripRouteLine); tripRouteLine = null; }
+
+// Find densest cluster: maximize stops within cap, minimize total distance
+function selectDensestCluster(start, candidates, cap){
+  if (candidates.length <= cap) return candidates;
+  
+  // Try: for each candidate as "seed", take cap nearest to seed, order them, pick best
+  let best = null, bestScore = Infinity;
+  const sampleSeeds = candidates.length > 20 ? 
+    candidates.sort((a,b) => havKm(start.lat,start.lng,a.lat,a.lng) - havKm(start.lat,start.lng,b.lat,b.lng)).slice(0, 20) :
+    candidates;
+  
+  for (const seed of sampleSeeds){
+    const nearest = [...candidates]
+      .sort((a,b) => havKm(seed.lat,seed.lng,a.lat,a.lng) - havKm(seed.lat,seed.lng,b.lat,b.lng))
+      .slice(0, cap);
+    const ordered = orderStops(start, nearest);
+    // Score: total distance (lower is better)
+    let d = havKm(start.lat, start.lng, ordered[0].lat, ordered[0].lng);
+    for (let i=1; i<ordered.length; i++) d += havKm(ordered[i-1].lat, ordered[i-1].lng, ordered[i].lat, ordered[i].lng);
+    if (d < bestScore){ bestScore = d; best = ordered; }
+  }
+  return best || candidates.slice(0, cap);
+}
+
+function planDay(start, excludeNs, dayNum){
+  const maxDist = plannerState.maxDist;
+  const scope = plannerState.scope;
+  const cap = plannerState.maxStops;
+  
+  // Filter
+  let candidates = LOCATIONS.filter(l => {
+    if (state.visited[l.n]) return false; // exclude visited always
+    if (excludeNs.has(l.n)) return false; // exclude previous days
+    if (scope === 'unvisited' && state.planned[l.n]) return false;
+    if (typeof l.lat !== 'number' || typeof l.lng !== 'number') return false;
+    const d = havKm(start.lat, start.lng, l.lat, l.lng);
+    return d <= maxDist;
+  });
+  
+  const totalInRange = candidates.length;
+  
+  // Select stops
+  let stops;
+  if (candidates.length > cap){
+    stops = selectDensestCluster(start, candidates, cap);
+  } else {
+    stops = orderStops(start, candidates);
+  }
+  
+  // Calculate legs
+  const legs = [];
+  let prev = start;
+  let totalKm = 0;
+  for (const stop of stops){
+    const straightKm = havKm(prev.lat, prev.lng, stop.lat, stop.lng);
+    const roadKm = straightKm * 1.3;
+    legs.push({ stop, straightKm, roadKm });
+    totalKm += roadKm;
+    prev = stop;
+  }
+  
+  // Return to start?
+  let returnLeg = null;
+  if (plannerState.returnToStart && stops.length > 0){
+    const last = stops[stops.length-1];
+    const straightKm = havKm(last.lat, last.lng, start.lat, start.lng);
+    const roadKm = straightKm * 1.3;
+    returnLeg = { straightKm, roadKm };
+    totalKm += roadKm;
+  }
+  
+  // Drive time
+  const speed = plannerState.vehicle === 'bike' ? 40 : 50;
+  const driveHours = totalKm / speed;
+  
+  return {
+    dayNum,
+    start: {...start},
+    stops,
+    legs,
+    returnLeg,
+    totalKm,
+    driveHours,
+    totalInRange,
+    remaining: totalInRange - stops.length
   };
 }
-function wireTripPlanner(){
-  if (!document.getElementById("tripGo")) return;
-  document.getElementById("tripUseLoc").onclick = () => {
-    if (myPos){ tripStart = { lat: myPos.lat, lng: myPos.lng }; updateTripStartLabel(); }
-    else if (navigator.geolocation){
-      toast(t("toast.locating"));
-      navigator.geolocation.getCurrentPosition(
-        p => { tripStart = { lat:p.coords.latitude, lng:p.coords.longitude }; setMyPos(p.coords.latitude, p.coords.longitude); updateTripStartLabel(); },
-        () => toast(t("sheet.denied_msg")),
-        { timeout:12000 });
-    } else toast(t("sheet.nogeo_msg"));
-  };
-  document.getElementById("tripPickMap").onclick = () => {
-    switchTab("explore"); closeSheet();
-    tripPicking = true;
-    document.getElementById("map").classList.add("picking");
-    toast(t("sheet.tap_map_hint"));
-  };
-  document.getElementById("tripGo").onclick = planTrip;
+
+function renderPlannerResult(){
+  const resultEl = document.getElementById('plannerResult');
+  const days = plannerState.days;
+  if (days.length === 0){
+    resultEl.style.display = 'none';
+    return;
+  }
+  
+  const day = days[plannerState.currentDay];
+  const vehicle = plannerState.vehicle;
+  const speed = vehicle === 'bike' ? 40 : 50;
+  
+  let html = '';
+  
+  // Day tabs if multi-day
+  if (days.length > 1){
+    html += '<div class="chiprow" style="margin-bottom:12px">';
+    days.forEach((d, i) => {
+      html += `<button class="chip ${i === plannerState.currentDay ? 'on' : ''}" data-day="${i}">Day ${d.dayNum}</button>`;
+    });
+    html += '</div>';
+  }
+  
+  if (day.stops.length === 0){
+    html += `<div class="note" style="text-align:center;padding:20px">${esc(t('planner.empty', { dist: plannerState.maxDist }))}</div>`;
+  } else {
+    // Timeline
+    html += '<div class="planner-timeline">';
+    day.legs.forEach((leg, i) => {
+      const l = leg.stop;
+      const name = state.lang === 'kn' && l.kn_name ? l.kn_name : l.name;
+      const approxBadge = l.approx ? `<span class="approx-badge">${esc(t('planner.approx_badge'))}</span>` : '';
+      html += `<div class="planner-stop" data-n="${l.n}">
+        <span class="num">${i+1}</span>
+        <div class="nm">${esc(name)}${approxBadge}</div>
+        <div class="meta">${esc(l.district)} · PIN ${esc(l.pin)}</div>
+        <div class="leg">→ ${leg.roadKm.toFixed(1)} km ${esc(t('planner.approx_label'))}</div>
+        <div style="margin-top:6px;display:flex;gap:6px">
+          <button class="btn ghost" style="padding:4px 10px;font-size:12px" data-act="up" data-idx="${i}" ${i===0?'disabled':''}>↑</button>
+          <button class="btn ghost" style="padding:4px 10px;font-size:12px" data-act="down" data-idx="${i}" ${i===day.stops.length-1?'disabled':''}>↓</button>
+          <button class="btn ghost" style="padding:4px 10px;font-size:12px" data-act="remove" data-idx="${i}">${esc(t('planner.remove'))}</button>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+    
+    // Totals
+    const hrs = Math.floor(day.driveHours);
+    const mins = Math.round((day.driveHours - hrs) * 60);
+    const timeStr = hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
+    
+    html += `<div class="planner-totals">
+      <div class="row"><span>${esc(t('planner.total_dist'))}</span><b>${day.totalKm.toFixed(0)} km ${esc(t('planner.approx_label'))}</b></div>
+      <div class="row"><span>${esc(t('planner.drive_time'))} (${speed} km/h)</span><b>${timeStr}</b></div>
+      <div class="row"><span>${esc(t('planner.stops'))}</span><b>${day.stops.length}</b></div>
+    </div>`;
+    
+    // Long ride warning
+    const warnLimit = vehicle === 'bike' ? 300 : 450;
+    if (day.totalKm > warnLimit){
+      html += `<div class="planner-warn">⚠️ ${esc(t('planner.long_ride', { km: Math.round(day.totalKm), limit: warnLimit }))}</div>`;
+    }
+    
+    // Remaining
+    if (day.remaining > 0){
+      html += `<div class="note" style="text-align:center;margin:10px 0">${esc(t('planner.more_in_range', { n: day.remaining }))} `;
+      html += `<button class="btn ghost" id="plannerNextDay" style="padding:6px 14px;font-size:13px">${esc(t('planner.next_day'))}</button></div>`;
+    }
+  }
+  
+  // Sticky actions
+  html += `<div class="planner-actions">
+    <button class="btn ghost" id="plannerShowMap">${esc(t('planner.show_on_map'))}</button>
+    <button class="btn ghost" id="plannerCopy">${esc(t('planner.copy_route'))}</button>
+    <button class="btn accent" id="plannerGmaps">${esc(t('planner.open_gmaps'))}</button>
+  </div>`;
+  html += `<div class="actionrow" style="margin-top:8px">
+    <button class="btn ghost" id="plannerMarkPlanned" style="flex:1">${esc(t('planner.mark_planned'))}</button>
+    <button class="btn ghost" id="plannerClear" style="flex:1">${esc(t('planner.clear'))}</button>
+  </div>`;
+  
+  resultEl.innerHTML = html;
+  resultEl.style.display = 'block';
+  
+  // Wire up events
+  wirePlannerResultEvents(day);
 }
+
+function wirePlannerResultEvents(day){
+  // Day tabs
+  document.querySelectorAll('#plannerResult [data-day]').forEach(btn => {
+    btn.onclick = () => {
+      plannerState.currentDay = +btn.dataset.day;
+      renderPlannerResult();
+    };
+  });
+  
+  // Reorder/remove
+  document.querySelectorAll('#plannerResult [data-act]').forEach(btn => {
+    btn.onclick = () => {
+      const idx = +btn.dataset.idx;
+      const act = btn.dataset.act;
+      const stops = day.stops;
+      if (act === 'remove'){
+        stops.splice(idx, 1);
+      } else if (act === 'up' && idx > 0){
+        [stops[idx-1], stops[idx]] = [stops[idx], stops[idx-1]];
+      } else if (act === 'down' && idx < stops.length-1){
+        [stops[idx+1], stops[idx]] = [stops[idx], stops[idx+1]];
+      }
+      // Recompute legs
+      const newDay = planDay(day.start, new Set(), day.dayNum);
+      // Keep manual order, just recompute distances
+      newDay.stops = stops;
+      newDay.legs = [];
+      let prev = day.start, totalKm = 0;
+      for (const stop of stops){
+        const straightKm = havKm(prev.lat, prev.lng, stop.lat, stop.lng);
+        const roadKm = straightKm * 1.3;
+        newDay.legs.push({ stop, straightKm, roadKm });
+        totalKm += roadKm;
+        prev = stop;
+      }
+      if (plannerState.returnToStart && stops.length > 0){
+        const last = stops[stops.length-1];
+        const straightKm = havKm(last.lat, last.lng, day.start.lat, day.start.lng);
+        const roadKm = straightKm * 1.3;
+        newDay.returnLeg = { straightKm, roadKm };
+        totalKm += roadKm;
+      }
+      const speed = plannerState.vehicle === 'bike' ? 40 : 50;
+      newDay.totalKm = totalKm;
+      newDay.driveHours = totalKm / speed;
+      plannerState.days[plannerState.currentDay] = newDay;
+      renderPlannerResult();
+    };
+  });
+  
+  // Next day
+  const nextBtn = document.getElementById('plannerNextDay');
+  if (nextBtn){
+    nextBtn.onclick = () => {
+      const excludeNs = new Set();
+      plannerState.days.forEach(d => d.stops.forEach(s => excludeNs.add(s.n)));
+      const lastStop = day.stops[day.stops.length-1];
+      const newStart = { lat: lastStop.lat, lng: lastStop.lng, label: lastStop.name };
+      const newDay = planDay(newStart, excludeNs, plannerState.days.length + 1);
+      plannerState.days.push(newDay);
+      plannerState.currentDay = plannerState.days.length - 1;
+      renderPlannerResult();
+    };
+  }
+  
+  // Show on map
+  document.getElementById('plannerShowMap').onclick = () => {
+    clearPlannerRoute();
+    const pts = [[day.start.lat, day.start.lng]].concat(day.stops.map(s => [s.lat, s.lng]));
+    if (plannerState.returnToStart && day.stops.length > 0){
+      pts.push([day.start.lat, day.start.lng]);
+    }
+    plannerState.routeLine = L.polyline(pts, { color: '#A91F26', weight: 4, opacity: 0.9, dashArray: '10, 8' }).addTo(map);
+    day.stops.forEach((s, i) => {
+      const m = L.marker([s.lat, s.lng], {
+        icon: L.divIcon({
+          className: 'planner-num-marker',
+          html: `<div style="background:#A91F26;color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.3)">${i+1}</div>`,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14]
+        })
+      }).addTo(map);
+      plannerState.routeMarkers.push(m);
+    });
+    switchTab('explore');
+    map.flyToBounds(L.latLngBounds(pts).pad(0.15), { duration: 0.8 });
+  };
+  
+  // Copy route
+  document.getElementById('plannerCopy').onclick = async () => {
+    let text = `Day ${day.dayNum} - StampQuest Route\n`;
+    text += `Start: ${day.start.label || day.start.lat.toFixed(4) + ', ' + day.start.lng.toFixed(4)}\n\n`;
+    day.legs.forEach((leg, i) => {
+      const l = leg.stop;
+      text += `${i+1}. ${l.name} (${l.pin}) - ${leg.roadKm.toFixed(1)} km\n`;
+    });
+    text += `\nTotal: ${day.totalKm.toFixed(0)} km (approx.)`;
+    try {
+      await navigator.clipboard.writeText(text);
+      toast(t('planner.copied'));
+    } catch(e){
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      toast(t('planner.copied'));
+    }
+  };
+  
+  // Open in Google Maps
+  document.getElementById('plannerGmaps').onclick = () => {
+    const origin = `${day.start.lat.toFixed(5)},${day.start.lng.toFixed(5)}`;
+    const stops = day.stops;
+    if (stops.length === 0) return;
+    
+    // Build waypoints: use "name, PIN" for verified, lat,lng for approx
+    const fmtStop = (s) => {
+      if (s.approx){
+        return `${s.lat.toFixed(5)},${s.lng.toFixed(5)}`;
+      } else {
+        return encodeURIComponent(`${s.name} Post Office, ${s.pin}, Karnataka`);
+      }
+    };
+    
+    let dest, waypoints = [];
+    if (plannerState.returnToStart){
+      dest = origin;
+      waypoints = stops.map(fmtStop);
+    } else {
+      const last = stops[stops.length-1];
+      dest = fmtStop(last);
+      waypoints = stops.slice(0, -1).map(fmtStop);
+    }
+    
+    // Google max 9 waypoints; enforce
+    if (waypoints.length > 9){
+      waypoints = waypoints.slice(0, 9);
+    }
+    
+    const travelmode = plannerState.vehicle === 'bike' ? 'two-wheeler' : 'driving';
+    let url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}&travelmode=${travelmode}`;
+    if (waypoints.length > 0){
+      url += `&waypoints=${waypoints.join('|')}`;
+    }
+    window.open(url, '_blank', 'noopener');
+  };
+  
+  // Mark as planned
+  document.getElementById('plannerMarkPlanned').onclick = () => {
+    day.stops.forEach(s => {
+      if (!state.visited[s.n]) state.planned[s.n] = true;
+    });
+    saveState();
+    toast(t('planner.marked_planned', { n: day.stops.length }));
+  };
+  
+  // Clear
+  document.getElementById('plannerClear').onclick = () => {
+    clearPlannerRoute();
+    plannerState.days = [];
+    plannerState.currentDay = 0;
+    document.getElementById('plannerResult').style.display = 'none';
+  };
+}
+
+function clearPlannerRoute(){
+  if (plannerState.routeLine){
+    map.removeLayer(plannerState.routeLine);
+    plannerState.routeLine = null;
+  }
+  plannerState.routeMarkers.forEach(m => map.removeLayer(m));
+  plannerState.routeMarkers = [];
+}
+
+// Initialize planner UI
+function initPlanner(){
+  // Restore chip states
+  document.querySelectorAll('#plannerDistChips .chip').forEach(c => {
+    c.classList.toggle('on', +c.dataset.dist === plannerState.maxDist);
+    c.onclick = () => {
+      plannerState.maxDist = +c.dataset.dist;
+      document.querySelectorAll('#plannerDistChips .chip').forEach(x => x.classList.toggle('on', x === c));
+      savePlannerSettings();
+    };
+  });
+  
+  document.querySelectorAll('#plannerVehicleChips .chip').forEach(c => {
+    c.classList.toggle('on', c.dataset.vehicle === plannerState.vehicle);
+    c.onclick = () => {
+      plannerState.vehicle = c.dataset.vehicle;
+      // Update default stops
+      const defaultStops = plannerState.vehicle === 'bike' ? 5 : 6;
+      plannerState.maxStops = defaultStops;
+      document.getElementById('plannerStops').value = defaultStops;
+      document.getElementById('plannerStopsVal').textContent = defaultStops;
+      document.querySelectorAll('#plannerVehicleChips .chip').forEach(x => x.classList.toggle('on', x === c));
+      savePlannerSettings();
+    };
+  });
+  
+  document.querySelectorAll('#plannerScopeChips .chip').forEach(c => {
+    c.classList.toggle('on', c.dataset.scope === plannerState.scope);
+    c.onclick = () => {
+      plannerState.scope = c.dataset.scope;
+      document.querySelectorAll('#plannerScopeChips .chip').forEach(x => x.classList.toggle('on', x === c));
+      savePlannerSettings();
+    };
+  });
+  
+  document.getElementById('plannerStops').value = plannerState.maxStops;
+  document.getElementById('plannerStopsVal').textContent = plannerState.maxStops;
+  document.getElementById('plannerStops').oninput = (e) => {
+    plannerState.maxStops = +e.target.value;
+    document.getElementById('plannerStopsVal').textContent = e.target.value;
+    savePlannerSettings();
+  };
+  
+  document.getElementById('plannerReturn').checked = plannerState.returnToStart;
+  document.getElementById('plannerReturn').onchange = (e) => {
+    plannerState.returnToStart = e.target.checked;
+    savePlannerSettings();
+  };
+  
+  // Near me
+  document.getElementById('plannerNearMe').onclick = () => {
+    if (!navigator.geolocation){
+      toast(t('planner.no_geo'));
+      return;
+    }
+    toast(t('planner.locating'));
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        plannerState.start = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          label: t('planner.my_location')
+        };
+        updatePlannerStartLabel();
+      },
+      (err) => {
+        toast(t('planner.geo_error'));
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+  
+  // Pick office - use existing office picker if available, else simple prompt
+  document.getElementById('plannerPickOffice').onclick = () => {
+    // Switch to explore tab and let user tap a pin
+    toast(t('planner.tap_pin'));
+    switchTab('explore');
+    // Set a flag so map click sets planner start
+    window._plannerPickMode = true;
+  };
+  
+  // Town input - match against office names
+  const townInput = document.getElementById('plannerTownInput');
+  townInput.addEventListener('change', () => {
+    const q = townInput.value.trim().toLowerCase();
+    if (!q) return;
+    const match = LOCATIONS.find(l => 
+      l.name.toLowerCase().includes(q) || 
+      (l.kn_name && l.kn_name.includes(townInput.value.trim())) ||
+      l.district.toLowerCase().includes(q)
+    );
+    if (match){
+      plannerState.start = { lat: match.lat, lng: match.lng, label: match.name };
+      updatePlannerStartLabel();
+    } else {
+      toast(t('planner.no_match'));
+    }
+  });
+  
+  // Plan button
+  document.getElementById('plannerGo').onclick = () => {
+    if (!plannerState.start){
+      toast(t('planner.need_start'));
+      return;
+    }
+    plannerState.days = [planDay(plannerState.start, new Set(), 1)];
+    plannerState.currentDay = 0;
+    clearPlannerRoute();
+    renderPlannerResult();
+  };
+}
+
+function updatePlannerStartLabel(){
+  const el = document.getElementById('plannerStartLabel');
+  if (plannerState.start){
+    el.textContent = t('planner.start_from') + ': ' + (plannerState.start.label || `${plannerState.start.lat.toFixed(3)}, ${plannerState.start.lng.toFixed(3)}`);
+  } else {
+    el.textContent = '';
+  }
+}
+
+// Hook into map clicks for office picking
+const _origMapClick = null; // will be set if map exists
+
 
 /* ================= circuits ================= */
 const REGION_ORDER = ["Coastal","Malnad","Mysuru region","Bengaluru region","North Karnataka"];
