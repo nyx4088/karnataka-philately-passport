@@ -1976,8 +1976,7 @@ let rsReleaseTrap = null;
 let rsPhotoList = [];
 async function openRivalProfile(uid){
   $("rivalSheet").style.display = "block";
-  const rsPanel = $("rivalSheet").querySelector(":scope > div");
-  if (rsPanel) rsPanel.style.transform = "";
+  if (typeof rsResetPanel === "function") rsResetPanel();
   rsReleaseTrap = trapFocus($("rivalSheet"), closeRivalSheet);
   const grid = $("rsPhotos");
   grid.textContent = "";
@@ -2061,32 +2060,54 @@ function closeRemoteViewer(){
   if (v){ if (v._onKey) document.removeEventListener("keydown", v._onKey); v.remove(); }
 }
 
-// ---- Rival sheet: drag handle + swipe-down-to-dismiss ----
+// ---- Rival sheet: drag handle to expand/collapse/dismiss ----
 (function(){
   const sheet = document.getElementById("rivalSheet");
   if (!sheet) return;
   const panel = sheet.querySelector(":scope > div");
   if (!panel) return;
-  const handle = document.createElement("div");
-  handle.id = "rsDrag";
-  handle.style.cssText = "width:44px;height:5px;border-radius:3px;background:var(--border-subtle);margin:0 auto 12px;cursor:grab;touch-action:none";
-  panel.insertBefore(handle, panel.firstChild);
-  let sY = 0, dY = 0, on = false;
-  handle.addEventListener("touchstart", e => { on = true; sY = dY = e.touches[0].clientY; panel.style.transition = "none"; }, { passive:true });
+  let handle = document.getElementById("rsDrag");
+  if (!handle){
+    handle = document.createElement("div");
+    handle.id = "rsDrag";
+    handle.style.cssText = "width:44px;height:5px;border-radius:3px;background:var(--border-subtle);margin:0 auto 12px;cursor:grab;touch-action:none;flex:none";
+    panel.insertBefore(handle, panel.firstChild);
+  }
+  let sY = 0, sH = 0, on = false;
+  const minH = () => Math.round(window.innerHeight * 0.32);
+  const maxH = () => Math.round(window.innerHeight * 0.92);
+  handle.addEventListener("touchstart", e => {
+    on = true; sY = e.touches[0].clientY; sH = panel.offsetHeight;
+    panel.style.transition = "none";
+  }, { passive:true });
   handle.addEventListener("touchmove", e => {
     if (!on) return;
-    dY = e.touches[0].clientY;
-    panel.style.transform = "translateY(" + Math.max(0, dY - sY) + "px)";
+    const dy = e.touches[0].clientY - sY;
+    const nh = Math.max(minH()*0.6, Math.min(maxH(), sH - dy));
+    panel.style.height = nh + "px";
+    panel.style.maxHeight = "none";
   }, { passive:true });
   const end = () => {
     if (!on) return; on = false;
-    panel.style.transition = "transform .25s ease";
-    if (dY - sY > 90){ panel.style.transform = "translateY(105%)"; setTimeout(closeRivalSheet, 220); }
-    else panel.style.transform = "";
+    const h = panel.offsetHeight;
+    panel.style.transition = "height .25s cubic-bezier(.32,.72,.35,1)";
+    if (h < minH()*0.85){
+      panel.style.height = "0px";
+      setTimeout(() => { closeRivalSheet(); panel.style.height = ""; panel.style.maxHeight = ""; }, 240);
+    } else {
+      const targets = [minH(), (minH()+maxH())/2, maxH()];
+      let best = targets[0], bd = 1e18;
+      targets.forEach(tg => { const d = Math.abs(h - tg); if (d < bd){ bd = d; best = tg; } });
+      panel.style.height = best + "px";
+    }
   };
   handle.addEventListener("touchend", end);
   handle.addEventListener("touchcancel", end);
 })();
+function rsResetPanel(){
+  const panel = document.querySelector("#rivalSheet > div");
+  if (panel){ panel.style.height = ""; panel.style.maxHeight = ""; panel.style.transform = ""; panel.style.transition = ""; }
+}
 
 // ---- Info (About) modal: moves info sections out of Settings on first open ----
 let infoMoved = false;
