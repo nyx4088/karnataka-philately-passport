@@ -756,8 +756,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       <div class="tilegrid" id="tileGrid"></div>
       <div class="note" id="gridEmpty" style="display:none;text-align:center;padding:18px 8px" data-i18n="passport.empty_filter">Nothing here yet — tap a pin on the map to start collecting.</div>
     </div>
-    <h3 class="sec" data-i18n="passport.district_progress">District progress</h3>
-    <div class="card" id="districtProg" style="padding:8px 14px"></div>
+
     <h3 class="sec" data-i18n="passport.share_backup">Share &amp; backup</h3>
     <div class="card">
       <div class="segrow" id="shareFmt" role="group" data-i18n-aria="passport.share_format" aria-label="Share card format">
@@ -835,7 +834,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 
 <!-- RIVAL PROFILE SHEET -->
 <div id="menuSheet" style="display:none;position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.5)" role="dialog" aria-label="Menu">
-  <div style="position:absolute;left:0;right:0;bottom:0;max-height:70vh;background:var(--surface);border-radius:18px 18px 0 0;overflow-y:auto;padding:18px">
+  <div style="position:absolute;left:0;right:0;bottom:0;max-height:75vh;background:var(--surface);border-radius:18px 18px 0 0;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:18px;padding-bottom:32px">
     <div style="width:44px;height:5px;border-radius:3px;background:var(--border-subtle);margin:0 auto 16px"></div>
     <div style="font-weight:800;font-size:18px;margin-bottom:12px" data-i18n="menu.title">Menu</div>
     <button class="rowbtn" data-menu="settings.about_app"><span class="grow"><span class="t" data-i18n="settings.about_app">About this app</span></span><span style="color:var(--ink-2)">›</span></button>
@@ -856,13 +855,13 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       <div class="note" id="wrappedSub" style="margin-top:12px;max-width:260px"></div>
     </div>
     <div style="display:flex;gap:8px;margin-top:20px;align-items:center">
-      <button class="btn ghost" id="wrappedPrev" style="width:48px;height:48px;border-radius:50%;font-size:20px">←</button>
+      <button id="wrappedPrev" style="width:48px;height:48px;border-radius:50%;font-size:20px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#F3EDE0;cursor:pointer">←</button>
       <div id="wrappedDots" style="display:flex;gap:6px"></div>
-      <button class="btn ghost" id="wrappedNext" style="width:48px;height:48px;border-radius:50%;font-size:20px">→</button>
+      <button id="wrappedNext" style="width:48px;height:48px;border-radius:50%;font-size:20px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#F3EDE0;cursor:pointer">→</button>
     </div>
     <div style="display:flex;gap:10px;margin-top:16px">
       <button class="btn accent" id="wrappedShare" style="display:none" data-i18n="wrapped.share">Share</button>
-      <button class="btn ghost" id="wrappedClose" data-i18n="wrapped.close">Done</button>
+      <button id="wrappedClose" style="padding:12px 28px;border-radius:12px;font-size:15px;font-weight:700;background:#F3EDE0;color:#1F1B16;border:none;cursor:pointer" data-i18n="wrapped.close">Done</button>
     </div>
   </div>
 </div>
@@ -920,8 +919,9 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 <!-- SETTINGS -->
 <section class="view" id="view-settings">
   <div class="pagehead" style="display:flex;align-items:flex-start;gap:12px">
+  <div style="flex:1"><h1 data-i18n="settings.title">Settings</h1><p data-i18n="settings.subtitle">App preferences and information.</p></div>
   <button id="menuBtn" aria-label="Menu" style="width:44px;height:44px;flex:none;border-radius:12px;border:1px solid var(--border-subtle);background:var(--surface);font-size:20px;cursor:pointer;margin-top:2px">☰</button>
-  <div><h1 data-i18n="settings.title">Settings</h1><p data-i18n="settings.subtitle">App preferences and information.</p></div></div>
+</div>
   <div class="scroll">
     <div class="card">
       <div class="togglerow"><span data-i18n="settings.dark">Dark theme</span>
