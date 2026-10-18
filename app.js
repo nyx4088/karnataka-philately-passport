@@ -2515,13 +2515,13 @@ function openMenu(){
 }
 function closeMenu(){
   const m = document.getElementById("menuSheet");
-  if (m) m.style.display = "none";
+  if (m){ m.style.display = "none"; m.classList.remove("active"); }
 }
 let infoFromMenu = false;
 function openInfoSection(key, fromMenu){
   infoFromMenu = !!fromMenu;
-  const bb = document.getElementById("infoBack");
-  if (bb) bb.style.display = infoFromMenu ? "block" : "none";
+  const modal = document.getElementById("infoModal");
+  if (modal){ modal.style.display = "flex"; modal.classList.add("active"); }
   ensureInfoStore();
   closeMenu();
   const body = document.getElementById("infoBody");
@@ -2547,7 +2547,7 @@ function closeInfoModal(){
   }
 }
 if ($("menuBtn")) $("menuBtn").onclick = openMenu;
-if ($("menuSheet")) $("menuSheet").addEventListener("click", e => { if (e.target.id === "menuSheet") closeMenu(); });
+$("menuBack") && $("menuBack").addEventListener("click", closeMenu);
 document.querySelectorAll("#menuSheet [data-menu]").forEach(b => {
   b.addEventListener("click", () => {
     if (b.dataset.menu === "tip"){ closeMenu(); openTip(); }
