@@ -72,7 +72,7 @@ const map = L.map("map", { zoomControl:false, attributionControl:true, zoomSnap:
 // (zoom lives in the glass rail; no default Leaflet zoom control)
 map.attributionControl.setPrefix(false);
 /* Karnataka bbox (buffered, from karnataka.geojson) — tiles never load outside this */
-const KA_BOUNDS = L.latLngBounds([11.608, 74.073], [18.479, 78.587]);
+const KA_BOUNDS = L.latLngBounds([11.35, 73.80], [18.73, 78.85]); // 25km buffer bbox
 const layers = {
   streets: L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom:19, bounds:KA_BOUNDS, attribution:"© OpenStreetMap contributors" }),
   satellite: L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom:19, bounds:KA_BOUNDS, attribution:"Imagery © Esri" }),
@@ -124,14 +124,24 @@ function kaContains(lat, lng){
   }
   return inside;
 }
-fetch("karnataka.geojson").then(r => { if (!r.ok) throw 0; return r.json(); }).then(gj => {
+Promise.all([
+  fetch("karnataka.geojson").then(r => { if (!r.ok) throw 0; return r.json(); }),
+  fetch("karnataka-buf25.geojson").then(r => r.ok ? r.json() : null).catch(() => null)
+]).then(([gj, bgj]) => {
   const feat = gj.type === "FeatureCollection" ? gj.features[0] : gj;
   const polys = feat.geometry.type === "MultiPolygon" ? feat.geometry.coordinates : [feat.geometry.coordinates];
   kaRings = polys.map(poly => poly[0].map(([x, y]) => [y, x]));
+  /* 25km buffered rings for the fog cutout (fallback to true rings) */
+  let fogRings = kaRings;
+  if (bgj){
+    const bf = bgj.type === "FeatureCollection" ? bgj.features[0] : bgj;
+    const bp = bf.geometry.type === "MultiPolygon" ? bf.geometry.coordinates : [bf.geometry.coordinates];
+    fogRings = bp.map(poly => poly[0].map(([x, y]) => [y, x]));
+  }
   const bounds = L.latLngBounds(kaRings.flat());
-  /* opaque inverted mask: huge outer rectangle with Karnataka cut out (covers any gesture/transition) */
+  /* opaque inverted mask: huge outer rectangle with Karnataka+25km cut out (covers any gesture/transition) */
   const outer = [[-90,-180],[90,-180],[90,180],[-90,180]];
-  const fog = L.polygon([outer, ...kaRings], { className:"fog-poly", stroke:false, fillOpacity:1 }).addTo(map);
+  const fog = L.polygon([outer, ...fogRings], { className:"fog-poly", stroke:false, fillOpacity:1 }).addTo(map);
   fog.on("click", () => { if (typeof pickingPos === "undefined" || !pickingPos) toast(t("toast.beyond")); });
   /* brand border along the edge */
   L.polygon(kaRings, { className:"ka-border", stroke:true, fill:false, interactive:false }).addTo(map);
