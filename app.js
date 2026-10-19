@@ -1355,7 +1355,7 @@ window.addEventListener("popstate", () => {
   setTimeout(() => { backExitArmed = false; }, 2000);
 });
 /* ================= tip jar (UPI) ================= */
-const TIP_UPI_ID = "pranaambp@nyes";
+const TIP_UPI_ID = "bengrepranaam@okhdfcbank";
 const TIP_NAME = "StampQuest";
 let tipAmt = 50;
 function openTip(){
