@@ -154,9 +154,9 @@ html[data-theme="dark"] .hcard{background:color-mix(in srgb, var(--header-bg) 92
 #nav button:active{transform:scale(.88)}
 .rowbtn{transition:background-color .2s ease,transform .15s ease}
 .rowbtn:active{transform:scale(.97)}
-#rivalSheet,#infoModal,#menuSheet,#tipModal,#msModal,#wrappedModal{animation:fadeIn .4s ease}
+#rivalSheet,#infoModal,#menuSheet,#msModal,#wrappedModal{animation:fadeIn .4s ease}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-#rivalSheet>div,#infoModal>div,#menuSheet>div,#tipModal>div{animation:sheetUp .34s cubic-bezier(.32,.72,.35,1)}
+#rivalSheet>div,#infoModal>div,#menuSheet>div{animation:sheetUp .34s cubic-bezier(.32,.72,.35,1)}
 @keyframes sheetUp{from{transform:translateY(48px);opacity:.5}to{transform:none;opacity:1}}
 .card.rise{animation:riseIn .45s cubic-bezier(.32,.72,.35,1) both}
 @keyframes riseIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
@@ -868,7 +868,6 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
   <div class="scroll" style="touch-action:pan-y">
     <button class="rowbtn" data-menu="settings.about_app" style="padding:16px"><span style="font-size:20px;margin-right:12px">ℹ️</span><span class="grow"><span class="t" data-i18n="settings.about_app">About this app</span></span><span style="color:var(--ink-2)">›</span></button>
     <a class="rowbtn" href="mailto:pannova89@gmail.com?subject=StampQuest%20feedback" style="text-decoration:none;padding:16px"><span style="font-size:20px;margin-right:12px">💬</span><span class="grow"><span class="t" data-i18n="settings.feedback">Send feedback</span></span><span style="color:var(--ink-2)">›</span></a>
-    <button class="rowbtn" data-menu="tip" style="padding:16px"><span style="font-size:20px;margin-right:12px">❤️</span><span class="grow"><span class="t" data-i18n="menu.support">Support StampQuest</span></span><span style="color:var(--ink-2)">›</span></button>
     <div style="height:12px"></div>
     <button class="rowbtn" data-menu="settings.faq" style="padding:16px"><span style="font-size:20px;margin-right:12px">❓</span><span class="grow"><span class="t" data-i18n="settings.faq">FAQ</span></span><span style="color:var(--ink-2)">›</span></button>
     <button class="rowbtn" data-menu="settings.about_data" style="padding:16px"><span style="font-size:20px;margin-right:12px">📊</span><span class="grow"><span class="t" data-i18n="settings.about_data">About this data</span></span><span style="color:var(--ink-2)">›</span></button>
@@ -901,26 +900,8 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
     <div class="serif" id="msNum" style="font-size:96px;line-height:1;color:var(--gold);letter-spacing:-0.03em">25</div>
     <div class="serif" id="msTitle" style="font-size:28px;margin:8px 0 12px;color:var(--ink)">Wanderer</div>
     <div class="note" id="msSub" style="max-width:280px;margin-bottom:16px"></div>
-    <button id="msTip" style="background:none;border:none;color:var(--gold);font-size:13px;text-decoration:underline;cursor:pointer;margin-bottom:20px;padding:8px" data-i18n="milestone.tip_cta">This quest stays free because collectors like you keep it alive.</button>
     <button class="btn accent" id="msShare" style="min-width:200px;margin-bottom:10px" data-i18n="milestone.share">Share</button>
     <button class="btn ghost" id="msClose" style="min-width:200px" data-i18n="milestone.close">Continue</button>
-  </div>
-</div>
-<div id="tipModal" class="view" style="display:none;z-index:70" role="dialog" aria-label="Support">
-  <div class="pagehead" style="display:flex;align-items:center;gap:12px;padding-top:calc(12px + env(safe-area-inset-top))">
-    <button id="tipBack" aria-label="Back" style="width:36px;height:36px;border-radius:50%;border:none;background:transparent;font-size:24px;cursor:pointer;flex:none;color:var(--ink)">‹</button>
-    <div style="flex:1;font-weight:700;font-size:18px" data-i18n="tip.title">Support StampQuest</div>
-  </div>
-  <div class="scroll" style="touch-action:pan-y;padding:22px 18px">
-    <div class="note" style="text-align:center;margin-bottom:16px" data-i18n="tip.body">Built solo by a fellow collector...</div>
-    <div style="display:flex;gap:8px;margin-bottom:12px">
-      <button class="btn ghost tip-amt" data-amt="10" style="flex:1">₹10</button>
-      <button class="btn ghost tip-amt" data-amt="50" style="flex:1">₹50</button>
-      <button class="btn ghost tip-amt" data-amt="100" style="flex:1">₹100</button>
-    </div>
-    <input id="tipCustom" inputmode="numeric" data-i18n-ph="tip.custom" placeholder="Custom amount" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--border-subtle);font-size:15px;margin-bottom:12px;box-sizing:border-box">
-    <button class="btn accent" id="tipPay" style="width:100%;padding:14px;font-size:16px" data-i18n="tip.pay">Pay via UPI</button>
-    <div class="note" style="text-align:center;margin-top:10px;font-size:12px" data-i18n="tip.note">Pay what you want.</div>
   </div>
 </div>
 <div id="infoModal" class="view" style="display:none;z-index:61" role="dialog" data-i18n-aria="info.open_aria" aria-label="About this app">
@@ -1030,13 +1011,6 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       <span data-i18n="settings.about_app_body">StampQuest was built solo by a fellow passport holder, with a little AI help along the way, so you may run into a glitch or a wrong detail. Spotted something? I'd genuinely like to hear about it. Loving it? Share it with your fellow collectors.</span>
       <br><br>
       <a class="btn" style="width:100%;text-decoration:none;text-align:center;display:block" data-i18n="settings.feedback" href="mailto:pannova89@gmail.com?subject=StampQuest%20feedback">Send feedback</a>
-    </div>
-    <h3 class="sec" data-i18n="menu.support">Support StampQuest</h3>
-    <div class="card" style="text-align:center;padding:20px">
-      <div style="font-size:32px;margin-bottom:8px">❤️</div>
-      <div style="font-weight:700;margin-bottom:6px" data-i18n="tip.card_title">Enjoying StampQuest?</div>
-      <div class="note" style="margin-bottom:14px" data-i18n="tip.card_sub">Built solo by a fellow collector. Your tip keeps it going.</div>
-      <button class="btn accent" id="btnSupportFromSettings" style="width:100%" data-i18n="menu.support">Support StampQuest</button>
     </div>
     <h3 class="sec" data-i18n="settings.danger">Danger zone</h3>
     <div class="card">
