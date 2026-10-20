@@ -69,6 +69,19 @@ function applyTheme(){ document.documentElement.dataset.theme = state.theme;
 
 /* ================= map ================= */
 const map = L.map("map", { zoomControl:false, attributionControl:true, zoomSnap:0.1, zoomDelta:0.5, bounceAtZoomLimits:false }).setView([15.0, 76.6], 7);
+/* Explore chrome: the header stack auto-hides while the user works the map; a tap (or the pill) brings it back */
+const exploreViewEl = document.getElementById("view-explore");
+function showChrome(){ if (exploreViewEl) exploreViewEl.classList.remove("chrome-hidden"); }
+function hideChrome(){ if (exploreViewEl) exploreViewEl.classList.add("chrome-hidden"); }
+let chromeGesture = false;
+const mapEl = map.getContainer();
+mapEl.addEventListener("pointerdown", () => { chromeGesture = true; }, { passive: true });
+mapEl.addEventListener("wheel", () => { chromeGesture = true; }, { passive: true });
+map.on("dragstart zoomstart", () => { if (chromeGesture) hideChrome(); });
+map.on("moveend", () => { chromeGesture = false; });
+map.on("click", showChrome);
+const chromeShowBtn = document.getElementById("chromeShow");
+if (chromeShowBtn) chromeShowBtn.addEventListener("click", () => { showChrome(); buzz(8); });
 // (zoom lives in the glass rail; no default Leaflet zoom control)
 map.attributionControl.setPrefix(false);
 /* Karnataka bbox (buffered, from karnataka.geojson): tiles never load outside this */
@@ -1082,6 +1095,7 @@ function showNearby(){
 /* ================= tabs ================= */
 function switchTab(name){
   if (typeof collapseTile === "function") collapseTile(true);
+  if (name === "explore" && typeof showChrome === "function") showChrome();
   document.querySelectorAll("#nav button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
   document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === "view-"+name));
   // close all overlays on tab change
