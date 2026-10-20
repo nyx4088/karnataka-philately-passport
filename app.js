@@ -96,8 +96,9 @@ let curLayer = "streets";
 
 const markers = {};
 const cluster = L.markerClusterGroup({
-  iconCreateFunction: c => L.divIcon({ html:'<div class="mk-cluster" style="width:40px;height:40px;font-size:14px">'+c.getChildCount()+'</div>',
-    className:"", iconSize:[40,40] }),
+  iconCreateFunction: c => { const n = c.getChildCount(); const s = n >= 60 ? 52 : n >= 20 ? 46 : 40;
+    return L.divIcon({ html:'<div class="mk-cluster" style="width:'+s+'px;height:'+s+'px;font-size:'+(s >= 52 ? 16 : s >= 46 ? 15 : 14)+'px">'+n+'</div>',
+      className:"", iconSize:[s,s] }); },
   maxClusterRadius: 46
 });
 function pinIcon(l, sel){
@@ -400,17 +401,23 @@ function renderRingCount(c){
   }
   lastRingCount = c;
 }
-let heroTyper = null;
+let heroTimer = null, heroIdx = 0;
+const HERO_STRINGS = ["100 post offices. One passport.", "Collect them all, one stamp at a time.", "Your Karnataka quest starts here."];
 function startHeroType(){
   const el = $("heroType");
-  if (!el || typeof Typed === "undefined" || REDUCED) return;
-  try {
-    if (heroTyper) heroTyper.destroy();
-    heroTyper = new Typed(el, { strings: ["100 post offices. One passport.", "Collect them all, one stamp at a time.", "Your Karnataka quest starts here."],
-      typeSpeed: 36, backSpeed: 20, backDelay: 1700, loop: true, showCursor: false });
-  } catch(e){}
+  if (!el) return;
+  stopHeroType();
+  heroIdx = 0;
+  el.textContent = HERO_STRINGS[0];
+  el.style.transition = "opacity .45s ease";
+  el.style.opacity = "1";
+  if (REDUCED) return;
+  heroTimer = setInterval(() => {
+    el.style.opacity = "0";
+    setTimeout(() => { heroIdx = (heroIdx + 1) % HERO_STRINGS.length; el.textContent = HERO_STRINGS[heroIdx]; el.style.opacity = "1"; }, 460);
+  }, 3400);
 }
-function stopHeroType(){ if (heroTyper){ try { heroTyper.destroy(); } catch(e){} heroTyper = null; } }
+function stopHeroType(){ if (heroTimer){ clearInterval(heroTimer); heroTimer = null; } }
 
 /* ================= functional splash (brand moment during real init only) ================= */
 let splashEl = document.getElementById("splash");
@@ -1388,10 +1395,12 @@ function renderCircuits(){
       '<span class="cmeta"><span class="note">'+t("circuits.collected", { done: done, total: stops.length })+'</span><span class="chev'+(open?" open":"")+'">›</span></span></button>'+
       '<div class="cbody'+(open?" open":"")+'" id="'+cid+'" role="region" aria-labelledby="ch-'+ri+'">'+
       '<div class="dbar"><i style="width:'+(stops.length?done/stops.length*100:0)+'%"></i></div>'+
-      '<div style="margin-top:10px">'+stops.map(l =>
-        '<button class="rowbtn" data-n="'+l.n+'">'+
+      '<div style="margin-top:10px">'+stops.map(l => {
+        const st = statusOf(l.n);
+        const chip = st === "visited" ? '<span class="cstat visited" aria-hidden="true">✓</span>' : st === "planned" ? '<span class="cstat planned" aria-hidden="true">★</span>' : '';
+        return '<button class="rowbtn" data-n="'+l.n+'">'+ chip +
         '<span class="grow"><span class="t">'+l.n+'. '+esc(l.name)+'</span><span class="s" style="display:block">'+esc(l.district)+' · '+l.pin+'</span></span>'+
-        '<span style="color:var(--ink-2)">›</span></button>').join("")+'</div>'+
+        '<span style="color:var(--ink-2)">›</span></button>'; }).join("")+'</div>'+
       '<button class="btn ghost" data-fit="'+esc(rg)+'" style="width:100%;margin-top:4px">'+t("circuits.show_on_map")+'</button></div></div>';
   }).join("");
   $("circuitList").querySelectorAll(".chead").forEach(h => h.onclick = () => {
@@ -1465,6 +1474,20 @@ function clearTilePhotoURLs(){
   Object.values(tilePhotoURLs).forEach(u => { try { URL.revokeObjectURL(u); } catch(e){} });
   tilePhotoURLs = {};
 }
+const fitCv = document.createElement("canvas").getContext("2d");
+function fitTileNames(g){
+  g.querySelectorAll(".tile .nm").forEach(el => {
+    const avail = el.clientWidth;
+    if (!avail) return; /* grid hidden (another tab): a later render fits it */
+    const fam = getComputedStyle(el).fontFamily;
+    fitCv.font = "12px " + fam;
+    const longest = Math.max.apply(null, el.textContent.split(/\s+/).map(w => fitCv.measureText(w).width));
+    if (longest > avail){
+      const target = Math.max(9, Math.floor(12 * avail / longest * 2) / 2);
+      el.style.fontSize = target + "px";
+    }
+  });
+}
 function renderGrid(){
   expandedN = null; /* grid rebuilt, any expanded detail is gone with the old DOM */
   clearTilePhotoURLs();
@@ -1475,6 +1498,7 @@ function renderGrid(){
     const ck = st === "visited" ? '<span class="check" aria-hidden="true">✓</span>' : "";
     return '<div class="tile '+st+'" data-n="'+l.n+'" role="button" tabindex="0"><span class="tno">'+l.n+'</span><span class="nm">'+esc(dispName(l))+'</span><span class="sr-only">'+esc(t("sheet.status_"+st).replace(" ✓",""))+'</span><span class="pcam" data-n="'+l.n+'" role="button" aria-label="'+t("sheet.add_photo")+'" title="'+t("sheet.add_photo")+'"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>'+ck+pm+'<span class="tphoto" aria-hidden="true"></span></div>';
   }).join("");
+  fitTileNames(g);
   g.querySelectorAll(".tile").forEach(t => {
     t.setAttribute("aria-expanded", "false");
     t.onclick = () => toggleTileExpand(t);
