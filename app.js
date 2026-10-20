@@ -711,6 +711,7 @@ function resizeBlob(file, maxPx, quality){
 }
 
 let photoSheetPushed = false;
+let photoPopHandled = false; /* the next popstate belongs to the photo sheet alone */
 function closePhotoPicker(){
   const d = document.getElementById("photoChoice");
   if (d) d.remove();
@@ -719,13 +720,14 @@ function closePhotoPicker(){
   document.removeEventListener("keydown", photoEscHandler);
   if (photoSheetPushed){
     photoSheetPushed = false;
+    photoPopHandled = true; /* this pop is ours: the main handler must stand down */
     try { history.back(); } catch(e){}
   }
 }
 function pushPhotoSheet(){
   if (photoSheetPushed) return;
   photoSheetPushed = true;
-  try { history.pushState({ photosheet: 1 }, "", location.href); } catch(e){}
+  try { history.pushState({ photosheet: 1 }, "", location.pathname + location.search); } catch(e){}
 }
 /* tile photo long-press actions */
 function openTilePhotoActions(n){
@@ -773,6 +775,7 @@ function openPhotoPicker(n){
 window.addEventListener("popstate", (e) => {
   if (document.getElementById("photoChoice")) {
     photoSheetPushed = false; // already popped, don't go back again
+    photoPopHandled = true; // main handler: this pop only closed the photo sheet
     closePhotoPicker();
   }
 });
@@ -1328,6 +1331,7 @@ $("wrappedReplay") && $("wrappedReplay").addEventListener("click", showWrapped);
 })();
 
 /* ================= device back button + modal back nav ================= */
+let bootLocHash = ""; /* a #loc= deep link captured at boot, before history is normalised */
 let backExitArmed = false;
 function anyModalOpen(){
   return ["menuSheet","msModal","wrappedModal","infoModal","rivalSheet"].some(id => {
@@ -1352,11 +1356,21 @@ function closeTopModal(){
   if (ls && ls.classList.contains("open")){ closeSheet(); return true; }
   return false;
 }
-// Push initial state so back button is interceptable
-try { history.pushState({ app: true }, ""); } catch(e){}
+// Push initial state so back button is interceptable. History entries never carry a
+// #loc= hash: if one did, a later back press landing on it would fire hashchange and
+// reopen that post office instead of arming the exit (the Mandarthi bug).
+try {
+  if (/^#loc=\d+$/.test(location.hash)){ bootLocHash = location.hash; history.replaceState(null, "", location.pathname + location.search); }
+  history.pushState({ app: true }, "", location.pathname + location.search);
+} catch(e){}
 window.addEventListener("popstate", () => {
+  if (photoPopHandled){
+    photoPopHandled = false;
+    try { history.pushState({ app: true }, "", location.pathname + location.search); } catch(e){}
+    return;
+  }
   if (closeTopModal()){
-    try { history.pushState({ app: true }, ""); } catch(e){}
+    try { history.pushState({ app: true }, "", location.pathname + location.search); } catch(e){}
     return;
   }
   if (backExitArmed){
@@ -1366,7 +1380,7 @@ window.addEventListener("popstate", () => {
   }
   backExitArmed = true;
   toast(t("app.press_back_exit") || "Press back again to exit");
-  try { history.pushState({ app: true }, ""); } catch(e){}
+  try { history.pushState({ app: true }, "", location.pathname + location.search); } catch(e){}
   setTimeout(() => { backExitArmed = false; }, 2000);
 });
 /* ================= haptic tap feedback ================= */
@@ -2502,7 +2516,9 @@ $("rivalSheet").addEventListener("click", e => { if (e.target.id === "rivalSheet
 
 /* ================= deep link / first run / init ================= */
 function handleHash(){
-  const m = location.hash.match(/^#loc=(\d+)$/);
+  const h = location.hash || bootLocHash;
+  bootLocHash = "";
+  const m = h.match(/^#loc=(\d+)$/);
   if (!m) return;
   const n = +m[1];
   if (byN[n]) openLocation(n);
