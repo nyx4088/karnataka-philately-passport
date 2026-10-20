@@ -1,4 +1,4 @@
-const CACHE = "stampquest-v61";
+const CACHE = "stampquest-v62";
 const SHELL = [
   "./",
   "index.html",
@@ -15,6 +15,7 @@ const SHELL = [
   "vendor/lenis.min.js",
   "i18n-strings.js",
   "app.js",
+  "splash-fallback.js",
   "karnataka.geojson",
   "karnataka-buf25.geojson",
   "icons/icon-192.png",
