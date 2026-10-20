@@ -1508,7 +1508,7 @@ function renderGrid(){
     const st = statusOf(l.n);
     const pm = st === "visited" ? '<span class="postmark">'+esc(l.district)+'</span>' : "";
     const ck = st === "visited" ? '<span class="check" aria-hidden="true">✓</span>' : "";
-    return '<div class="tile '+st+'" data-n="'+l.n+'" role="button" tabindex="0" aria-label="'+l.n+". "+esc(l.name)+", "+st+'"><span class="tno">'+l.n+'</span><span class="nm">'+esc(dispName(l))+'</span><span class="pcam" data-n="'+l.n+'" role="button" aria-label="'+t("sheet.add_photo")+'" title="'+t("sheet.add_photo")+'"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>'+ck+pm+'<span class="tphoto" aria-hidden="true"></span></div>';
+    return '<div class="tile '+st+'" data-n="'+l.n+'" role="button" tabindex="0"><span class="tno">'+l.n+'</span><span class="nm">'+esc(dispName(l))+'</span><span class="sr-only">'+esc(t("sheet.status_"+st).replace(" ✓",""))+'</span><span class="pcam" data-n="'+l.n+'" role="button" aria-label="'+t("sheet.add_photo")+'" title="'+t("sheet.add_photo")+'"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>'+ck+pm+'<span class="tphoto" aria-hidden="true"></span></div>';
   }).join("");
   g.querySelectorAll(".tile").forEach(t => {
     t.setAttribute("aria-expanded", "false");
