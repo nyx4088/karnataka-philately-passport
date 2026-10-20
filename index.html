@@ -5,25 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#6B2236">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.org https://server.arcgisonline.com https://*.tile.opentopomap.org https://*.supabase.co; font-src 'self'; connect-src 'self' https://*.supabase.co https://tile.openstreetmap.org https://server.arcgisonline.com https://*.tile.opentopomap.org;">
-<title>StampQuest — Karnataka Philately Passport Explorer</title>
+<title>StampQuest · Karnataka Philately Passport Explorer</title>
+<link rel="preload" href="fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/dmsans-latin.woff2" as="font" type="font/woff2" crossorigin>
 <meta name="description" content="Interactive map of all 100 Karnataka Philately Passport post offices. Discover, navigate, and track your stamp collection.">
 <link rel="canonical" href="https://nyx4088.github.io/karnataka-philately-passport/">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="favicon.ico" type="image/x-icon">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
-<meta property="og:title" content="StampQuest — Karnataka Philately Passport">
+<meta property="og:title" content="StampQuest · Karnataka Philately Passport">
 <meta property="og:description" content="Collect all 100 Karnataka Philately Passport stamps. Track your journey across the state.">
 <meta property="og:image" content="icons/og-image.png">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="StampQuest — Karnataka Philately Passport">
+<meta name="twitter:title" content="StampQuest · Karnataka Philately Passport">
 <meta name="twitter:description" content="Collect all 100 Karnataka Philately Passport stamps.">
 <meta name="twitter:image" content="icons/og-image.png">
 <link rel="preload" href="fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/dmsans-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="vendor/bundle.css">
 <style>
-/* ============ StampQuest — Postmark Modern design system (self-hosted fonts) ============ */
+/* ============ StampQuest · Postmark Modern design system (self-hosted fonts) ============ */
 @font-face{font-family:"Fraunces";font-style:normal;font-weight:100 900;font-display:swap;
   src:url("fonts/fraunces-latin.woff2") format("woff2");
   unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
@@ -146,7 +148,7 @@ html[data-theme="dark"] .hcard{background:color-mix(in srgb, var(--header-bg) 92
 /* ---- premium motion pass ---- */
 .view.active{animation:viewIn .32s cubic-bezier(.32,.72,.35,1)}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.btn,.btn.accent,.btn.ghost,.btn.primary{transition:background-color .6s ease,border-color .6s ease,transform .15s cubic-bezier(.34,1.56,.64,1)}
+.btn,.btn.accent,.btn.ghost,.btn.primary{transition:background-color .6s ease,border-color .6s ease,transform .15s cubic-bezier(.34,1.56,.64,1),box-shadow .25s ease}
 .btn:active,.btn.accent:active,.btn.ghost:active,.btn.primary:active{transform:scale(.95)}
 #nav button{transition:color .2s ease,transform .15s cubic-bezier(.34,1.56,.64,1)}
 #nav button:active{transform:scale(.88)}
@@ -239,7 +241,7 @@ body.sheet-open .mapctl{display:none}
 .layersheet button{display:block;width:100%;text-align:left;background:none;border:0;padding:11px 14px;font-size:13px;color:var(--ink)}
 .layersheet button.on{color:var(--brand);font-weight:700}
 
-/* postmark markers — states differ by shape, not only colour; single pins are white with a ring */
+/* postmark markers: states differ by shape, not only colour; single pins are white with a ring */
 .mk{width:32px;height:32px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;
   font-family:var(--font-mono);font-weight:500;font-size:13px;line-height:1;
   box-shadow:0 0 0 2px var(--paper),0 2px 6px rgba(0,0,0,.35)}
@@ -305,6 +307,9 @@ body.sheet-open .mapctl{display:none}
 .btn{border:0;border-radius:12px;padding:12px 18px;font-size:14px;font-weight:700;min-height:48px;font-family:var(--font-sans)}
 .btn.primary{background:var(--brand);color:var(--on-brand);flex:1}
 .btn.primary:hover{background:var(--brand-hover)}
+@media (hover:hover) and (prefers-reduced-motion: no-preference){
+.btn.primary:hover,.btn.accent:hover{transform:translateY(-1px) scale(1.02);box-shadow:0 8px 20px rgba(31,27,22,.22)}
+}
 .btn.ghost{background:transparent;border:1.5px solid var(--border-strong);color:var(--ink)}
 .btn.accent{background:var(--brand);color:var(--on-brand);transition:background-color .6s ease}
 .btn.accent:hover{background:var(--brand-hover)}
@@ -369,7 +374,7 @@ h3.sec{font-size:17px;margin:22px 0 10px;letter-spacing:.5px;margin-bottom:12px}
 .planner-actions{position:sticky;bottom:0;background:var(--paper);padding:10px 0;border-top:1px solid var(--border-subtle);display:flex;gap:8px}
 .planner-actions .btn{flex:1}
 .pagehead{padding:calc(14px + env(safe-area-inset-top)) 16px 4px}
-.pagehead h1{font-size:24px;margin:0;letter-spacing:1px}
+.pagehead h1,.pagehead h2{font-size:24px;margin:0;letter-spacing:1px}
 .pagehead p{color:var(--ink-2);font-size:12px;margin:4px 0 0}
 
 /* dark mode form fixes */
@@ -615,9 +620,14 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 .td-photo.has{display:block}
 .td-fact{font-size:13px;color:var(--ink-2);margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .td-actions{margin-top:auto}
+
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip-link{position:fixed;top:-60px;left:12px;z-index:4000;background:var(--brand);color:var(--on-brand);padding:10px 16px;border-radius:0 0 10px 10px;font-weight:600;text-decoration:none;transition:top .2s ease}
+.skip-link:focus{top:0}
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main" data-i18n="a11y.skip">Skip to main content</a>
 
 <!-- functional splash: visible during real init only, removed by app.js -->
 <div id="splash" aria-hidden="true">
@@ -636,6 +646,9 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
   </div>
 </div>
 
+<main id="main" tabindex="-1">
+<h1 class="sr-only">StampQuest: the Karnataka Philately Passport tracker</h1>
+
 <!-- EXPLORE -->
 <section class="view active" id="view-explore">
   <div id="sotdCard" class="card" style="position:absolute;top:150px;left:12px;right:12px;z-index:500;display:none;padding:12px 14px;box-shadow:var(--shadow-float)">
@@ -647,7 +660,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
         <div class="note" id="sotdFact" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
       </div>
       <button class="btn ghost" id="sotdView" style="flex:none;padding:8px 12px;font-size:13px" data-i18n="sotd.view">View</button>
-      <button id="sotdClose" style="background:none;border:none;font-size:18px;color:var(--ink-2);cursor:pointer;padding:4px">×</button>
+      <button id="sotdClose" type="button" data-i18n-aria="info.close_aria" aria-label="Close" style="background:none;border:none;font-size:18px;color:var(--ink-2);cursor:pointer;padding:4px;min-width:34px;min-height:34px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%">×</button>
     </div>
   </div>
   <div id="map"></div>
@@ -665,7 +678,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
         <div style="display:flex;align-items:center;gap:8px"><div id="streakBadge" style="display:none;align-items:center;gap:4px;padding:6px 10px;border-radius:20px;background:var(--surface);border:1px solid var(--card-border);font-size:12px;font-weight:700" title="Month streak">
   <span style="font-size:14px">🔥</span><span id="streakNum">0</span>
 </div>
-<button class="progchip" id="progChip" data-i18n-aria="passport.progress_aria" aria-label="Open passport progress" style="position:relative;width:46px;height:46px;padding:0;border-radius:50%">
+<button class="progchip" id="progChip" aria-label="Passport progress: 0 of 100 stamps collected" style="position:relative;width:46px;height:46px;padding:0;border-radius:50%">
   <svg width="46" height="46" viewBox="0 0 46 46" style="display:block">
     <circle cx="23" cy="23" r="18" fill="none" stroke="currentColor" stroke-opacity="0.16" stroke-width="3.5"/>
     <circle id="progRingFg" cx="23" cy="23" r="18" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="113.1" stroke-dashoffset="113.1" transform="rotate(-90 23 23)" style="transition:stroke-dashoffset .7s cubic-bezier(.32,.72,.35,1)"/>
@@ -699,7 +712,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 
 <!-- CIRCUITS -->
 <section class="view" id="view-circuits">
-  <div class="pagehead"><h1 data-i18n="circuits.title">Circuits</h1><p data-i18n="circuits.subtitle">Suggested region-wise routes. Neutral for everyone — start wherever you are.</p></div>
+  <div class="pagehead"><h2 data-i18n="circuits.title">Circuits</h2><p data-i18n="circuits.subtitle">Suggested region-wise routes. Neutral for everyone, start wherever you are.</p></div>
   <div class="scroll">
 
   <div id="circuitList"></div>
@@ -709,8 +722,8 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 <!-- PASSPORT -->
 <section class="view" id="view-passport">
   <div class="pagehead">
-    <h1 class="serif" data-i18n="passport.title">My Passport</h1>
-    <p data-i18n="passport.subtitle">Add a stamp photo to mark an office visited. Your stamps and dates stay on this device — nothing reaches the Rivals leaderboard unless you join and upload.</p>
+    <h2 class="serif" data-i18n="passport.title">My Passport</h2>
+    <p data-i18n="passport.subtitle">Add a stamp photo to mark an office visited. Your stamps and dates stay on this device. Nothing reaches the Rivals leaderboard unless you join and upload.</p>
   </div>
   <div class="scroll">
     <div class="card" style="padding:14px 16px;margin-bottom:16px">
@@ -738,7 +751,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       <button class="chip" data-f="unvisited" data-i18n="passport.filter_unvisited" aria-pressed="false">Unvisited</button>
     </div>
     <div class="tilegrid" id="tileGrid"></div>
-    <div class="note" id="gridEmpty" style="display:none;text-align:center;padding:18px 8px" data-i18n="passport.empty_filter">Nothing here yet — tap a pin on the map to start collecting.</div>
+    <div class="note" id="gridEmpty" style="display:none;text-align:center;padding:18px 8px" data-i18n="passport.empty_filter">Nothing here yet. Tap a pin on the map to start collecting.</div>
 
     <div class="card rise" id="journeyCard" style="display:none;margin-top:16px">
       <div class="serif" style="font-size:16px;margin-bottom:12px" data-i18n="journey.title">Your journey</div>
@@ -787,7 +800,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 <!-- SAVED -->
 <!-- RIVALS -->
 <section class="view" id="view-rivals">
-  <div class="pagehead"><h1 data-i18n="rivals.title">Rivals</h1><p data-i18n="rivals.subtitle">Compete with fellow collectors. Tap anyone to see their stamps.</p></div>
+  <div class="pagehead"><h2 data-i18n="rivals.title">Rivals</h2><p data-i18n="rivals.subtitle">Compete with fellow collectors. Tap anyone to see their stamps.</p></div>
   <div class="scroll" id="rivalsScroll">
     <div class="card" id="rivalProfile" style="display:none">
       <div style="display:flex;align-items:center;gap:12px">
@@ -831,7 +844,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
     <div id="rivalBoard"><div class="note">Loading…</div></div>
     <h3 class="sec" id="rivalFriendsHead" data-i18n="rivals.my_friends" style="display:none">My friends</h3>
     <div id="rivalFriends" style="display:none"><div class="note">No friends added yet.</div></div>
-    <div class="card note" id="rivalOffline" style="display:none" data-i18n="rivals.offline">You're offline — the leaderboard needs an internet connection. Your progress is safe on this device.</div>
+    <div class="card note" id="rivalOffline" style="display:none" data-i18n="rivals.offline">You're offline. The leaderboard needs an internet connection. Your progress is safe on this device.</div>
   </div>
 </section>
 
@@ -839,7 +852,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 <div id="menuSheet" class="view" style="display:none;z-index:60" role="dialog" aria-label="Menu">
   <div class="pagehead" style="display:flex;align-items:center;gap:12px;padding-top:calc(12px + env(safe-area-inset-top))">
     <button id="menuBack" aria-label="Back" style="width:36px;height:36px;border-radius:50%;border:none;background:transparent;font-size:24px;cursor:pointer;flex:none;color:var(--ink)">‹</button>
-    <h1 style="margin:0;font-size:18px;font-weight:700">Menu</h1>
+    <h2 style="margin:0;font-size:18px;font-weight:700">Menu</h2>
   </div>
   <div class="scroll" style="touch-action:pan-y">
     <button class="rowbtn" data-menu="settings.about_app" style="padding:16px"><span style="font-size:20px;margin-right:12px">ℹ️</span><span class="grow"><span class="t" data-i18n="settings.about_app">About this app</span></span><span style="color:var(--ink-2)">›</span></button>
@@ -928,7 +941,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 <!-- SETTINGS -->
 <section class="view" id="view-settings">
   <div class="pagehead" style="display:flex;align-items:flex-start;gap:12px">
-  <div style="flex:1"><h1 data-i18n="settings.title">Settings</h1><p data-i18n="settings.subtitle">App preferences and information.</p></div>
+  <div style="flex:1"><h2 data-i18n="settings.title">Settings</h2><p data-i18n="settings.subtitle">App preferences and information.</p></div>
   <button id="menuBtn" aria-label="Menu" style="width:44px;height:44px;flex:none;border-radius:12px;border:1px solid var(--border-subtle);background:var(--surface);font-size:20px;cursor:pointer;margin-top:2px">☰</button>
 </div>
   <div class="scroll">
@@ -950,11 +963,11 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
     <div class="card faq">
       <details>
         <summary data-i18n="faq.visited.q">How do I mark a place visited?</summary>
-        <div class="a" data-i18n="faq.visited.a">Visit a post office, tap its tile in Passport, add a photo of your stamp — <b>it's marked visited automatically</b>, with the visit date saved. You'll see "Marked visited." with an Undo button if you want to revert. Prefer no photo? Use <b>Mark visited without photo</b> on the office card.</div>
+        <div class="a" data-i18n="faq.visited.a">Visit a post office, tap its tile in Passport, add a photo of your stamp and <b>it's marked visited automatically</b>, with the visit date saved. You'll see "Marked visited." with an Undo button if you want to revert. Prefer no photo? Use <b>Mark visited without photo</b> on the office card.</div>
       </details>
       <details>
         <summary data-i18n="faq.photos.q">Where are my photos stored?</summary>
-        <div class="a" data-i18n="faq.photos.a"><b>On this device by default.</b> Photos are kept in on-device storage. If you switch on "Share stamp photos" in Settings, a ~400px copy of each photo is shown publicly on Rivals. Removing a photo or switching sharing off deletes that public copy. Photos are <b>not included</b> if you export your progress as a JSON backup — the backup carries your visited/planned lists only.</div>
+        <div class="a" data-i18n="faq.photos.a"><b>On this device by default.</b> Photos are kept in on-device storage. If you switch on "Share stamp photos" in Settings, a ~400px copy of each photo is shown publicly on Rivals. Removing a photo or switching sharing off deletes that public copy. Photos are <b>not included</b> if you export your progress as a JSON backup, which carries your visited/planned lists only.</div>
       </details>
       <details>
         <summary data-i18n="faq.tiles.q">What do the passport tile colors mean?</summary>
@@ -966,18 +979,18 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       </details>
       <details>
         <summary data-i18n="faq.directions.q">How do I get directions?</summary>
-        <div class="a" data-i18n="faq.directions.a">Tap any pin or tile, then <b>Directions</b> — it opens Google Maps searching the post office by name and PIN. <b>Directions to map pin</b> navigates to the exact pinned point instead. "Getting there" names the nearest major transit town as a hint only; there is no live transport data and no fares.</div>
+        <div class="a" data-i18n="faq.directions.a">Tap any pin or tile, then <b>Directions</b>. It opens Google Maps searching the post office by name and PIN. <b>Directions to map pin</b> navigates to the exact pinned point instead. "Getting there" names the nearest major transit town as a hint only; there is no live transport data and no fares.</div>
       </details>
       <details>
         <summary data-i18n="faq.backup.q">Is my progress backed up anywhere?</summary>
         <div class="a" data-i18n="faq.backup.a">Only if you back it up: use <b>Export progress</b> under Share &amp; backup to save a JSON file, and <b>Import</b> to restore it. Photos are not part of the backup. Clearing browser data erases everything unless you exported.</div></details>
       <details>
         <summary data-i18n="faq.circuits.q">What are Circuits?</summary>
-        <div class="a" data-i18n="faq.circuits.a">Suggested region-wise routes (North, Coastal, South, etc.) to plan multi-stop stamp runs. They're neutral suggestions — start wherever you are.</div>
+        <div class="a" data-i18n="faq.circuits.a">Suggested region-wise routes (North, Coastal, South, etc.) to plan multi-stop stamp runs. They're neutral suggestions, so start wherever you are.</div>
       </details>
       <details>
         <summary data-i18n="faq.karnataka.q">Why is only Karnataka on the map?</summary>
-        <div class="a" data-i18n="faq.karnataka.a">That's the whole quest — the passport covers Karnataka's 100 post offices only. Beyond the border you can see 25 km of surroundings; everything further out is hidden by design.</div>
+        <div class="a" data-i18n="faq.karnataka.a">That's the whole quest. The passport covers Karnataka's 100 post offices only. Beyond the border you can see 25 km of surroundings; everything further out is hidden by design.</div>
       </details>
     </div>
     <h3 class="sec" data-i18n="settings.tutorial">Tutorial</h3>
@@ -987,13 +1000,13 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
     </div>
     <h3 class="sec" data-i18n="settings.about_data">About this data</h3>
     <div class="card note" data-i18n="settings.about_data_body">
-      Locations are the 100 post offices from the Karnataka Philately Passport booklet (₹600, issued October 2026 by the Department of Posts, Karnataka Circle). Coordinates were geocoded per post office — 34 hand-verified to the actual office, 3 near-verified, the rest town-level approximations labelled "Approximate location" on their cards; the Directions button searches the post office on Google Maps, and "Directions to map pin" navigates to the exact pinned point.<br><br>
-      Pictorial-cancellation motifs and introduction dates shown come from India Post's published permanent pictorial cancellation lists. No complete public registry of the passport's 100 motifs exists — the booklet itself is the definitive source. Where no published entry matched, the motif section is omitted — check your booklet on the ground.<br><br>
-      "Getting there" names the nearest major transit town as an indicative hint only — use Directions for live routing. Nothing here is live transport data and there are no fares.
+      Locations are the 100 post offices from the Karnataka Philately Passport booklet (₹600, issued October 2026 by the Department of Posts, Karnataka Circle). Coordinates were geocoded per post office: 34 hand-verified to the actual office, 3 near-verified, the rest town-level approximations labelled "Approximate location" on their cards; the Directions button searches the post office on Google Maps, and "Directions to map pin" navigates to the exact pinned point.<br><br>
+      Pictorial-cancellation motifs and introduction dates shown come from India Post's published permanent pictorial cancellation lists. No complete public registry of the passport's 100 motifs exists, and the booklet itself is the definitive source. Where no published entry matched, the motif section is omitted, so check your booklet on the ground.<br><br>
+      "Getting there" names the nearest major transit town as an indicative hint only, so use Directions for live routing. Nothing here is live transport data and there are no fares.
     </div>
     <h3 class="sec" data-i18n="settings.privacy">Privacy</h3>
     <div class="card note" data-i18n="settings.privacy_body">
-      Everything — your visited and planned lists, theme choice, and location (used only when you tap "Near me") — stays in this browser's local storage on your device. No analytics. Rivals uses an anonymous account (no sign-up) storing your display name, friend code and visited-office list, publicly readable by other collectors. Photos upload only if "Share stamp photos" is switched on. A linked email is used only for sign-in. Clearing browser data erases your local passport unless you exported a backup.
+      Everything, your visited and planned lists, theme choice, and location (used only when you tap "Near me"), stays in this browser's local storage on your device. No analytics. Rivals uses an anonymous account (no sign-up) storing your display name, friend code and visited-office list, publicly readable by other collectors. Photos upload only if "Share stamp photos" is switched on. A linked email is used only for sign-in. Clearing browser data erases your local passport unless you exported a backup.
     </div>
     <h3 class="sec" data-i18n="settings.tiles">Map tiles</h3>
     <div class="card note">
@@ -1003,7 +1016,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
     </div>
     <h3 class="sec" data-i18n="settings.about_app">About this app</h3>
     <div class="card note">
-      <span data-i18n="settings.about_app_body">StampQuest was built solo by a fellow passport holder, with a little AI help along the way — so you may run into a glitch or a wrong detail. Spotted something? I'd genuinely like to hear about it. Loving it? Share it with your fellow collectors.</span>
+      <span data-i18n="settings.about_app_body">StampQuest was built solo by a fellow passport holder, with a little AI help along the way, so you may run into a glitch or a wrong detail. Spotted something? I'd genuinely like to hear about it. Loving it? Share it with your fellow collectors.</span>
       <br><br>
       <a class="btn" style="width:100%;text-decoration:none;text-align:center;display:block" data-i18n="settings.feedback" href="mailto:pannova89@gmail.com?subject=StampQuest%20feedback">Send feedback</a>
     </div>
@@ -1021,6 +1034,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
     <div class="note" style="text-align:center;margin-top:18px" data-i18n="settings.version">StampQuest · v2.0<br>Karnataka Philately Passport</div>
   </div>
 </section>
+</main>
 
 <nav id="nav" data-i18n-aria="nav.aria" aria-label="Main navigation">
   <button data-tab="explore" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-5.6-7-11a7 7 0 1 1 14 0c0 5.4-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>Explore</button>
@@ -1036,9 +1050,9 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
   <div class="handle" id="sheetHandle" role="button" tabindex="0" data-i18n-aria="handle.aria" aria-label="Drag to resize details panel"></div>
   <div class="sheet-head">
     <div class="info">
-      <div class="no" id="shNo">No. —</div>
-      <h2 id="shName">—</h2>
-      <div class="meta" id="shMeta">—</div>
+      <div class="no" id="shNo">No. …</div>
+      <h2 id="shName">…</h2>
+      <div class="meta" id="shMeta">…</div>
       <span class="badge unvisited" id="shBadge">UNVISITED</span>
     </div>
   </div>
@@ -1061,15 +1075,15 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
       <div class="tslide">
         <div class="serif" style="font-size:20px;margin-bottom:8px" data-i18n="tutorial.s1_title">Welcome to StampQuest</div>
         <div id="heroType" aria-hidden="true" style="font-size:13px;color:var(--brand);min-height:20px;margin-bottom:10px;font-style:italic"></div>
-        <div class="note" style="font-size:13px;color:var(--ink)" data-i18n="tutorial.s1_body">All 100 Karnataka Philately Passport post offices, on one map. Tap a pin for details and directions, mark each stamp as you collect it, and watch your passport fill up.<br><br>The slim rail on the right holds <b>Layers</b> (map style), <b>Near me</b> (closest offices) and <b>Reset</b> (back to Karnataka view), plus zoom.<br><br>Your stamps and photos stay on this device — only your stamp count appears on the Rivals leaderboard.<br><br>Built solo by a fellow collector, with a little AI help — so if you spot a glitch or a wrong detail, I'd genuinely like to hear about it (see <b>Settings → About this app</b>).</div>
+        <div class="note" style="font-size:13px;color:var(--ink)" data-i18n="tutorial.s1_body">All 100 Karnataka Philately Passport post offices, on one map. Tap a pin for details and directions, mark each stamp as you collect it, and watch your passport fill up.<br><br>The slim rail on the right holds <b>Layers</b> (map style), <b>Near me</b> (closest offices) and <b>Reset</b> (back to Karnataka view), plus zoom.<br><br>Your stamps and photos stay on this device. Only your stamp count appears on the Rivals leaderboard.<br><br>Built solo by a fellow collector, with a little AI help, so if you spot a glitch or a wrong detail, I'd genuinely like to hear about it (see <b>Settings → About this app</b>).</div>
       </div>
       <div class="tslide">
         <div class="serif" style="font-size:20px;margin-bottom:8px" data-i18n="tutorial.s2_title">Collect with a photo</div>
-        <div class="note" style="font-size:13px;color:var(--ink)" data-i18n="tutorial.s2_body">Add a stamp photo to mark an office visited. Tap its tile in Passport, choose a photo — it's marked visited automatically with today's date.<br><br>Photos stay on this device unless you switch on Share stamp photos in Settings.</div>
+        <div class="note" style="font-size:13px;color:var(--ink)" data-i18n="tutorial.s2_body">Add a stamp photo to mark an office visited. Tap its tile in Passport, choose a photo and it's marked visited automatically with today's date.<br><br>Photos stay on this device unless you switch on Share stamp photos in Settings.</div>
       </div>
       <div class="tslide">
         <div class="serif" style="font-size:20px;margin-bottom:8px" data-i18n="tutorial.s3_title">Explore Karnataka</div>
-        <div class="note" style="font-size:13px;color:var(--ink)" data-i18n="tutorial.s3_body">Use Circuits for region-wise routes, the Planned filter in Passport for your planned stops, and share your progress as a postcard when the passport fills up.<br><br>Only Karnataka is on the map — that's the whole quest.</div>
+        <div class="note" style="font-size:13px;color:var(--ink)" data-i18n="tutorial.s3_body">Use Circuits for region-wise routes, the Planned filter in Passport for your planned stops, and share your progress as a postcard when the passport fills up.<br><br>Only Karnataka is on the map, and that's the whole quest.</div>
       </div>
     </div>
     <div class="tdots" id="tDots"><span class="on"></span><span></span><span></span></div>
@@ -1090,14 +1104,6 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 <script src="vendor/lenis.min.js"></script>
 <script src="i18n-strings.js"></script>
 <script src="app.js"></script>
-<script>
-/* Bulletproof splash fallback: independent of app.js — removes splash after 4s no matter what */
-setTimeout(function(){
-  try {
-    var s = document.getElementById("splash");
-    if (s){ s.style.transition = "opacity .4s"; s.style.opacity = "0"; setTimeout(function(){ s.remove(); }, 450); }
-  } catch(e){}
-}, 4000);
-</script>
+<script src="splash-fallback.js"></script>
 </body>
 </html>
