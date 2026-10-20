@@ -255,8 +255,8 @@ body.sheet-open .mapctl{display:none}
 .mk.visited .mk-check{font-size:15px;font-weight:700}
 .mk.sel{width:40px;height:40px;border:3px solid var(--brand);font-size:15px;
   box-shadow:0 0 0 2px var(--paper),0 0 0 5px var(--brand),0 2px 8px rgba(0,0,0,.4)}
-.mk-cluster{background:var(--ink);color:var(--paper);border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-family:var(--font-mono);font-weight:500;border:2px solid var(--paper);box-shadow:0 1px 6px rgba(0,0,0,.35)}
+.mk-cluster{background:var(--paper);color:var(--brand);border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-weight:700;border:2px solid var(--brand);box-shadow:inset 0 0 0 2px var(--paper),inset 0 0 0 4px var(--brand),0 1px 6px rgba(0,0,0,.3);transform:rotate(-6deg)}
 
 /* ---------- bottom sheet ---------- */
 #sheet{position:fixed;z-index:700;left:0;right:0;bottom:calc(70px + env(safe-area-inset-bottom));background:var(--surface);border-top:1px solid var(--border-subtle);
@@ -410,7 +410,7 @@ select option { background: var(--surface); color: var(--ink); }
   mask-composite:exclude}
 .tile .tno{font-family:var(--font-mono);font-weight:500;font-size:20px;line-height:1.2;color:var(--ink-2);text-align:center;flex:none}
 .tile .nm{font-size:12px;line-height:1.3;color:var(--ink-2);text-align:center;margin:auto 4px 6px;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:100%;min-height:2.6em;overflow-wrap:anywhere}
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:100%;min-height:2.6em;overflow-wrap:break-word}
 .tile .pcam{position:relative;display:flex;align-items:center;justify-content:center;width:32px;height:32px;flex:none;
   color:var(--ink-2);border-radius:8px;margin-bottom:auto}
 .tile .pcam::after{content:"";position:absolute;top:-6px;left:-6px;right:-6px;bottom:-6px;}
@@ -634,6 +634,10 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
   .topbar{transition:transform .38s cubic-bezier(.32,.72,.35,1)}
   #chromeShow{transition:transform .38s cubic-bezier(.32,.72,.35,1),opacity .3s ease,visibility 0s}
 }
+
+.cstat{flex:none;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;margin-right:10px}
+.cstat.visited{background:var(--collected);color:var(--paper)}
+.cstat.planned{background:transparent;color:var(--gold);border:1.5px solid var(--gold);font-size:11px}
 </style>
 </head>
 <body>
@@ -934,7 +938,7 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 <section class="view" id="view-settings">
   <div class="pagehead" style="display:flex;align-items:flex-start;gap:12px">
   <div style="flex:1"><h2 data-i18n="settings.title">Settings</h2><p data-i18n="settings.subtitle">App preferences and information.</p></div>
-  <button id="menuBtn" aria-label="Menu" style="width:44px;height:44px;flex:none;border-radius:12px;border:1px solid var(--border-subtle);background:var(--surface);font-size:20px;cursor:pointer;margin-top:2px">☰</button>
+  <button id="menuBtn" aria-label="Menu" style="height:44px;flex:none;border-radius:12px;border:1px solid var(--border-subtle);background:var(--surface);font-size:15px;font-weight:600;cursor:pointer;margin-top:2px;padding:0 14px;display:inline-flex;align-items:center;gap:7px"><span style="font-size:17px" aria-hidden="true">☰</span>Menu</button>
 </div>
   <div class="scroll">
     <div class="card">
@@ -1059,8 +1063,8 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
     <div class="ttrack" id="tTrack">
       <div class="tslide">
         <div class="serif" style="font-size:20px;margin-bottom:8px" data-i18n="tutorial.s1_title">Welcome to StampQuest</div>
-        <div id="heroType" aria-hidden="true" style="font-size:13px;color:var(--brand);min-height:20px;margin-bottom:10px;font-style:italic"></div>
-        <div class="note" style="font-size:13px;color:var(--ink)" data-i18n="tutorial.s1_body">All 100 Karnataka Philately Passport post offices, on one map. Tap a pin for details and directions, mark each stamp as you collect it, and watch your passport fill up.<br><br>The slim rail on the right holds <b>Layers</b> (map style), <b>Near me</b> (closest offices) and <b>Reset</b> (back to Karnataka view), plus zoom.<br><br>Your stamps and photos stay on this device. Only your stamp count appears on the Rivals leaderboard.<br><br>Built solo by a fellow collector, with a little AI help, so if you spot a glitch or a wrong detail, I'd genuinely like to hear about it (see <b>Settings → About this app</b>).</div>
+        <div id="heroType" aria-hidden="true" style="font-size:13px;color:var(--brand);min-height:20px;margin-bottom:10px;font-style:italic">100 post offices. One passport.</div>
+        <div class="note" style="font-size:13px;color:var(--ink)" data-i18n="tutorial.s1_body">All 100 Karnataka Philately Passport post offices, on one map. Tap a pin for details and directions, mark each stamp as you collect it, and watch your passport fill up.<br><br>Your stamps and photos stay on this device. Nothing appears on the Rivals leaderboard unless you join Rivals and upload your progress.</div>
       </div>
       <div class="tslide">
         <div class="serif" style="font-size:20px;margin-bottom:8px" data-i18n="tutorial.s2_title">Collect with a photo</div>
