@@ -577,10 +577,6 @@ $("msShare") && $("msShare").addEventListener("click", () => {
   $("msModal").style.display = "none";
   if (typeof openShareCard === "function") openShareCard();
 });
-$("msTip") && $("msTip").addEventListener("click", () => {
-  $("msModal").style.display = "none";
-  if (typeof openTip === "function") openTip();
-});
 function checkMilestones(){
   const c = visitedCount();
   [25,50,75,100].forEach(m => {
@@ -1105,7 +1101,6 @@ function switchTab(name){
   document.querySelectorAll(".toast").forEach(t => t.remove());
   if (typeof closeInfoModal === "function") closeInfoModal();
   if (typeof closeMenu === "function") closeMenu();
-  if (typeof closeTip === "function") closeTip();
   if (typeof closeMsModal === "function") closeMsModal();
   if (typeof closeWrapped === "function") closeWrapped();
   if (typeof closeRivalSheet === "function"){ const rs = document.getElementById("rivalSheet"); if (rs && rs.style.display === "block") closeRivalSheet(); }
@@ -1328,20 +1323,19 @@ $("wrappedReplay") && $("wrappedReplay").addEventListener("click", showWrapped);
 /* ================= device back button + modal back nav ================= */
 let backExitArmed = false;
 function anyModalOpen(){
-  return ["menuSheet","tipModal","msModal","wrappedModal","infoModal","rivalSheet"].some(id => {
+  return ["menuSheet","msModal","wrappedModal","infoModal","rivalSheet"].some(id => {
     const el = document.getElementById(id);
     return el && el.style.display !== "none" && el.style.display !== "";
   });
 }
 function closeTopModal(){
-  const order = ["wrappedModal","msModal","tipModal","infoModal","menuSheet","rivalSheet"];
+  const order = ["wrappedModal","msModal","infoModal","menuSheet","rivalSheet"];
   for (const id of order){
     const el = document.getElementById(id);
     if (el && (el.style.display === "block" || el.style.display === "flex")){
       // Use proper close function for full-page views
       if (id === "menuSheet") closeMenu();
       else if (id === "infoModal") closeInfoModal();
-      else if (id === "tipModal") closeTip();
       else { el.style.display = "none"; }
       return true;
     }
@@ -1368,49 +1362,6 @@ window.addEventListener("popstate", () => {
   try { history.pushState({ app: true }, ""); } catch(e){}
   setTimeout(() => { backExitArmed = false; }, 2000);
 });
-/* ================= tip jar (UPI) ================= */
-const TIP_UPI_ID = "bengrepranaam@okhdfcbank";
-const TIP_NAME = "StampQuest";
-let tipAmt = 50;
-function openTip(){
-  const m = document.getElementById("tipModal");
-  if (m){ m.style.display = "flex"; m.classList.add("active"); }
-  document.querySelectorAll(".tip-amt").forEach(b => {
-    b.classList.toggle("accent", b.dataset.amt == tipAmt);
-    b.classList.toggle("ghost", b.dataset.amt != tipAmt);
-  });
-}
-function closeTip(){
-  const m = document.getElementById("tipModal");
-  if (m){ m.style.display = "none"; m.classList.remove("active"); }
-}
-document.querySelectorAll(".tip-amt").forEach(b => {
-  b.addEventListener("click", () => {
-    tipAmt = parseInt(b.dataset.amt, 10) || 50;
-    document.getElementById("tipCustom").value = "";
-    document.querySelectorAll(".tip-amt").forEach(x => {
-      x.classList.toggle("accent", x === b);
-      x.classList.toggle("ghost", x !== b);
-    });
-    buzz(8);
-  });
-});
-const tipPayBtn = document.getElementById("tipPay");
-if (tipPayBtn) tipPayBtn.addEventListener("click", () => {
-  const custom = parseInt((document.getElementById("tipCustom") || {}).value, 10);
-  const amt = (custom > 0) ? custom : tipAmt;
-  const url = "upi://pay?pa=" + encodeURIComponent(TIP_UPI_ID) +
-    "&pn=" + encodeURIComponent(TIP_NAME) +
-    "&cu=INR&am=" + amt +
-    "&tn=" + encodeURIComponent("StampQuest support");
-  window.location.href = url;
-  setTimeout(() => toast(t("tip.thanks")), 800);
-});
-const tipCloseBtn = document.getElementById("tipClose");
-if (tipCloseBtn) tipCloseBtn.addEventListener("click", closeTip);
-const tipModalEl = document.getElementById("tipModal");
-if (tipModalEl) tipModalEl.addEventListener("click", e => { if (e.target.id === "tipModal") closeTip(); });
-
 /* ================= haptic tap feedback ================= */
 function buzz(ms){ try{ if (navigator.vibrate) navigator.vibrate(ms || 8); }catch(e){} }
 document.addEventListener("click", e => {
@@ -1926,7 +1877,6 @@ function applyLang(){
   if (typeof renderPhotoMeter === "function") renderPhotoMeter();
 }
 function dispName(l){ return (state.lang === "kn" && l.kn_name) ? l.kn_name : l.name; }
-$("btnSupportFromSettings") && $("btnSupportFromSettings").addEventListener("click", () => { if (typeof openTip === "function") openTip(); });
     $("btnReset").onclick = async () => {
   const vCount = Object.keys(state.visited).length;
   const photoCount = await photoCountAll().catch(()=>0);
@@ -2516,16 +2466,14 @@ function closeInfoModal(){
 if ($("menuBtn")) $("menuBtn").onclick = openMenu;
 $("menuBack") && $("menuBack").addEventListener("click", closeMenu);
 $("infoBack") && $("infoBack").addEventListener("click", () => { closeInfoModal(); if (typeof infoFromMenu !== "undefined" && infoFromMenu) openMenu(); });
-$("tipBack") && $("tipBack").addEventListener("click", () => { closeTip(); openMenu(); });
 document.querySelectorAll("#menuSheet [data-menu]").forEach(b => {
   b.addEventListener("click", () => {
-    if (b.dataset.menu === "tip"){ closeMenu(); openTip(); }
-    else openInfoSection(b.dataset.menu, true);
+    openInfoSection(b.dataset.menu, true);
   });
 });
 if ($("infoClose")) $("infoClose").onclick = closeInfoModal;
 if ($("infoModal")) $("infoModal").addEventListener("click", e => { if (e.target.id === "infoModal") closeInfoModal(); });
-document.addEventListener("keydown", e => { if (e.key === "Escape"){ closeInfoModal(); closeMenu(); closeTip(); closeMsModal(); closeWrapped(); } });
+document.addEventListener("keydown", e => { if (e.key === "Escape"){ closeInfoModal(); closeMenu(); closeMsModal(); closeWrapped(); } });
 $("rivalSheet").addEventListener("click", e => { if (e.target.id === "rivalSheet") closeRivalSheet(); });
 
 /* ================= deep link / first run / init ================= */
