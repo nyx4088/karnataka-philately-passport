@@ -624,6 +624,16 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .skip-link{position:fixed;top:-60px;left:12px;z-index:4000;background:var(--brand);color:var(--on-brand);padding:10px 16px;border-radius:0 0 10px 10px;font-weight:600;text-decoration:none;transition:top .2s ease}
 .skip-link:focus{top:0}
+
+#sotdCard{margin-top:8px;background:color-mix(in srgb, var(--surface) 94%, transparent);border:1px solid var(--card-border);border-radius:12px;padding:7px 8px 7px 10px}
+#chromeShow{position:absolute;top:calc(8px + env(safe-area-inset-top));left:50%;transform:translate(-50%,-72px);z-index:600;width:40px;height:26px;border-radius:14px;border:1px solid var(--card-border);background:var(--surface);color:var(--ink-2);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow);opacity:0;visibility:hidden}
+#view-explore.chrome-hidden .topbar{transform:translateY(calc(-100% - 6px));pointer-events:none}
+#view-explore.chrome-hidden .topbar>*{pointer-events:none}
+#view-explore.chrome-hidden #chromeShow{transform:translate(-50%,0);opacity:1;visibility:visible}
+@media (prefers-reduced-motion: no-preference){
+  .topbar{transition:transform .38s cubic-bezier(.32,.72,.35,1)}
+  #chromeShow{transition:transform .38s cubic-bezier(.32,.72,.35,1),opacity .3s ease,visibility 0s}
+}
 </style>
 </head>
 <body>
@@ -651,18 +661,6 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
 
 <!-- EXPLORE -->
 <section class="view active" id="view-explore">
-  <div id="sotdCard" class="card" style="position:absolute;top:150px;left:12px;right:12px;z-index:500;display:none;padding:12px 14px;box-shadow:var(--shadow-float)">
-    <div style="display:flex;align-items:center;gap:12px">
-      <div style="width:44px;height:44px;border-radius:50%;flex:none;background:linear-gradient(135deg,var(--brand),var(--gold));display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px">✦</div>
-      <div style="flex:1;min-width:0">
-        <div class="k" style="color:var(--brand)" data-i18n="sotd.title">Stamp of the day</div>
-        <div class="serif" id="sotdName" style="font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
-        <div class="note" id="sotdFact" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
-      </div>
-      <button class="btn ghost" id="sotdView" style="flex:none;padding:8px 12px;font-size:13px" data-i18n="sotd.view">View</button>
-      <button id="sotdClose" type="button" data-i18n-aria="info.close_aria" aria-label="Close" style="background:none;border:none;font-size:18px;color:var(--ink-2);cursor:pointer;padding:4px;min-width:34px;min-height:34px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%">×</button>
-    </div>
-  </div>
   <div id="map"></div>
   <div class="topbar">
     <div class="hcard">
@@ -692,8 +690,21 @@ html[data-theme="dark"] #map .leaflet-control-attribution a{color:#E8DFCF}
         <button class="sclear" id="searchClear" data-i18n-aria="search.clear" aria-label="Clear search">✕</button>
       </div>
       <div id="searchResults" role="listbox"></div>
+      <div id="sotdCard" style="display:none">
+        <div style="display:flex;align-items:center;gap:9px">
+          <div style="width:30px;height:30px;border-radius:50%;flex:none;background:linear-gradient(135deg,var(--brand),var(--gold));display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px">✦</div>
+          <div style="flex:1;min-width:0">
+            <div class="k" style="color:var(--brand)" data-i18n="sotd.title">Stamp of the day</div>
+            <div class="serif" id="sotdName" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+            <div class="note" id="sotdFact" style="display:none"></div>
+          </div>
+          <button class="btn ghost" id="sotdView" style="flex:none;padding:6px 10px;font-size:12px" data-i18n="sotd.view">View</button>
+          <button id="sotdClose" type="button" data-i18n-aria="info.close_aria" aria-label="Close" style="background:none;border:none;font-size:17px;color:var(--ink-2);cursor:pointer;padding:4px;min-width:32px;min-height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%">×</button>
+        </div>
+      </div>
     </div>
   </div>
+  <button id="chromeShow" data-i18n-aria="map.show_header" aria-label="Show header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
   <div class="mapctl rail" role="toolbar" data-i18n-aria="map.controls" aria-label="Map controls">
     <button id="btnLayers" data-i18n-aria="map.layers" data-i18n-title="map.layers" aria-label="Change map view" title="Change map view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg></button>
     <button id="btnLocate" data-i18n-aria="map.locate" data-i18n-title="map.locate_title" aria-label="Find nearest to me" title="Near me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="2" x2="5" y1="12" y2="12"/><line x1="19" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="5"/><line x1="12" x2="12" y1="19" y2="22"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/></svg></button>
