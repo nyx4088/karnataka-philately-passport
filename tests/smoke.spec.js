@@ -17,7 +17,14 @@ test.beforeEach(async ({ page }, testInfo) => {
   const errors = [];
   page.on('pageerror', (err) => errors.push(`pageerror: ${err.message}`));
   page.on('console', (msg) => {
-    if (msg.type() === 'error') errors.push(`console.error: ${msg.text()}`);
+    if (msg.type() !== 'error') return;
+    // Tile CDNs are third-party and, by design, never cached by the service
+    // worker: their load failures (offline reloads, CDN throttling) are
+    // environmental, not app errors. A dedicated test below asserts tiles
+    // actually load when online.
+    const url = (msg.location() && msg.location().url) || '';
+    if (/(tile\.openstreetmap\.org|basemaps\.cartocdn\.com|arcgisonline\.com|tile\.opentopomap\.org)/.test(url)) return;
+    errors.push(`console.error: ${msg.text()}`);
   });
   testInfo.errors = errors;
   await page.goto('/', { waitUntil: 'domcontentloaded' });
