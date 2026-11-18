@@ -1,4 +1,4 @@
-const CACHE = "stampquest-v69";
+const CACHE = "stampquest-v70";
 const SHELL = [
   "./",
   "index.html",
@@ -28,7 +28,25 @@ const SHELL = [
   "fonts/dmsans-rupee.woff2",
   "fonts/dmmono-latin-500.woff2",
   "fonts/dmmono-latinext-500.woff2",
-  "fonts/notosans-kannada-subset.woff2"
+  "fonts/notosans-kannada-subset.woff2",
+  "assets/stamps/nataraja-1949.jpg",
+  "assets/stamps/gommateshwara-1981.jpg",
+  "assets/stamps/gloriosa-1977.jpg",
+  "assets/stamps/tipu-1974.jpg",
+  "assets/stamps/muddana-2017.jpg",
+  "assets/stamps/golgumbaz-1949.jpg",
+  "assets/stamps/jain-temple-ranakpur-2009.jpg",
+  "assets/stamps/mahavira-1974.jpg",
+  "assets/stamps/brihadeeswarar-2010.jpg",
+  "assets/stamps/ajanta-2014.jpg",
+  "assets/stamps/lighthouse-2012.jpg",
+  "assets/stamps/tiger-2011.jpg",
+  "assets/stamps/elephant-2011.jpg",
+  "assets/stamps/butterfly-1981.jpg",
+  "assets/stamps/woodpigeon.jpg",
+  "assets/stamps/darjeeling-railway-1982.jpg",
+  "assets/stamps/dallake-1967.jpg",
+  "assets/stamps/dandiya-2017.jpg"
 ];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
